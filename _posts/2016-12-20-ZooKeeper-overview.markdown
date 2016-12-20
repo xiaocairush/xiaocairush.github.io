@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "ZooKeeper: 分布式应用的分布式协调服务"
+title:  "ZooKeeper overview"
 date:   2016-12-20 20:00:00 +0800
 categories: ZooKeeper
 ---
