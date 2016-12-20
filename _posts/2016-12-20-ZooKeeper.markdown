@@ -51,15 +51,18 @@ zookeeper支持watch的概念。client可以在znode上设置一个watch。当zn
 
 ## 保证
 zookeeper是非常快速和简单的。尽管它的目标是成为构建更为复杂service的基础，例如同步，它也提供了一系列的保证。它们是：
+
 * 顺序一致性
 * 原子性
 * 单系统镜像 - 无论client连接到哪个server它们看到的视图都是相同的
 * 高可用 - 一旦update被apply了，它将会从那个时间点持久化直到client重写了update
 * 及时性 - 保证client看到的系统的视图在一定时间内被更新
+
 更多方面有待讨论
 
 ## 简单的api
 ZooKeeper的一个设计目标是提供简化的编程接口。它支持以下操作
+
 ```
 create
 	在树种的一个节点创建node
@@ -76,6 +79,7 @@ get children
 sync
 	等待数据复制完成
 ```
+
 对于在这些方面的深度讨论，以及如何实现high level的操作，仍旧有待讨论。
 
 ## 实现
