@@ -33,9 +33,9 @@ Spark 有一系列的样例程序。Scala, Java, Python 和 R的例子在example
 ./bin/spark-shell --master local[2]
 ```
 
-```--master```选项确定了[cluster的master的URL](http://spark.apache.org/docs/latest/submitting-applications.html#master-urls)，local在本地运行一个线程，local[N]在本地运行N个线程。你可以使用local来启动测一下这点。使用--help选项可以获得所有的选项。
+--master选项确定了[cluster的master的URL](http://spark.apache.org/docs/latest/submitting-applications.html#master-urls)，local在本地运行一个线程，local[N]在本地运行N个线程。你可以使用local来启动测一下这点。使用--help选项可以获得所有的选项。
 
-Spark也提供了Python API。要在Python接受器中运行Spark，使用```bin/pyspark```
+Spark也提供了Python API。要在Python接受器中运行Spark，使用bin/pyspark
 
 ```
 ./bin/pyspark --master local[2]
