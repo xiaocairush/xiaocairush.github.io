@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Spark Overview(翻译)"
+title:  "Spark Overview"
 date:   2016-12-21 21:00:00 +0800
 categories: Spark
 ---
@@ -111,5 +111,5 @@ Spark也提供了Python API。要在Python接受器中运行Spark，使用```bin
 * [Spark社区](http://spark.apache.org/community.html) 资源, 以及本地会议
 * [StackOverflow tag apache-spark](http://stackoverflow.com/questions/tagged/apache-spark)
 * [邮件列表](http://spark.apache.org/mailing-lists.html): 提问关于Spark的问题
-* [AMP Camps](http://ampcamp.berkeley.edu/): 一些列在美国伯克利的训练营，主要讨论关于Spark, Spark Streaming, Mesos等等的特性和训练.[视频](http://ampcamp.berkeley.edu/6/), [幻灯片](http://ampcamp.berkeley.edu/6/) 以及[联系](http://ampcamp.berkeley.edu/6/exercises/)在线上都是免费的。
+* [AMP Camps](http://ampcamp.berkeley.edu/): 一些列在美国伯克利的训练营，主要讨论关于Spark, Spark Streaming, Mesos等等的特性和训练.[视频](http://ampcamp.berkeley.edu/6/), [幻灯片](http://ampcamp.berkeley.edu/6/) 以及[练习](http://ampcamp.berkeley.edu/6/exercises/)在线上都是免费的。
 * [Code Examples](http://spark.apache.org/examples.html): 更多样例在Spark的子文件夹```example```下面都是可用的 ([Scala](https://github.com/apache/spark/tree/master/examples/src/main/scala/org/apache/spark/examples), [Java](https://github.com/apache/spark/tree/master/examples/src/main/java/org/apache/spark/examples), [Python](https://github.com/apache/spark/tree/master/examples/src/main/python), [R](https://github.com/apache/spark/tree/master/examples/src/main/r))
