@@ -101,3 +101,71 @@ ClassPathResource使用构造函数显示的创建，但是当你调用API函数
 这个类是byte array资源的Resource实现。它为给定的byte array资源创建ByteArrayInputStream对象。
 
 这个类适用于从给定的byte array中加载内容，而不需要借助于InputStreamResource。
+
+### 4.4 ResourceLoader
+
+实现了ResourceLoader的对象可以返回Resource实例
+
+```
+public interface ResourceLoader {
+
+    Resource getResource(String location);
+
+}
+```
+
+所有的应用上下文都实现了ResourceLoader接口，因此应用上下文可以用来获取Resource实例。
+
+当你调用特定的应用上下文的getResource()方法时，如果location path没有特定的前缀，你将会获得一个适合于某个应用上下文的Resource类型。例如，假设下面的代码段在执行```ClassPathXmlApplicationContext```这个实例
+
+```
+Resource template = ctx.getResource("some/resource/path/myTemplate.txt");
+```
+
+这段代码将会获取一个ClassPathResource；如果相同的函数在执行FileSystemXmlApplicationContext实例，你将会获得FileSystemResource；执行WebApplicationContext，你将会获得ServletContextResource，以此类推。
+
+另一方面，你可能想强制使用ClassPathResource，不依赖于应用上下文的类型，只需要确保以特定的classpath:作为前缀即可。
+
+```
+Resource template = ctx.getResource("classpath:some/resource/path/myTemplate.txt");
+```
+
+相似的，通过确定标准形式的ava.net.URL可以强制获取UrlResource 
+
+```
+Resource template = ctx.getResource("file:///some/resource/path/myTemplate.txt");
+```
+
+```
+Resource template = ctx.getResource("http://myhost.com/resource/path/myTemplate.txt");
+```
+
+下面的表格总结了将各种String转化为Resource的策略
+
+| 前缀       | 例子                           | 解释                     |
+|------------|--------------------------------|--------------------------|
+| classpath: | classpath:com/myapp/config.xml | 从classpath中加载        |
+| file:      | file:///data/config.xml        | 从文件系统中加载为URL    |
+| http:      | http://myserver/logo.png       | 加载为URL                |
+| (none)     | /data/config.xml               | 依赖于ApplicationContext |
+
+
+### 4.5 ResourceLoaderAware接口
+
+ResourceLoaderAware是一个特定的标记接口，标识对象需要提供一个ResourceLoader引用。
+
+```
+public interface ResourceLoaderAware {
+
+    void setResourceLoader(ResourceLoader resourceLoader);
+}
+
+```
+
+当一个类实现了ResourceLoaderAware接口并且被发布到应用上下文时（作为Spring管理的bean），它被应用上下文识别为ResourceLoaderAware。应用上下文将会调用setResourceLoader(ResourceLoader)，并使用自身作为参数（注意，Spring的所有的应用上下文都实现了ResourceLoader接口）。
+
+
+当然，因为ApplicationContext是一个ResourceLoader，实现了ApplicationContextAware接口的bean也可以直接使用应用上下文来加载资源，但是通常来说，最好使用特定的ResourceLoader接口如果正是它只需要应用上下文来加载Resource。这样做会使代码耦合于ResourceLoader，而不是耦合于Spring的ApplicationContext接口，从这个角度来看可以认为这是个实用的接口。
+
+自从Spring 2.5起，你可以使用ResourceLoader的自动注入作为实现ResourceLoaderAware接口的替代方式。
+
