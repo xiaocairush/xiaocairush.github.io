@@ -69,6 +69,35 @@ UrlResource包装了java.net.URL，并且可以用来访问任何通过URL访问
 UrlResource对象通过UrlResource的构造函数来显式地创建，但是当你调用使用String参数代表path的API函数的时候通常被隐式创建。对于后者，一个叫做PropertyEditor的JavaBeans最终决定创建那种类型的Resource。如果path字符串包含众所周知的前缀，例如classpath：，PropertyEditor将会创建适合于那个前缀的特定的Resource。然而，如果它不认识那个前缀，它将会假设该字符串是一个标准的URL字符串，并会创建UrlResource。
 
 
+#### 4.3.2 ClassPathResource
+
+这个class表示资源应该从classpath中获取。这个类使用thread context class loader，或者给定class loader，或者给定的class来加载资源。
+
+如果类路径在文件系统中存在的话，Resource的这个实现也支持解析java.io.File，但是如果calsspath resource在文件系统中是无法展开的例如在jar包或者在Servlet Engine中这个类就无法解析了。为了解决这个问题，Resource的不同实现总是支持将资源解析为java.net.URL。
 
 
+ClassPathResource使用构造函数显示的创建，但是当你调用API函数时，这个函数使用String参数，ClassPathResource经常被隐式的创建。对于后者PropertyEditor将会识别String path的classpath:前缀，然后创建ClassPathResource对象。
 
+
+#### 4.3.3 FileSystemResource
+
+这个类是处理java.io.File的Resource接口实现。它明显支持解析File和URL。
+
+#### 4.3.4 ServletContextResource
+
+这个类是ServletContext资源的Resource实现，解析相对应web应用程序根路径的相对路径。
+
+它支持访问Stream和URL，但是只有在web应用程序文件被展开并且资源在文件系统物理存在时才允许访问java.io.File。web应用程序文件是否展开还是直接从jar
+文件或者其它地方如DB访问实际上依赖于Sevlet容器。
+
+#### 4.3.5 InputStreamResource
+
+这个类是相对于InputStream的Resource实现。这个类只在没有Resource特定适用的实现的情况下才应该被使用。特别的，推荐使用ByteArrayResource或者任何可能的基于文件的Resource实现。
+
+相对于Resource的其它实现，这个类是对于一个已经打开资源的描述符。因此isOpen()返回true。如果你需要在某些地方持有资源描述符或者多次读取stream，不要使用这个类。
+
+#### 4.3.6 ByteArrayResource
+
+这个类是byte array资源的Resource实现。它为给定的byte array资源创建ByteArrayInputStream对象。
+
+这个类适用于从给定的byte array中加载内容，而不需要借助于InputStreamResource。
