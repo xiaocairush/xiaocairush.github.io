@@ -167,5 +167,37 @@ public interface ResourceLoaderAware {
 
 当然，因为ApplicationContext是一个ResourceLoader，实现了ApplicationContextAware接口的bean也可以直接使用应用上下文来加载资源，但是通常来说，最好使用特定的ResourceLoader接口如果正是它只需要应用上下文来加载Resource。这样做会使代码耦合于ResourceLoader，而不是耦合于Spring的ApplicationContext接口，从这个角度来看可以认为这是个实用的接口。
 
-自从Spring 2.5起，你可以使用ResourceLoader的自动注入作为实现ResourceLoaderAware接口的替代方式。
+自从Spring 2.5起，你可以使用ResourceLoader的自动注入作为实现ResourceLoaderAware接口的替代方式。传统的contructor和byType自动注入的模式现在能够提供Resource类型的依赖作为相应的构造函数参数或者setter函数参数。如果想更灵活些（包括能够自动注入字段和多参数函数），可以考虑使用新的基于注解的自动注入特性。在那种情况下，ResourceLoader将会用来注入字段，构造函数参数，函数参数，只要在字段，构造函数，函数上加上@Autowired注解。
 
+## 4.6 使用资源作为依赖
+
+bean本身要通过某种动态处理来确定和应用资源的path，使用ResourceLoader接口来加载资源可能对bean来说是有意义的。以加载某种（下面代码中的）template为例，这种情况下需要的资源取决于用户的角色。如果资源是静态的，不使用ResourceLoader也可以，只需要bean暴露出来它需要的Resource属性并注入即可。
+
+有个细节的地方是在注入属性上，所有的应用上下文都register和使用了一个叫做PropertyEditor的特殊的JavaBean，这个bean可以把String路径装换成Resource对象。所以如果myBean有一个Resource类型的template属性，就可以通过配置一个简单的string来获取资源，如下：
+
+```
+<bean id="myBean" class="...">
+    <property name="template" value="some/resource/path/myTemplate.txt"/>
+</bean>
+```
+
+需要注意的是资源路径没有前缀，之所以这样是因为应用上下文本身被当做ResourceLoader来使用，资源被加载为ClassPathResource, FileSystemResource 还是 ServletContextResource取决于上下文的类型。
+
+如果想强制使用某种类型的Resource，加前缀就可以。下面的例子显示了怎样强制加载为ClassPathResource和UrlResource （后者用于访问文件系统的文件）
+
+```
+<property name="template" value="classpath:some/resource/path/myTemplate.txt">
+<property name="template" value="file:///some/resource/path/myTemplate.txt"/>
+```
+
+## 4.7 应用上下文和资源路径
+
+### 4.7.1 构造应用上下文
+
+应用上下文构造函数把String或者String数组看成Resource(s)的path(s)，例如xml文件组成了context的定义。
+
+尽管这样的path没有一个前缀，由那个path来构建的类型和用来加载的bean的定义，取决和适用于某种应用上下文。例如，如果你像下面这样创建ClassPathXmlApplicationContext：
+
+```
+ApplicationContext ctx = new ClassPathXmlApplicationContext("conf/appContext.xml");
+```
