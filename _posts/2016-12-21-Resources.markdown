@@ -201,3 +201,80 @@ bean本身要通过某种动态处理来确定和应用资源的path，使用Res
 ```
 ApplicationContext ctx = new ClassPathXmlApplicationContext("conf/appContext.xml");
 ```
+
+bean的定义将从classpath中加载，作为ClassPathResource来使用。但是如果你像下面这样创建FileSystemXmlApplicationContext：
+
+```
+ApplicationContext ctx = new FileSystemXmlApplicationContext("conf/appContext.xml");
+```
+
+bean定义将从文件系统中位置加载，在这种情况下将相对于当前工作路径来寻找文件位置。
+
+注意使用classpath前缀作为标准的URL前缀将会重载Resource的默认类型来加载定义。所以下面这个FileSystemXmlApplicationContext
+
+```
+ApplicationContext ctx = new FileSystemXmlApplicationContext("classpath:conf/appContext.xml");
+```
+
+将会从classpath来加载bean的定义。然而，它仍然是一个FileSystemXmlApplicationContext。如果后面作为ResourceLoader来使用，任何没有前缀的path将会被认为是文件系统的path。
+
+#### 构造ClassPathXmlApplicationContext实例
+
+ClassPathXmlApplicationContext暴露了一些列的构造函数使实例化更方便。基本的想法是只是提供一个String数组，这个数组只是包含了xml文件的文件名（没有前缀信息），同时提供一个class；ClassPathXmlApplicationContext将会根据提供的class衍生出路径信息。
+
+一个例子可以解释清楚。路径布局是下面这样：
+
+```
+| com/
+|-- foo/
+|   |-- services.xml
+|   |-- daos.xml
+|-- MessengerService.class
+```
+
+由services.xml和daos.xm定义的bean来组成ClassPathXmlApplicationContext：
+
+```
+ApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] {"services.xml", "daos.xml"}, MessengerService.class);
+```
+
+想更详细的了解不同的构造器请参考ClassPathXmlApplicationContext的javadocs。
+
+### 4.7.2 应用上下文构造器resource path中的通配符
+
+Resource path在应用上下文构造器中的值可以是一个简单的path（像上面一样）一一对应于目标Resource，或者包含特殊的“classpath*:”前缀或者内部Ant风格的正则表达式（使用Spring的PathMatcher来匹配）。后面两种都是有效的通配符。
+
+这种机制的一种用处是组装组装风格的应用。所有的组件可以将上下文定义片段发布到一个已知的path位置，当使用classpath*:作为path的前缀来创建最终的应用上下文时，所有的组件片段可以被自动选择。
+
+注意这种通配符是应用上下文构造器中Resource path的特殊用法（或者说直接使用了PathMatcher），在构造的时候解析完成。它与Resource类型本身没有关系。不能使用classpath*：前缀来构造一个实际的Resource，因为一个Resource一次只能指向一个资源。
+
+#### Ant风格的Pattern
+
+当位置的path包含了Ant风格的pattern的时候，例如
+
+```
+/WEB-INF/*-context.xml
+|-- com/mycompany/**/applicationContext.xml
+|-- file:C:/some/path/*-context.xml
+|-- classpath:com/mycompany/**/applicationContext.xml
+```
+
+解析器遵循一种更加复杂但是定义的步骤来解析通配符。它为最后没有通配符的path产生一个Resource并且从中获取一个URL。如果这个URL不是jar:类型的URL或者特殊容器的变体（例如WebLogic中的zip：，WebSphere中的wsjar），就可以从中获取一个java.io.File并通过遍历文件系统来解析通配符。如果是一个jar的URL，解析器从中获取一个java.net.JarURLConnection或者人工转换jar URL然后遍历jar文件中的内容来解析通配符。
+
+#### 蕴含的可移植性
+
+如果某一个path已经是一个文件的URL（或者显式的或者是隐式的）因为ResourceLoader是基于文件系统的，可以保证可移植风格的通配符是有效的。
+
+如果某一个path是classpath中的位置，解析器就可以通过调用Classloader.getResource()来获取最后的没有通配符的URL路径。因为它只是path中的一个节点（而不是在最后的文件名）实际上（在ClassLoader javadocs）中没有定义这种情况下返回哪种类型的URL。实际上，总是使用java.io.File来表示目录，不论classpath resource解析到文件系统位置或者某种jar的URL或者jar的位置。同时它考虑了操作的可移植性。
+
+如果jar的URL从最后的没有通配符的片段获取，这个解析器就一定能从中获取java.net.JarURLConnection，或者人工转换jar的URL，一定能遍历jar的内容并解析通配符。这将在大多数的环境下有效，但是也会失败，强烈推荐在你依赖这种方式前在自己的环境中测一下能不能解析来自jar的资源。
+
+#### classpath*:前缀的可移植性
+
+当构造基于xml的应用上下文时，表示位置的string可能使用classpath*:前缀：
+
+```
+ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath*:conf/appContext.xml");
+```
+
+这种特殊的前缀确定所有必须获取的classpath资源（在内部，本质上调用ClassLoader.getResources(…​)），然后合并成最后的应用上下文定义。
