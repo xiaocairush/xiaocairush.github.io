@@ -10,6 +10,7 @@ categories: MultiThread
 ## CountDownLatch
 
 CountDownLatch是一种灵活的闭锁实现，它可以使一个或多个线程等待一组事件的发生。
+
 ```
 1. 创建对象
 CountDownLatch startGate = new CountDownLatch(3); 
@@ -45,6 +46,7 @@ try{
 ## Semaphore
 
 用于控制同时执行操作的数量，实现某种资源池，对容器施加边界。
+
 ```
 Semaphore sem = new Semaphore(1);
 sem.acquire();
@@ -57,6 +59,7 @@ sem.release();
 ### CyclicBarrier
 
 CyclicBarrier可以使一定数量的参与方反复地在栅栏位置汇集，它在并行迭代算法中非常有用：这种算法通常将一个问题拆分成一系列相互独立的子问题。（即栅栏是可重复利用的）
+
 
 ```
 1. 创建CyclicBarrier对象，当3个线程到达栅栏位置时执行run()方法
