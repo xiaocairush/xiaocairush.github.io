@@ -92,7 +92,7 @@ replicated database是一个维护整个数据树的内存数据库。为了可�
 
 作为协商协议的一部分，所有来自client的write请求都被转发到一个单独的叫做leader的server上。zookeeper中剩余的server都叫做follower，他们只能接受leader的调配。消息层负责替代失败的leader和同步follower与leader一致。
 
-zookeeper使用结点的自动消息协议。因为消息层是自动的，zookeeper能够保证本地备份不会产生误差。当leader接收到write请求之后，它计算系统的状态是什么，什么时候应用这个写请求将它转换成事务来捕捉这个新的状态。
+zookeeper使用经典的原子性的消息协议。因为消息层是原子性的，zookeeper能够保证本地备份不会产生误差。当leader接收到write请求之后，它计算系统的状态是什么，什么时候应用这个写请求将它转换成事务来捕捉这个新的状态。
 
 ## 用法
 ZooKeeper的编程接口有意设计得很简单。使用它你可以实现high level的命令操作，例如同步的语义，组关系，权限，等等。Some distributed applications have used it to: [tbd: add uses from white paper and video presentation.] For more information, see [tbd]
