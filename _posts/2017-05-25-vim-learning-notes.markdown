@@ -5,7 +5,7 @@ date:   2017-05-25 22:00:00 +0800
 categories: vim
 ---
 
-# Vim Learning Notes
+[This is a learning notes of  《vimbook-OPL.pdf》](https://docs.google.com/viewer?a=v&pid=sites&srcid=ZGVmYXVsdGRvbWFpbnxrb25nbHR8Z3g6NTUyOGM0NmRlYmQzY2E5Mg)
 
 ## Basic Command:
 
