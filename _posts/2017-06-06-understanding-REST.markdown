@@ -9,9 +9,7 @@ categories: REST
 
 翻译自：https://spring.io/understanding/REST <br/>
 维基百科：https://zh.wikipedia.org/wiki/REST <br/>
-REST (Representational State Transfer)是由[Roy Fielding](https://en.wikipedia.org/wiki/Roy_Fielding)2000年发表的[博士论文](https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm)提出的
-
-。REST并非标准，而是有一系列约束组成，例如无状态，C/S以及风格一致的接口。REST与HTTP没有必然的联系。
+REST (Representational State Transfer)是由[Roy Fielding](https://en.wikipedia.org/wiki/Roy_Fielding)2000年发表的[博士论文](https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm)提出的。REST并非标准，而是有一系列约束组成，例如无状态，C/S以及风格一致的接口。REST与HTTP没有必然的联系。
 
 ## REST的原则
 
