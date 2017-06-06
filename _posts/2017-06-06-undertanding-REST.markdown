@@ -1,15 +1,17 @@
 ﻿---
 layout: post
-title:  "理解REST"
-date:   2017-06-06 23:59:59 +0800
+title:  "Understanding REST"
+date:   2017-06-06 21:00:00 +0800
 categories: REST
 ---
 
 # 理解REST
 
-翻译自：https://spring.io/understanding/REST
-维基百科：https://zh.wikipedia.org/wiki/REST
-REST (Representational State Transfer)是由[Roy Fielding](https://en.wikipedia.org/wiki/Roy_Fielding)2000年发表的[博士论文](https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm)提出的。REST并非标准，而是有一系列约束组成，例如无状态，C/S以及风格一致的接口。REST与HTTP没有必然的联系。
+翻译自：https://spring.io/understanding/REST <br/>
+维基百科：https://zh.wikipedia.org/wiki/REST <br/>
+REST (Representational State Transfer)是由[Roy Fielding](https://en.wikipedia.org/wiki/Roy_Fielding)2000年发表的[博士论文](https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm)提出的
+
+。REST并非标准，而是有一系列约束组成，例如无状态，C/S以及风格一致的接口。REST与HTTP没有必然的联系。
 
 ## REST的原则
 
@@ -24,7 +26,9 @@ REST (Representational State Transfer)是由[Roy Fielding](https://en.wikipedia.
 
 ## GET
 
-获取信息。GET必须是安全和幂等的，就是说无论使用相同的参数GET多少次，结果都是相同的。GET可能会有负面影响，但不应该是用户所期望的，所以对于系统的操作来说并不严格。请求也可以是局部的或有条件的。
+获取信息。GET必须是安全和幂等的，就是说无论使用相同的参数GET多少次，结果都是相同的。GET可能会有负面影响，但不应该是用户所期望的，所以对于系统的操作来说并不严格。请求也可以是局部的或有条件的
+
+。
 获取一个ID是1的地址：
 
 ```
@@ -81,4 +85,6 @@ DELETE /addresses/1
 
 ## Media类型
 
-**Accept** 和 **Content-Type** HTTP headers 可以用来描述HTTP请求中发送或者请求的内容。如果他请求的是JSON形式的response，客户端可能会将 **Accept** 设置成**application/json** . 相反, 在发送数据的时候, 将 **Content-Type**设置成**application/xml**将表示客户端请求正在发送的数据是XML形式。
+**Accept** 和 **Content-Type** HTTP headers 可以用来描述HTTP请求中发送或者请求的内容。如果他请求的是JSON形式的response，客户端可能会将 **Accept** 设置成**application/json** . 相反, 在发送数
+
+据的时候, 将 **Content-Type**设置成**application/xml**将表示客户端请求正在发送的数据是XML形式。
