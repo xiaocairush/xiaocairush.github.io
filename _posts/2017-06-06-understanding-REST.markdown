@@ -1,6 +1,6 @@
 ﻿---
 layout: post
-title:  "Understanding REST"
+title:  "understanding REST"
 date:   2017-06-06 21:00:00 +0800
 categories: REST
 ---
