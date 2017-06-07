@@ -1,4 +1,4 @@
-﻿---
+---
 layout: post
 title:  "understanding REST"
 date:   2017-06-06 21:00:00 +0800
@@ -24,9 +24,7 @@ REST (Representational State Transfer)是由[Roy Fielding](https://en.wikipedia.
 
 ## GET
 
-获取信息。GET必须是安全和幂等的，就是说无论使用相同的参数GET多少次，结果都是相同的。GET可能会有负面影响，但不应该是用户所期望的，所以对于系统的操作来说并不严格。请求也可以是局部的或有条件的
-
-。
+获取信息。GET必须是安全和幂等的，就是说无论使用相同的参数GET多少次，结果都是相同的。GET可能会有负面影响，但不应该是用户所期望的，所以对于系统的操作来说并不严格。请求也可以是局部的或有条件的。
 获取一个ID是1的地址：
 
 ```
@@ -35,7 +33,7 @@ GET /addresses/1
 
 ## POST
 
-请求位于URI的资源使用提供的entity做一些事情。通常用来创建entity，也可以用来更新entity。
+请求位于URI的资源并使用提供的entity做一些事情。通常用来创建entity，也可以用来更新entity。
 创建一个新的地址
 
 ```
@@ -44,7 +42,7 @@ POST /addresses
 
 ## PUT
 
-在URI除存储entity。PUT可以创建或者更新entity。PUT请求是幂等的。幂等是PUT和POST之间的主要区别。
+在URI处存储entity。PUT可以创建或者更新entity。PUT请求是幂等的。幂等是PUT和POST之间的主要区别。
 更改ID是1的地址
 
 ```
