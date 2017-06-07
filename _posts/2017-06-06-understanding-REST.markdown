@@ -81,6 +81,4 @@ DELETE /addresses/1
 
 ## Media类型
 
-**Accept** 和 **Content-Type** HTTP headers 可以用来描述HTTP请求中发送或者请求的内容。如果他请求的是JSON形式的response，客户端可能会将 **Accept** 设置成**application/json** . 相反, 在发送数
-
-据的时候, 将 **Content-Type**设置成**application/xml**将表示客户端请求正在发送的数据是XML形式。
+**Accept** 和 **Content-Type** HTTP headers 可以用来描述HTTP请求中发送或者请求的内容。如果他请求的是JSON形式的response，客户端可能会将 **Accept** 设置成**application/json** . 相反, 在发送数据的时候, 将 **Content-Type**设置成**application/xml**将表示客户端请求正在发送的数据是XML形式。
