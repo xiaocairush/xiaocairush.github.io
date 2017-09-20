@@ -160,7 +160,7 @@ static final class TreeNode<K,V> extends Node<K,V> {
 
 ### TreeBin
 
-TreeBin封装了红黑树的逻辑，有关红黑树, 可以参考的资料有[《Algorithm》网站](http://www.jianshu.com/p/23b84ba9a498) 以及 [中文翻译](http://www.cnblogs.com/yangecnu/p/Introduce-Red-Black-Tree.html)
+TreeBin封装了红黑树的逻辑，有关红黑树, 可以参考的资料有[《Algorithm》网站](http://algs4.cs.princeton.edu/33balanced/) 以及 [中文翻译](http://www.cnblogs.com/yangecnu/p/Introduce-Red-Black-Tree.html)
 
 也可以试玩[Red/Black Tree Visualization](https://www.cs.usfca.edu/~galles/visualization/RedBlack.html) 。
 
