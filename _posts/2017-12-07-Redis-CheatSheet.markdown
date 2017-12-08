@@ -1,4 +1,9 @@
-[toc]
+---
+layout: post
+title:  "Redis-CheatSheet"
+date:   2017-12-07 21:00:00 +0800
+categories: redis
+---
 
 # Redis CheatSheet
 
