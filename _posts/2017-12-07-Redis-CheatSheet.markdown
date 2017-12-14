@@ -265,15 +265,62 @@ Raft算法简述：
 
 ## 集群
 
-### 数据分区理论
+### 数据分布
+
+#### 数据分区理论
 
 1. 节点取余
-2. 一致性哈希分区
+2. 一致性哈希分区(常用于缓存场景)
 3. 虚拟槽分区
 
-### redis数据分区
+#### redis数据分区
 
 slot = CRC16(key) & 16383
+
+#### 功能限制
+
+1. 批量操作如mset，mget只支持具有相同slot值的key执行操作
+2. 只支持多key在同一节点上的事务操作
+3. key作为数据分区的最小粒度，因此不能将一个大的键值对象如hash，list映射到不同的节点
+4. 不支持多数据库空间。单机最多可使用16个数据库，集群模式只能使用一个数据库空间，即db 0
+5. 复制结构只支持一层，不支持嵌套树状复制结构
+
+### 搭建集群
+
+### 准备节点
+
+配置：
+
+```
+port 6379
+# 开启集群模式
+cluster-enabled yes
+# 节点超时时间，单位毫秒
+cluster-node-timeout 15000
+# 集群内部配置文件
+cluster-config-file "nodes-6379.conf"
+```
+
+启动节点：
+
+```
+redis-server conf/redis-6379.conf
+```
+
+### 节点握手
+
+```
+cluster meet 127.0.0.1 6381
+cluster nodes
+cluster info
+```
+
+### 分配槽
+
+```
+redis-cli -h 127.0.0.1 -p 6379 cluster addslots {0...5461}
+cluster replicate {node run id}
+```
 
 ### 节点通信
 
