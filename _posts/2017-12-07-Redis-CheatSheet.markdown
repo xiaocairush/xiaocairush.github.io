@@ -388,5 +388,6 @@ cluster replicate {node run id}
 
 ### 资料
 
+[Raft算法](http://www.infoq.com/cn/articles/raft-paper)<br/>
 [作者 付磊博客](http://carlosfu.iteye.com) <br/>
 [作者 张益军博客](http://hot66hot.iteye.com)
