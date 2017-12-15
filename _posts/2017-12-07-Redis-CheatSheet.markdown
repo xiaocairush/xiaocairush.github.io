@@ -9,7 +9,7 @@ categories: redis
 
 ## 简介
 
-清单来自《Redis开发与运维》
+清单来自[《Redis开发与运维》](https://yuedu.163.com/source/e99b02fd21a44345bee98821e64b2af6_4)
 
 ### 特点
 
