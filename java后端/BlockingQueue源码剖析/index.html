@@ -1,0 +1,1878 @@
+
+
+
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta http-equiv="x-dns-prefetch-control" content="on">
+      <link rel="dns-prefetch" href="//oi-wiki.org">
+      <link rel="dns-prefetch" href="//search.oi-wiki.org">
+      <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+      <link rel="dns-prefetch" href="//api.github.com">
+      <link rel="dns-prefetch" href="//cdn-for-oi-wiki.billchn.com">
+      <link rel="dns-prefetch" href="//www.google-analytics.com">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+        <link rel="canonical" href="https://xiaocairush.github.io/java%E5%90%8E%E7%AB%AF/BlockingQueue%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/">
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="复制">
+      
+        <meta name="lang:clipboard.copied" content="已复制">
+      
+        <meta name="lang:search.language" content="jp">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="没有找到符合条件的结果">
+      
+        <meta name="lang:search.result.one" content="找到 1 个符合条件的结果">
+      
+        <meta name="lang:search.result.other" content="# 个符合条件的结果">
+      
+        <meta name="lang:search.tokenizer" content="[\uff0c\u3002]+">
+      
+      <link rel="shortcut icon" href="../..">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-4.4.2">
+    
+    
+      
+        <title>BlockingQueue源码剖析</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/application.30686662.css">
+      
+        <link rel="stylesheet" href="../../assets/stylesheets/application-palette.a8b3c06d.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="">
+      
+    
+    
+      <script src="../../assets/javascripts/modernizr.27508f0e.js"></script>
+    
+    
+      
+        <style>@font-face{font-family:'Fira Sans';font-style:normal;font-weight:300;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.eot);src:local('Fira Sans'),local('FiraSans-Normal'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Sans';font-style:normal;font-weight:regular;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.eot);src:local('Fira Sans'),local('FiraSans-Normal'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Sans';font-style:italic;font-weight:regular;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.eot);src:local('Fira Sans'),local('FiraSans-Italic'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Sans';font-style:normal;font-weight:700;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.eot);src:local('Fira Sans'),local('FiraSans-Normal'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Mono';font-style:normal;font-weight:regular;src:url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.eot);src:local('Fira Mono'),local('FiraMono-Normal'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.svg#FiraMono) format('svg')}body,input{font-family:"Fira Sans","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Fira Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/material-icons@0.2.3/iconfont/material-icons.min.css">
+    
+      <link rel="manifest" href="../../manifest.webmanifest">
+    
+    
+    
+      
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="white" data-md-color-accent="red">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#blockingqueue" tabindex="1" class="md-skip">
+        跳转至
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://xiaocairush.github.io/" title="知识总结" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon">school</i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              知识总结
+            </span>
+            <span class="md-header-nav__topic">
+              
+                BlockingQueue源码剖析
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            键入以开始搜索
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+        
+
+  
+
+<nav class="md-tabs md-tabs--active" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  <li class="md-tabs__item">
+    
+      <a href="../.." class="md-tabs__link">
+        Home
+      </a>
+    
+  </li>
+
+      
+        
+      
+        
+  
+  
+    <li class="md-tabs__item">
+      
+        <a href="../ZooKeeper-overview/" class="md-tabs__link md-tabs__link--active">
+          java后端
+        </a>
+      
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+      
+      <main class="md-main" role="main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://xiaocairush.github.io/" title="知识总结" class="md-nav__button md-logo">
+      
+        <i class="md-icon">school</i>
+      
+    </a>
+    知识总结
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../about.md" title="About" class="md-nav__link">
+      About
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+    
+    <label class="md-nav__link" for="nav-3">
+      java后端
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        java后端
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../ZooKeeper-overview/" title="ZooKeeper" class="md-nav__link">
+      ZooKeeper
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Spark-Overview/" title="Spark" class="md-nav__link">
+      Spark
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Resources/" title="Resources" class="md-nav__link">
+      Resources
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../%E5%90%8C%E6%AD%A5%E5%B7%A5%E5%85%B7%E7%B1%BB/" title="同步工具类" class="md-nav__link">
+      同步工具类
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../java-SE8-in-practice/" title="java-SE8-in-practice" class="md-nav__link">
+      java-SE8-in-practice
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../vim-learning-notes/" title="vim" class="md-nav__link">
+      vim
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../understanding-REST/" title="理解REST" class="md-nav__link">
+      理解REST
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../spring-callstack/" title="spring" class="md-nav__link">
+      spring
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        BlockingQueue源码剖析
+      </label>
+    
+    <a href="./" title="BlockingQueue源码剖析" class="md-nav__link md-nav__link--active">
+      BlockingQueue源码剖析
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">目录</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    参考
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arrayblockingqueue" class="md-nav__link">
+    ArrayBlockingQueue
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    核心组成：
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    取元素逻辑
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    存元素逻辑
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inc" class="md-nav__link">
+    inc
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delayqueue" class="md-nav__link">
+    DelayQueue
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    核心组成
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leader-follower" class="md-nav__link">
+    leader-follower模式
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#take" class="md-nav__link">
+    take
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#put" class="md-nav__link">
+    put
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#linkedblockingqueue" class="md-nav__link">
+    LinkedBlockingQueue
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    核心成员
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#take_1" class="md-nav__link">
+    take
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#put_1" class="md-nav__link">
+    put
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#priorityblockingqueue" class="md-nav__link">
+    PriorityBlockingQueue
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    核心成员
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#take_2" class="md-nav__link">
+    take
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#put_2" class="md-nav__link">
+    put
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#synchronousqueue" class="md-nav__link">
+    SynchronousQueue
+  </a>
+  
+</li>
+      
+      
+      <!-- 
+      
+       -->
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../ConcurrentHashMap%281.8%E7%89%88%E6%9C%AC%29%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" title="ConcurrentHashMap" class="md-nav__link">
+      ConcurrentHashMap
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../java.util.concurrent.locks%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" title="java.util.concurrent.locks源码剖析" class="md-nav__link">
+      java.util.concurrent.locks源码剖析
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Redis-CheatSheet/" title="Redis" class="md-nav__link">
+      Redis
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">目录</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    参考
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arrayblockingqueue" class="md-nav__link">
+    ArrayBlockingQueue
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    核心组成：
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    取元素逻辑
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    存元素逻辑
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inc" class="md-nav__link">
+    inc
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delayqueue" class="md-nav__link">
+    DelayQueue
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    核心组成
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leader-follower" class="md-nav__link">
+    leader-follower模式
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#take" class="md-nav__link">
+    take
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#put" class="md-nav__link">
+    put
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#linkedblockingqueue" class="md-nav__link">
+    LinkedBlockingQueue
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    核心成员
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#take_1" class="md-nav__link">
+    take
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#put_1" class="md-nav__link">
+    put
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#priorityblockingqueue" class="md-nav__link">
+    PriorityBlockingQueue
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    核心成员
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#take_2" class="md-nav__link">
+    take
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#put_2" class="md-nav__link">
+    put
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#synchronousqueue" class="md-nav__link">
+    SynchronousQueue
+  </a>
+  
+</li>
+      
+      
+      <!-- 
+      
+       -->
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <p>[toc]</p>
+<h1 id="blockingqueue">BlockingQueue源码剖析<a class="headerlink" href="#blockingqueue" title="Permanent link">&para;</a></h1>
+<h2 id="_1">参考<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p><a href="https://docs.oracle.com/javase/8/docs/api/index.html?java/util/concurrent/package-summary.html">英文文档</a><br/>
+<a href="http://tutorials.jenkov.com/java-util-concurrent/index.html">英文 jenkov</a><br/>
+<a href="http://blog.csdn.net/defonds/article/details/44021605/">中文 defonds</a><br/></p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</pre></div></td><td class="code"><div class="highlight"><pre><span></span>package java.util.concurrent;
+import java.util.Collection;
+import java.util.Queue;
+
+public interface BlockingQueue&lt;E&gt; extends Queue&lt;E&gt; {
+
+    boolean add(E e);
+
+    boolean offer(E e);
+
+    void put(E e) throws InterruptedException;
+
+
+    boolean offer(E e, long timeout, TimeUnit unit)
+        throws InterruptedException;
+
+
+    E take() throws InterruptedException;
+
+
+    E poll(long timeout, TimeUnit unit)
+        throws InterruptedException;
+
+    int remainingCapacity();
+
+    boolean remove(Object o);
+
+    public boolean contains(Object o);
+
+    //从队列中移除所有可用的元素，并将移除的元素加入到给定的集合中。当你需要重复poll的时候这个操作比较有效。
+    int drainTo(Collection&lt;? super E&gt; c);
+
+    int drainTo(Collection&lt;? super E&gt; c, int maxElements);
+}
+</pre></div>
+</td></tr></table>
+<p>BlockingQueue的实现类有</p>
+<ul>
+<li>ArrayBlockingQueue</li>
+<li>DelayQueue</li>
+<li>LinkedBlockingQueue</li>
+<li>PriorityBlockingQueue</li>
+<li>SynchronousQueue</li>
+</ul>
+<h2 id="arrayblockingqueue">ArrayBlockingQueue<a class="headerlink" href="#arrayblockingqueue" title="Permanent link">&para;</a></h2>
+<p><a href="http://www.jianshu.com/p/9a652250e0d1">转载地址</a></p>
+<h3 id="_2">核心组成：<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre><span></span>    /** 底层维护队列元素的数组 */
+    final Object[] items;
+
+    /**  当读取元素时数组的下标(这里称为读下标) */
+    int takeIndex;
+
+    /** 添加元素时数组的下标 (这里称为写小标)*/
+    int putIndex;
+
+    /** 队列中的元素个数 */
+    int count;
+
+    /** 用于并发控制的工具类**/
+    final ReentrantLock lock;
+
+    /** 保证所有访问的主要的锁*/
+    final ReentrantLock lock;
+
+    /** 控制take操作时是否让线程等待 */
+    private final Condition notEmpty;
+
+    /** 控制put操作时是否让线程等待 */
+    private final Condition notFull;
+</pre></div>
+</td></tr></table>
+<h3 id="_3">取元素逻辑<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>在队列是空的时候需要等待到它不是空，同时take需要保证线程安全性。
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45</pre></div></td><td class="code"><div class="highlight"><pre><span></span>public E take() throws InterruptedException {
+        final ReentrantLock lock = this.lock;
+        /*
+            尝试获取锁之前，检测当前线程是否被中断，如果已被中断就抛出InterruptedException
+         */
+        lock.lockInterruptibly();
+        try {
+            /*
+          如果此时队列中的元素个数为0,那么就让当前线程wait,并且释放锁。
+          注意:这里使用了while进行重复检查，是为了防止当前线程可能由于其他未知的原因被唤醒。
+          (通常这种情况被称为&quot;spurious wakeup&quot;)
+            */
+        while (count == 0)
+                // 使当前线程一直处于等待状态，直到notEmpty发出signal信号
+                notEmpty.await();
+            //如果队列不为空，则从队列的头部取元素
+            return extract();
+        } finally {
+             //完成锁的释放
+            lock.unlock();
+        }
+    }
+
+/*
+      根据takeIndex来获取当前的元素,然后通知其他等待的线程。
+      Call only when holding lock.(只有当前线程已经持有了锁之后，它才能调用该方法)
+     */
+    private E extract() {
+        final Object[] items = this.items;
+
+        //根据takeIndex获取元素,因为元素是一个Object类型的数组,因此它通过cast方法将其转换成泛型。
+        E x = this.&lt;E&gt;cast(items[takeIndex]);
+
+        //将当前位置的元素设置为null
+        items[takeIndex] = null;
+
+        //并且将takeIndex++,注意：这里因为已经使用了锁，因此inc方法中没有使用到原子操作
+        takeIndex = inc(takeIndex);
+
+        //将队列中的总的元素减1
+        --count;
+        //唤醒其他等待的线程
+        notFull.signal();
+        return x;
+    }
+</pre></div>
+</td></tr></table></p>
+<h3 id="_4">存元素逻辑<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</pre></div></td><td class="code"><div class="highlight"><pre><span></span>public void put(E e) throws InterruptedException {
+        checkNotNull(e);
+        final ReentrantLock lock = this.lock;
+        //进行锁的抢占
+        lock.lockInterruptibly();
+        try {
+            /*当队列的长度等于数组的长度,此时说明队列已经满了,这里同样
+              使用了while来方式当前线程被&quot;伪唤醒&quot;。*/
+            while (count == items.length)
+                //则让当前线程处于等待状态
+                notFull.await();
+            //一旦获取到锁并且队列还未满时，则执行insert操作。
+            insert(e);
+        } finally {
+            //完成锁的释放
+            lock.unlock();
+        }
+    }
+
+     //该方法的逻辑非常简单
+    private void insert(E x) {
+        //将当前元素设置到putIndex位置   
+        items[putIndex] = x;
+        //让putIndex++
+        putIndex = inc(putIndex);
+        //将队列的大小加1
+        ++count;
+        //唤醒其他正在处于等待状态的线程
+        notEmpty.signal();
+    }
+</pre></div>
+</td></tr></table>
+<h3 id="inc">inc<a class="headerlink" href="#inc" title="Permanent link">&para;</a></h3>
+<p>在extract和insert的时候都用到了inc方法，可以看出数组空间被循环利用了，因此ArrayBlockingQueue其实是一个循环队列</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span></span>final int inc(int i) {
+        //当takeIndex的值等于数组的长度时,就会重新置为0，这个一个循环递增的过程
+        return (++i == items.length) ? 0 : i;
+    }
+</pre></div>
+</td></tr></table>
+<h2 id="delayqueue">DelayQueue<a class="headerlink" href="#delayqueue" title="Permanent link">&para;</a></h2>
+<p>进入DelayQueue的元素必须实现 java.util.concurrent.Delayed 接口：</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span></span>public interface Delayed extends Comparable&lt;Delayed&lt; {  
+
+ public long getDelay(TimeUnit timeUnit);  
+
+}  
+</pre></div>
+</td></tr></table>
+<p>当getDelay方法返回延迟的是 0 或者负值时，将被认为过期，该元素将会在 DelayQueue 的下一次take被调用的时候被释放掉。</p>
+<p><a href="http://www.jianshu.com/p/e0bcc9eae0ae">原理实现参考文档</a></p>
+<h3 id="_5">核心组成<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span></span>    private final transient ReentrantLock lock = new ReentrantLock();
+    // 用于根据delay时间排序的优先级队列
+    private final PriorityQueue&lt;E&gt; q = new PriorityQueue&lt;E&gt;();
+
+    // 这个变量用来保存工作线程的引用，通过减少线程切换
+    private Thread leader = null;
+
+
+    private final Condition available = lock.newCondition();
+</pre></div>
+</td></tr></table>
+<h3 id="leader-follower">leader-follower模式<a class="headerlink" href="#leader-follower" title="Permanent link">&para;</a></h3>
+<p>参考<a href="http://blog.csdn.net/goldlevi/article/details/7705180">这篇文章</a></p>
+<h3 id="take">take<a class="headerlink" href="#take" title="Permanent link">&para;</a></h3>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44</pre></div></td><td class="code"><div class="highlight"><pre><span></span>// 获取队列中首元素，如果该元素未过期就需要等待该元素过期，然后取出该元素
+public E take() throws InterruptedException {
+        final ReentrantLock lock = this.lock;
+        lock.lockInterruptibly();
+        try {
+            for (;;) {
+                // 从优先队列中取出但不删除第一个元素
+                E first = q.peek();
+                if (first == null)
+                    // 阻塞队列为空的状态下需要等待
+                    available.await();
+                else { // 阻塞队列非空，且leader为null
+
+                    // 检测first是否过期，如果过期就取出first并返回
+                    long delay = first.getDelay(NANOSECONDS);
+                    if (delay &lt;= 0)
+                        return q.poll();
+
+                    // first没有过期，需要继续等待
+                    first = null; // 在等待期间first不持有引用，是因为first有可能被其它线程拿走了，且其它线程用完之后需要GC回收掉
+                    // 当前线程需要竞选leader
+                    if (leader != null)
+                        available.await();
+                    else {
+                        // 当前线程竞选leader成功
+                        Thread thisThread = Thread.currentThread();
+                        leader = thisThread;
+                        try {
+                            // 等待首元素过期，可减少线程切换时间，从而提高效率
+                            available.awaitNanos(delay);
+                        } finally {
+                            if (leader == thisThread)
+                                leader = null;
+                        }
+                    }
+                }
+            }
+        } finally {
+            // 如果阻塞队列非空且没有在work的leader线程，此时队列可用
+            if (leader == null &amp;&amp; q.peek() != null)
+                available.signal();
+            lock.unlock();
+        }
+    }
+</pre></div>
+</td></tr></table>
+<p>思考：采用leader/follower设计模式有什么好处？</p>
+<p>不采用L/F模式，即直接将for循环里面first = null;之后的代码替换为available.awaitNanos(delay)，无法避免频繁切换线程上下文的开销，比如以下场景：
+线程A和B同时在awaitNanos，A等待了100ms，B等待了200ms，假设等待时限为300ms，线程B被唤醒，并在100ms内完成take()操作，100ms之后线程A被唤醒，发现首元素没有过期，因为之前过期的元素已经被线程B take出去了，就会继续等待。可见，线程A没有必要被唤醒，因为它付出了切换线程A上下文的代价。</p>
+<p>采用L/F模式，可以避免这种开销，因为follower线程一直都在等待，不存在线程切入与切出上下文的问题。</p>
+<h3 id="put">put<a class="headerlink" href="#put" title="Permanent link">&para;</a></h3>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span></span>    public void put(E e) {
+        offer(e);
+    }
+
+    // 向队列中放一个元素，不满足放入条件时阻塞
+    public boolean offer(E e) {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            q.offer(e);
+            if (q.peek() == e) {
+                leader = null;
+                available.signal();
+            }
+            return true;
+        } finally {
+            lock.unlock();
+        }
+    }
+</pre></div>
+</td></tr></table>
+<h2 id="linkedblockingqueue">LinkedBlockingQueue<a class="headerlink" href="#linkedblockingqueue" title="Permanent link">&para;</a></h2>
+<p>可参考<a href="http://www.jianshu.com/p/057e94b71df9">这篇文章</a></p>
+<h3 id="_6">核心成员<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43</pre></div></td><td class="code"><div class="highlight"><pre><span></span>//链表中节点的定义
+ static class Node&lt;E&gt; {
+        // 放入队列的元素值
+        E item;
+
+        /**
+         * 指向下一个节点
+         * 指向this, 意思是下一个节点是head.next
+         * null, 没有实际的下一个节点
+         */
+        Node&lt;E&gt; next;
+
+        Node(E x) { item = x; }
+    }
+
+    /** 队列的容量, 不提供容量就是Integer.MAX_VALUE*/
+    private final int capacity;
+
+    /**队列中元素的容量*/
+    private final AtomicInteger count = new AtomicInteger();
+
+    /**
+     * 链表头结点引用.
+     * 恒等式: head.item == null
+     * 头结点不用于存储实际的元素
+     */
+    transient Node&lt;E&gt; head;
+
+    /**
+     * 链表尾节点
+     * 恒等式: last.next == null
+     */
+    private transient Node&lt;E&gt; last;
+
+    /** 保护take, poll等获取元素操作的锁*/
+    private final ReentrantLock takeLock = new ReentrantLock();
+
+    private final Condition notEmpty = takeLock.newCondition();
+
+    /** 保护put, offer等存入元素操作的锁 */
+    private final ReentrantLock putLock = new ReentrantLock();
+
+    private final Condition notFull = putLock.newCondition();
+</pre></div>
+</td></tr></table>
+<h3 id="take_1">take<a class="headerlink" href="#take_1" title="Permanent link">&para;</a></h3>
+<p>// 当队列非空的时候，取出链表首元素
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</pre></div></td><td class="code"><div class="highlight"><pre><span></span>public E take() throws InterruptedException {
+        E x;
+        int c = -1;
+        final AtomicInteger count = this.count;
+        final ReentrantLock takeLock = this.takeLock;
+        takeLock.lockInterruptibly();
+        try {
+            while (count.get() == 0) {
+                notEmpty.await();
+            }
+            x = dequeue();
+            c = count.getAndDecrement();
+            if (c &gt; 1)
+                // 在检查take的时候检查队列是否非空，并发出非空的信号，这挺贪心的。目的是提高效率，并非必须检查。
+                notEmpty.signal();
+        } finally {
+            takeLock.unlock();
+        }
+        if (c == capacity)
+            signalNotFull();
+        return x;
+    }
+
+private E dequeue() {
+        Node&lt;E&gt; h = head;
+        Node&lt;E&gt; first = h.next;
+        // todo: 为什么要这样写？
+        // stackoverflow: https://stackoverflow.com/questions/10106191/openjdks-linkedblockingqueue-implementation-node-class-and-gc
+        // commit: http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/main/java/util/concurrent/LinkedBlockingQueue.java?r1=1.50&amp;r2=1.51
+        h.next = h; // help GC
+        head = first;
+        E x = first.item;
+        first.item = null;
+        return x;
+    }
+</pre></div>
+</td></tr></table></p>
+<h3 id="put_1">put<a class="headerlink" href="#put_1" title="Permanent link">&para;</a></h3>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41</pre></div></td><td class="code"><div class="highlight"><pre><span></span>public void put(E e) throws InterruptedException {
+        if (e == null) throw new NullPointerException();
+        // 注意: 约定在put/take等操作中都要预设本地变量
+        // 如果没有给c负值，就是-1，用来判断是否操作失败
+        int c = -1;
+        Node&lt;E&gt; node = new Node&lt;E&gt;(e);
+        final ReentrantLock putLock = this.putLock;
+        final AtomicInteger count = this.count;
+        putLock.lockInterruptibly();
+        try {
+            // 检查队列是否已满，如果已满需要等待队列变为未满的状态
+            while (count.get() == capacity) {
+                notFull.await();
+            }
+            enqueue(node);
+            c = count.getAndIncrement();
+            if (c + 1 &lt; capacity)
+                notFull.signal();
+        } finally {
+            putLock.unlock();
+        }
+        // 发出非空信号
+        if (c == 0)
+            signalNotEmpty();
+    }
+
+private void enqueue(Node&lt;E&gt; node) {
+        // assert putLock.isHeldByCurrentThread();
+        // assert last.next == null;
+        last = last.next = node;
+    }
+
+private void signalNotEmpty() {
+        final ReentrantLock takeLock = this.takeLock;
+        takeLock.lock();
+        try {
+            notEmpty.signal();
+        } finally {
+            takeLock.unlock();
+        }
+    }
+</pre></div>
+</td></tr></table>
+<h2 id="priorityblockingqueue">PriorityBlockingQueue<a class="headerlink" href="#priorityblockingqueue" title="Permanent link">&para;</a></h2>
+<h3 id="_7">核心成员<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</pre></div></td><td class="code"><div class="highlight"><pre><span></span>    /**
+     * 用来表示优先级队列的平衡的二进制堆（最小堆）：queue[n]的两个儿子是queue[2*n+1]和 queue[2*(n+1)]。  
+     * 优先级队列根据comparator排序, 如果comparator是null的话，就根据元素自然顺序排序。
+     */
+    private transient Object[] queue;
+
+    //元素的个数
+    private transient int size;
+
+     // 用于确定元素顺序的比较器
+    private transient Comparator&lt;? super E&gt; comparator;
+
+     // 用于保护所有操作的锁
+    private final ReentrantLock lock;
+
+    private final Condition notEmpty;
+
+     // 用来保护扩容的锁（Spinlock），需要通过CAS来实现
+    private transient volatile int allocationSpinLock;
+
+     // 仅用于序列化，只有在序列化和反序列话的时候才是非空的
+    private PriorityQueue&lt;E&gt; q;
+</pre></div>
+</td></tr></table>
+<h3 id="take_2">take<a class="headerlink" href="#take_2" title="Permanent link">&para;</a></h3>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</pre></div></td><td class="code"><div class="highlight"><pre><span></span>public E take() throws InterruptedException {
+        final ReentrantLock lock = this.lock;
+        lock.lockInterruptibly();
+        E result;
+        try {
+            while ( (result = dequeue()) == null)
+                notEmpty.await();
+        } finally {
+            lock.unlock();
+        }
+        return result;
+    }
+private E dequeue() {
+        // 指向最后一个元素
+        int n = size - 1;
+        if (n &lt; 0)
+            return null;
+        else {
+            Object[] array = queue;
+            E result = (E) array[0];
+            E x = (E) array[n];
+            array[n] = null;
+            Comparator&lt;? super E&gt; cmp = comparator;
+            if (cmp == null)
+                siftDownComparable(0, x, array, n);
+            else
+                // 继续维护最小堆
+                siftDownUsingComparator(0, x, array, n, cmp);
+            size = n;
+            return result;
+        }
+    }
+</pre></div>
+</td></tr></table>
+<h3 id="put_2">put<a class="headerlink" href="#put_2" title="Permanent link">&para;</a></h3>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63</pre></div></td><td class="code"><div class="highlight"><pre><span></span>  public void put(E e) {
+        offer(e); // never need to block
+    }
+
+    public boolean offer(E e) {
+        if (e == null)
+            throw new NullPointerException();
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        int n, cap;
+        Object[] array;
+        while ((n = size) &gt;= (cap = (array = queue).length))
+            // 如果数组空间不够，需要重新分配空间，offer比较简单，因此可以主要关注一下数组空间是怎样增长的即可
+            tryGrow(array, cap);
+        try {
+            Comparator&lt;? super E&gt; cmp = comparator;
+            if (cmp == null)
+                siftUpComparable(n, e, array);
+            else
+                siftUpUsingComparator(n, e, array, cmp);
+            size = n + 1;
+            notEmpty.signal();
+        } finally {
+            lock.unlock();
+        }
+        return true;
+
+    private void tryGrow(Object[] array, int oldCap) {
+        lock.unlock(); // 必须释放并在函数尾重新获取锁，这样take就不会被阻塞住了，效率有提升
+        Object[] newArray = null;
+
+        if (allocationSpinLock == 0 &amp;&amp;
+        // 如果allocationSpinLock为0就把1赋值给它
+            UNSAFE.compareAndSwapInt(this, allocationSpinLockOffset,
+                                     0, 1)) {
+            try {
+            // 如果当前size小于64，就增长为2*size+2; 否则增长为1.5 * size
+            // 这种策略可以使size小的时候增长快，size大的时候增长不会过快
+                int newCap = oldCap + ((oldCap &lt; 64) ?
+                                       (oldCap + 2) : // grow faster if small
+                                       (oldCap &gt;&gt; 1));
+                if (newCap - MAX_ARRAY_SIZE &gt; 0) {    // 可能会溢出
+                    int minCap = oldCap + 1; // 溢出的情况下size增加1
+                    if (minCap &lt; 0 || minCap &gt; MAX_ARRAY_SIZE)
+                        throw new OutOfMemoryError();
+                    newCap = MAX_ARRAY_SIZE;
+                }
+
+                // 如果queue != array，说明之前有其它线程分配了新的空间
+                if (newCap &gt; oldCap &amp;&amp; queue == array)
+                    newArray = new Object[newCap];
+            } finally {
+                allocationSpinLock = 0;
+            }
+        }
+        if (newArray == null) // 如果其它线程正在尝试重新分配空间，暗示cpu优先调度其它线程
+            Thread.yield();
+        lock.lock();
+        if (newArray != null &amp;&amp; queue == array) {
+            queue = newArray;
+            System.arraycopy(array, 0, newArray, 0, oldCap);
+        }
+    }
+</pre></div>
+</td></tr></table>
+<h2 id="synchronousqueue">SynchronousQueue<a class="headerlink" href="#synchronousqueue" title="Permanent link">&para;</a></h2>
+<p>SynchronousQueue 是一个特殊的队列，它的内部同时只能够容纳单个元素。<br/>
+如果该队列已有一元素的话，试图向队列中插入一个新元素的线程将会阻塞，直到另一个线程将该元素从队列中抽走。<br/>
+同样，如果该队列为空，试图向队列中抽取一个元素的线程将会阻塞，直到另一个线程向队列中插入了一条新的元素。</p>
+                
+                  
+                
+              
+              <!-- 
+                 
+ 
+ 
+<hr><blockquote class="page-copyright">
+  <span><i class="md-icon">build</i>本页面最近更新：</span><span class="facts_modified"></span>，<a class="edit_history">更新历史</a><br>
+  <span><i class="md-icon">edit</i>发现错误？想一起完善？ <a href="None" title="编辑此页" class="page_edit_url">在 GitHub 上编辑此页！</a></span><br>
+  <span><i class="md-icon">people</i>本页面贡献者：</span><span class="page_contributors">OI-wiki</span><br>
+  <span><i class="md-icon">copyright</i>本页面的全部内容在 <strong></strong> 协议之条款下提供，附加条款亦可能应用</span>
+</blockquote>
+
+               -->
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<script>function scrollFunction(){20<document.body.scrollTop||20<document.documentElement.scrollTop?document.getElementById("myBtn").style.display="block":document.getElementById("myBtn").style.display="none"}function topFunction(){document.body.scrollTop=0,document.documentElement.scrollTop=0}window.onscroll=function(){scrollFunction()}</script>
+<button onclick="topFunction()" id="myBtn" class="data-tip-left" data-tip="回到顶部">
+  <svg class="Zi Zi--BackToTop data-tip-left" data-tip="回到顶部" fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
+    <path d="M16.036 19.59a1 1 0 0 1-.997.995H9.032a.996.996 0 0 1-.997-.996v-7.005H5.03c-1.1 0-1.36-.633-.578-1.416L11.33 4.29a1.003 1.003 0 0 1 1.412 0l6.878 6.88c.782.78.523 1.415-.58 1.415h-3.004v7.005z"></path>
+  </svg>
+</button>
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../spring-callstack/" title="spring" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  上一页
+                </span>
+                spring
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../ConcurrentHashMap%281.8%E7%89%88%E6%9C%AC%29%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" title="ConcurrentHashMap" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  下一页
+                </span>
+                ConcurrentHashMap
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+        <div id="miitbeian"></div>
+      </div>
+      
+      <span style="float:right" class="build_date_utc"><a href="https://github.com/24OI/OI-wiki">最近更新：, 2021-09-29</a></span>
+      <script>
+        /* miitbeian */
+        if (window.location.hostname == "oi-wiki.com") {
+          document.getElementById("miitbeian").innerHTML = `<a href="http://beian.miit.gov.cn/">黑ICP备19005132号-2</a>`;
+        }
+        /* Easter Egg */
+        console.log(`%c OI Wiki %c  %c`,"background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff","background:#41b883 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff","background:transparent");
+        console.log('少年，恭喜你囍提彩蛋，我们在做一些 OI 相关的有趣的事情，如果您对此感兴趣，欢迎访问 https://join-us.oi-wiki.org');
+      </script>
+      
+    </div>
+    <div class="sponsor" style="text-align:center;color:#fff;vertical-align:middle">
+      Supported by <span>
+      <a href="/intro/hulu/">
+        <img src="https://cdn.jsdelivr.net/npm/oicdn@0.0.1/hulu-white.png" style="vertical-align:-12px;width:125px;margin-left:5px">
+      </a>
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/application.ad30b88d.js"></script>
+      <script>app.initialize({version:"1.2.2",url:{base:"../.."}}),"serviceWorker"in navigator&&navigator.serviceWorker.register("/service-worker.js",{scope:"/"}).then(function(e){console.log("PWA Registration succeeded. Scope is "+e.scope)}).catch(function(e){console.log("PWA Registration failed with "+e)})</script>
+      
+    
+  </body>
+</html>

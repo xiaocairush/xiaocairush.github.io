@@ -1,0 +1,770 @@
+
+
+
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta http-equiv="x-dns-prefetch-control" content="on">
+      <link rel="dns-prefetch" href="//oi-wiki.org">
+      <link rel="dns-prefetch" href="//search.oi-wiki.org">
+      <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+      <link rel="dns-prefetch" href="//api.github.com">
+      <link rel="dns-prefetch" href="//cdn-for-oi-wiki.billchn.com">
+      <link rel="dns-prefetch" href="//www.google-analytics.com">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+        <link rel="canonical" href="https://xiaocairush.github.io/java%E5%90%8E%E7%AB%AF/understanding-REST/">
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="复制">
+      
+        <meta name="lang:clipboard.copied" content="已复制">
+      
+        <meta name="lang:search.language" content="jp">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="没有找到符合条件的结果">
+      
+        <meta name="lang:search.result.one" content="找到 1 个符合条件的结果">
+      
+        <meta name="lang:search.result.other" content="# 个符合条件的结果">
+      
+        <meta name="lang:search.tokenizer" content="[\uff0c\u3002]+">
+      
+      <link rel="shortcut icon" href="../..">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-4.4.2">
+    
+    
+      
+        <title>understanding REST</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/application.30686662.css">
+      
+        <link rel="stylesheet" href="../../assets/stylesheets/application-palette.a8b3c06d.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="">
+      
+    
+    
+      <script src="../../assets/javascripts/modernizr.27508f0e.js"></script>
+    
+    
+      
+        <style>@font-face{font-family:'Fira Sans';font-style:normal;font-weight:300;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.eot);src:local('Fira Sans'),local('FiraSans-Normal'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Sans';font-style:normal;font-weight:regular;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.eot);src:local('Fira Sans'),local('FiraSans-Normal'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Sans';font-style:italic;font-weight:regular;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.eot);src:local('Fira Sans'),local('FiraSans-Italic'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Sans';font-style:normal;font-weight:700;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.eot);src:local('Fira Sans'),local('FiraSans-Normal'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Mono';font-style:normal;font-weight:regular;src:url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.eot);src:local('Fira Mono'),local('FiraMono-Normal'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.svg#FiraMono) format('svg')}body,input{font-family:"Fira Sans","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Fira Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/material-icons@0.2.3/iconfont/material-icons.min.css">
+    
+      <link rel="manifest" href="../../manifest.webmanifest">
+    
+    
+    
+      
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="white" data-md-color-accent="red">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#rest" tabindex="1" class="md-skip">
+        跳转至
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://xiaocairush.github.io/" title="知识总结" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon">school</i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              知识总结
+            </span>
+            <span class="md-header-nav__topic">
+              
+                understanding REST
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            键入以开始搜索
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+        
+
+  
+
+<nav class="md-tabs md-tabs--active" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  <li class="md-tabs__item">
+    
+      <a href="../.." class="md-tabs__link">
+        Home
+      </a>
+    
+  </li>
+
+      
+        
+      
+        
+  
+  
+    <li class="md-tabs__item">
+      
+        <a href="../ZooKeeper-overview/" class="md-tabs__link md-tabs__link--active">
+          java后端
+        </a>
+      
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+      
+      <main class="md-main" role="main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://xiaocairush.github.io/" title="知识总结" class="md-nav__button md-logo">
+      
+        <i class="md-icon">school</i>
+      
+    </a>
+    知识总结
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../about.md" title="About" class="md-nav__link">
+      About
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+    
+    <label class="md-nav__link" for="nav-3">
+      java后端
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        java后端
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../ZooKeeper-overview/" title="ZooKeeper" class="md-nav__link">
+      ZooKeeper
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Spark-Overview/" title="Spark" class="md-nav__link">
+      Spark
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Resources/" title="Resources" class="md-nav__link">
+      Resources
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../%E5%90%8C%E6%AD%A5%E5%B7%A5%E5%85%B7%E7%B1%BB/" title="同步工具类" class="md-nav__link">
+      同步工具类
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../java-SE8-in-practice/" title="java-SE8-in-practice" class="md-nav__link">
+      java-SE8-in-practice
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../vim-learning-notes/" title="vim" class="md-nav__link">
+      vim
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        理解REST
+      </label>
+    
+    <a href="./" title="理解REST" class="md-nav__link md-nav__link--active">
+      理解REST
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">目录</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rest_1" class="md-nav__link">
+    REST的原则
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#http-methods" class="md-nav__link">
+    HTTP methods
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#get" class="md-nav__link">
+    GET
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#post" class="md-nav__link">
+    POST
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#put" class="md-nav__link">
+    PUT
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#patch" class="md-nav__link">
+    PATCH
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delete" class="md-nav__link">
+    DELETE
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#http" class="md-nav__link">
+    HTTP 状态码
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#media" class="md-nav__link">
+    Media类型
+  </a>
+  
+</li>
+      
+      
+      <!-- 
+      
+       -->
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../spring-callstack/" title="spring" class="md-nav__link">
+      spring
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../BlockingQueue%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" title="BlockingQueue源码剖析" class="md-nav__link">
+      BlockingQueue源码剖析
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../ConcurrentHashMap%281.8%E7%89%88%E6%9C%AC%29%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" title="ConcurrentHashMap" class="md-nav__link">
+      ConcurrentHashMap
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../java.util.concurrent.locks%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" title="java.util.concurrent.locks源码剖析" class="md-nav__link">
+      java.util.concurrent.locks源码剖析
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Redis-CheatSheet/" title="Redis" class="md-nav__link">
+      Redis
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">目录</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rest_1" class="md-nav__link">
+    REST的原则
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#http-methods" class="md-nav__link">
+    HTTP methods
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#get" class="md-nav__link">
+    GET
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#post" class="md-nav__link">
+    POST
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#put" class="md-nav__link">
+    PUT
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#patch" class="md-nav__link">
+    PATCH
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delete" class="md-nav__link">
+    DELETE
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#http" class="md-nav__link">
+    HTTP 状态码
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#media" class="md-nav__link">
+    Media类型
+  </a>
+  
+</li>
+      
+      
+      <!-- 
+      
+       -->
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="rest">理解REST<a class="headerlink" href="#rest" title="Permanent link">&para;</a></h1>
+<p>翻译自：<a href="https://spring.io/understanding/REST">https://spring.io/understanding/REST</a> <br/>
+维基百科：<a href="https://zh.wikipedia.org/wiki/REST">https://zh.wikipedia.org/wiki/REST</a> <br/>
+REST (Representational State Transfer)是由<a href="https://en.wikipedia.org/wiki/Roy_Fielding">Roy Fielding</a>2000年发表的<a href="https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm">博士论文</a>提出的。REST并非标准，而是由一系列约束组成，例如无状态，C/S模式以及风格一致的接口。REST与HTTP没有必然的联系。</p>
+<h2 id="rest_1">REST的原则<a class="headerlink" href="#rest_1" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Resources</strong>暴露容易理解的URI路径结构</li>
+<li><strong>Representations</strong>把JSON或XML转换成对象或者属性</li>
+<li><strong>Messages</strong>显示使用HTTP的方法（例如GET, POST, PUT, DELETE）</li>
+<li><strong>Stateless</strong>交互不在服务器上存储请求的客户端上下文。状态的依赖会限制可扩展性，客户端保存会话状态。</li>
+</ul>
+<h2 id="http-methods">HTTP methods<a class="headerlink" href="#http-methods" title="Permanent link">&para;</a></h2>
+<p>使用HTTP methods来将CRUD (create, retrieve, update, delete) 操作映射到HTTP请求</p>
+<h2 id="get">GET<a class="headerlink" href="#get" title="Permanent link">&para;</a></h2>
+<p>获取信息。GET必须是安全和幂等的，就是说无论使用相同的参数GET多少次，结果都是相同的。GET可能会有负面影响，但不应该是用户所期望的，所以对于系统的操作来说并不严格。请求也可以是局部的或有条件的。
+获取一个ID是1的地址：</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>GET /addresses/1
+</pre></div>
+</td></tr></table>
+<h2 id="post">POST<a class="headerlink" href="#post" title="Permanent link">&para;</a></h2>
+<p>请求位于URI的资源并使用提供的entity做一些事情。通常用来创建entity，也可以用来更新entity。
+创建一个新的地址</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>POST /addresses
+</pre></div>
+</td></tr></table>
+<h2 id="put">PUT<a class="headerlink" href="#put" title="Permanent link">&para;</a></h2>
+<p>在URI处存储entity。PUT可以创建或者更新entity。PUT请求是幂等的。幂等是PUT和POST之间的主要区别。
+更改ID是1的地址</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>PUT /addresses/1
+</pre></div>
+</td></tr></table>
+<blockquote>
+<p>PUT替代存在的entity。如果只提供数据元素的子集，未提供的数据元素将用empty或者null来替代。</p>
+</blockquote>
+<h2 id="patch">PATCH<a class="headerlink" href="#patch" title="Permanent link">&para;</a></h2>
+<p>只更新处于URI位置的entity的特定的域。PATCH请求是幂等的，幂等是PATCH与POST的主要区别。</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>PATCH /addresses/1
+</pre></div>
+</td></tr></table>
+<h2 id="delete">DELETE<a class="headerlink" href="#delete" title="Permanent link">&para;</a></h2>
+<p>请求移除资源；然而资源不必立即被移除，它可是是一个异步的或运行时间很长的请求。</p>
+<p>删除ID是1的地址</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>DELETE /addresses/1
+</pre></div>
+</td></tr></table>
+<h2 id="http">HTTP 状态码<a class="headerlink" href="#http" title="Permanent link">&para;</a></h2>
+<p>状态码代表了HTTP请求的结果</p>
+<ul>
+<li>1XX - informational</li>
+<li>2XX - success</li>
+<li>3XX - redirection</li>
+<li>4XX - client error</li>
+<li>5XX - server error</li>
+</ul>
+<h2 id="media">Media类型<a class="headerlink" href="#media" title="Permanent link">&para;</a></h2>
+<p><strong>Accept</strong> 和 <strong>Content-Type</strong> HTTP headers 可以用来描述HTTP请求中发送或者请求的内容。如果他请求的是JSON形式的response，客户端可能会将 <strong>Accept</strong> 设置成<strong>application/json</strong> . 相反, 在发送数据的时候, 将 <strong>Content-Type</strong>设置成<strong>application/xml</strong>将表示客户端请求正在发送的数据是XML形式。</p>
+                
+                  
+                
+              
+              <!-- 
+                 
+ 
+ 
+<hr><blockquote class="page-copyright">
+  <span><i class="md-icon">build</i>本页面最近更新：</span><span class="facts_modified"></span>，<a class="edit_history">更新历史</a><br>
+  <span><i class="md-icon">edit</i>发现错误？想一起完善？ <a href="None" title="编辑此页" class="page_edit_url">在 GitHub 上编辑此页！</a></span><br>
+  <span><i class="md-icon">people</i>本页面贡献者：</span><span class="page_contributors">OI-wiki</span><br>
+  <span><i class="md-icon">copyright</i>本页面的全部内容在 <strong></strong> 协议之条款下提供，附加条款亦可能应用</span>
+</blockquote>
+
+               -->
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<script>function scrollFunction(){20<document.body.scrollTop||20<document.documentElement.scrollTop?document.getElementById("myBtn").style.display="block":document.getElementById("myBtn").style.display="none"}function topFunction(){document.body.scrollTop=0,document.documentElement.scrollTop=0}window.onscroll=function(){scrollFunction()}</script>
+<button onclick="topFunction()" id="myBtn" class="data-tip-left" data-tip="回到顶部">
+  <svg class="Zi Zi--BackToTop data-tip-left" data-tip="回到顶部" fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
+    <path d="M16.036 19.59a1 1 0 0 1-.997.995H9.032a.996.996 0 0 1-.997-.996v-7.005H5.03c-1.1 0-1.36-.633-.578-1.416L11.33 4.29a1.003 1.003 0 0 1 1.412 0l6.878 6.88c.782.78.523 1.415-.58 1.415h-3.004v7.005z"></path>
+  </svg>
+</button>
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../vim-learning-notes/" title="vim" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  上一页
+                </span>
+                vim
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../spring-callstack/" title="spring" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  下一页
+                </span>
+                spring
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+        <div id="miitbeian"></div>
+      </div>
+      
+      <span style="float:right" class="build_date_utc"><a href="https://github.com/24OI/OI-wiki">最近更新：, 2021-09-29</a></span>
+      <script>
+        /* miitbeian */
+        if (window.location.hostname == "oi-wiki.com") {
+          document.getElementById("miitbeian").innerHTML = `<a href="http://beian.miit.gov.cn/">黑ICP备19005132号-2</a>`;
+        }
+        /* Easter Egg */
+        console.log(`%c OI Wiki %c  %c`,"background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff","background:#41b883 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff","background:transparent");
+        console.log('少年，恭喜你囍提彩蛋，我们在做一些 OI 相关的有趣的事情，如果您对此感兴趣，欢迎访问 https://join-us.oi-wiki.org');
+      </script>
+      
+    </div>
+    <div class="sponsor" style="text-align:center;color:#fff;vertical-align:middle">
+      Supported by <span>
+      <a href="/intro/hulu/">
+        <img src="https://cdn.jsdelivr.net/npm/oicdn@0.0.1/hulu-white.png" style="vertical-align:-12px;width:125px;margin-left:5px">
+      </a>
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/application.ad30b88d.js"></script>
+      <script>app.initialize({version:"1.2.2",url:{base:"../.."}}),"serviceWorker"in navigator&&navigator.serviceWorker.register("/service-worker.js",{scope:"/"}).then(function(e){console.log("PWA Registration succeeded. Scope is "+e.scope)}).catch(function(e){console.log("PWA Registration failed with "+e)})</script>
+      
+    
+  </body>
+</html>

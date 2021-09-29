@@ -1,0 +1,1374 @@
+
+
+
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta http-equiv="x-dns-prefetch-control" content="on">
+      <link rel="dns-prefetch" href="//oi-wiki.org">
+      <link rel="dns-prefetch" href="//search.oi-wiki.org">
+      <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+      <link rel="dns-prefetch" href="//api.github.com">
+      <link rel="dns-prefetch" href="//cdn-for-oi-wiki.billchn.com">
+      <link rel="dns-prefetch" href="//www.google-analytics.com">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+        <link rel="canonical" href="https://xiaocairush.github.io/java%E5%90%8E%E7%AB%AF/vim-learning-notes/">
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="复制">
+      
+        <meta name="lang:clipboard.copied" content="已复制">
+      
+        <meta name="lang:search.language" content="jp">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="没有找到符合条件的结果">
+      
+        <meta name="lang:search.result.one" content="找到 1 个符合条件的结果">
+      
+        <meta name="lang:search.result.other" content="# 个符合条件的结果">
+      
+        <meta name="lang:search.tokenizer" content="[\uff0c\u3002]+">
+      
+      <link rel="shortcut icon" href="../..">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-4.4.2">
+    
+    
+      
+        <title>Vim Learning Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/application.30686662.css">
+      
+        <link rel="stylesheet" href="../../assets/stylesheets/application-palette.a8b3c06d.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="">
+      
+    
+    
+      <script src="../../assets/javascripts/modernizr.27508f0e.js"></script>
+    
+    
+      
+        <style>@font-face{font-family:'Fira Sans';font-style:normal;font-weight:300;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.eot);src:local('Fira Sans'),local('FiraSans-Normal'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Sans';font-style:normal;font-weight:regular;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.eot);src:local('Fira Sans'),local('FiraSans-Normal'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Sans';font-style:italic;font-weight:regular;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.eot);src:local('Fira Sans'),local('FiraSans-Italic'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Sans';font-style:normal;font-weight:700;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.eot);src:local('Fira Sans'),local('FiraSans-Normal'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Mono';font-style:normal;font-weight:regular;src:url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.eot);src:local('Fira Mono'),local('FiraMono-Normal'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.svg#FiraMono) format('svg')}body,input{font-family:"Fira Sans","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Fira Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/material-icons@0.2.3/iconfont/material-icons.min.css">
+    
+      <link rel="manifest" href="../../manifest.webmanifest">
+    
+    
+    
+      
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="white" data-md-color-accent="red">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#basic-command" tabindex="1" class="md-skip">
+        跳转至
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://xiaocairush.github.io/" title="知识总结" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon">school</i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              知识总结
+            </span>
+            <span class="md-header-nav__topic">
+              
+                Vim Learning Notes
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            键入以开始搜索
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+        
+
+  
+
+<nav class="md-tabs md-tabs--active" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  <li class="md-tabs__item">
+    
+      <a href="../.." class="md-tabs__link">
+        Home
+      </a>
+    
+  </li>
+
+      
+        
+      
+        
+  
+  
+    <li class="md-tabs__item">
+      
+        <a href="../ZooKeeper-overview/" class="md-tabs__link md-tabs__link--active">
+          java后端
+        </a>
+      
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+      
+      <main class="md-main" role="main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://xiaocairush.github.io/" title="知识总结" class="md-nav__button md-logo">
+      
+        <i class="md-icon">school</i>
+      
+    </a>
+    知识总结
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../about.md" title="About" class="md-nav__link">
+      About
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+    
+    <label class="md-nav__link" for="nav-3">
+      java后端
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        java后端
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../ZooKeeper-overview/" title="ZooKeeper" class="md-nav__link">
+      ZooKeeper
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Spark-Overview/" title="Spark" class="md-nav__link">
+      Spark
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Resources/" title="Resources" class="md-nav__link">
+      Resources
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../%E5%90%8C%E6%AD%A5%E5%B7%A5%E5%85%B7%E7%B1%BB/" title="同步工具类" class="md-nav__link">
+      同步工具类
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../java-SE8-in-practice/" title="java-SE8-in-practice" class="md-nav__link">
+      java-SE8-in-practice
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        vim
+      </label>
+    
+    <a href="./" title="vim" class="md-nav__link md-nav__link--active">
+      vim
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">目录</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#basic-command" class="md-nav__link">
+    Basic Command:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edit-a-little-faster" class="md-nav__link">
+    Edit A Little Faster
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#searching" class="md-nav__link">
+    Searching
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#text-blocks-and-multiple-files" class="md-nav__link">
+    Text Blocks and Multiple Files
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#window-buffer" class="md-nav__link">
+    Window &amp;&amp; Buffer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#basic-visual-mode" class="md-nav__link">
+    Basic Visual Mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commands-for-programmers" class="md-nav__link">
+    Commands for Programmers
+  </a>
+  
+</li>
+      
+      
+      <!-- 
+      
+       -->
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../understanding-REST/" title="理解REST" class="md-nav__link">
+      理解REST
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../spring-callstack/" title="spring" class="md-nav__link">
+      spring
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../BlockingQueue%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" title="BlockingQueue源码剖析" class="md-nav__link">
+      BlockingQueue源码剖析
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../ConcurrentHashMap%281.8%E7%89%88%E6%9C%AC%29%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" title="ConcurrentHashMap" class="md-nav__link">
+      ConcurrentHashMap
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../java.util.concurrent.locks%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" title="java.util.concurrent.locks源码剖析" class="md-nav__link">
+      java.util.concurrent.locks源码剖析
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Redis-CheatSheet/" title="Redis" class="md-nav__link">
+      Redis
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">目录</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#basic-command" class="md-nav__link">
+    Basic Command:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edit-a-little-faster" class="md-nav__link">
+    Edit A Little Faster
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#searching" class="md-nav__link">
+    Searching
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#text-blocks-and-multiple-files" class="md-nav__link">
+    Text Blocks and Multiple Files
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#window-buffer" class="md-nav__link">
+    Window &amp;&amp; Buffer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#basic-visual-mode" class="md-nav__link">
+    Basic Visual Mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commands-for-programmers" class="md-nav__link">
+    Commands for Programmers
+  </a>
+  
+</li>
+      
+      
+      <!-- 
+      
+       -->
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                  <h1>vim</h1>
+                
+                <p>This is a learning notes of  <a href="https://docs.google.com/viewer?a=v&amp;pid=sites&amp;srcid=ZGVmYXVsdGRvbWFpbnxrb25nbHR8Z3g6NTUyOGM0NmRlYmQzY2E5Mg">《vimbook-OPL.pdf》</a></p>
+<h2 id="basic-command">Basic Command:<a class="headerlink" href="#basic-command" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:help</td>
+<td>get help. You can also use \&lt;F1>.</td>
+</tr>
+<tr>
+<td>h,j,k,l</td>
+<td>move cursor to left,down,up,right</td>
+</tr>
+<tr>
+<td>2h</td>
+<td>an example to move cursor to left 2 character. use \&lt;n>h/j/k/l to move faster</td>
+</tr>
+<tr>
+<td>o</td>
+<td>open new line below cursor</td>
+</tr>
+<tr>
+<td>O</td>
+<td>open new line above cursor</td>
+</tr>
+<tr>
+<td>a</td>
+<td>append</td>
+</tr>
+<tr>
+<td>3a5\&lt;Esc></td>
+<td>an example to append '555'. similarly, command 3x will delete 3 characters.</td>
+</tr>
+<tr>
+<td>i</td>
+<td>insert</td>
+</tr>
+<tr>
+<td>ZZ</td>
+<td>save and close</td>
+</tr>
+<tr>
+<td>ctrl+]</td>
+<td>jump to tag</td>
+</tr>
+<tr>
+<td>ctrl+T</td>
+<td>pop a tag off the tag stack. (go back to location before jump tag.)</td>
+</tr>
+<tr>
+<td>dd</td>
+<td>cut line into vim clipboard.</td>
+</tr>
+<tr>
+<td>dw</td>
+<td>cut a word</td>
+</tr>
+<tr>
+<td>d3w</td>
+<td>cut three words</td>
+</tr>
+</tbody>
+</table>
+<h2 id="edit-a-little-faster">Edit A Little Faster<a class="headerlink" href="#edit-a-little-faster" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>w</td>
+<td>move cursor forward one word</td>
+</tr>
+<tr>
+<td>b</td>
+<td>move cursor back one word</td>
+</tr>
+<tr>
+<td>2w</td>
+<td>move cursor forward two word</td>
+</tr>
+<tr>
+<td>$, \&lt;End></td>
+<td>move cursor to end of line</td>
+</tr>
+<tr>
+<td>^</td>
+<td>move cursor to first nonblank character of the line</td>
+</tr>
+<tr>
+<td>\&lt;Home></td>
+<td>move cursor to first character of the line</td>
+</tr>
+<tr>
+<td>2$</td>
+<td>move cursor to end of next line</td>
+</tr>
+<tr>
+<td>\&lt;kHome></td>
+<td>move cursor to first character of current line</td>
+</tr>
+<tr>
+<td>f\&lt;x></td>
+<td>forward search character \&lt;x>.</td>
+</tr>
+<tr>
+<td>5f\&lt;x></td>
+<td>forward move cursor to fifth character \&lt;x> of current line</td>
+</tr>
+<tr>
+<td>F\&lt;x></td>
+<td>back search character \&lt;x>.</td>
+</tr>
+<tr>
+<td>t\&lt;x></td>
+<td>forward search character \&lt;x> but move cursor before the character \&lt;x></td>
+</tr>
+<tr>
+<td>T\&lt;x></td>
+<td>back search character \&lt;x> but move cursor after the character \&lt;x></td>
+</tr>
+<tr>
+<td>3G</td>
+<td>move cursor to the 3<sup>rd</sup> line</td>
+</tr>
+<tr>
+<td>:set nu</td>
+<td>show line number</td>
+</tr>
+<tr>
+<td>:set nonu</td>
+<td>don't show line number</td>
+</tr>
+<tr>
+<td>ctrl+G</td>
+<td>displays a status line that indicates where you are in the file</td>
+</tr>
+<tr>
+<td>ctrl+U</td>
+<td>scrolls up half a screen of text</td>
+</tr>
+<tr>
+<td>ctrl+D</td>
+<td>scrolls down half a screen of text</td>
+</tr>
+<tr>
+<td>d$, D</td>
+<td>delete to end of line</td>
+</tr>
+<tr>
+<td>cw</td>
+<td>change a word</td>
+</tr>
+<tr>
+<td>cc</td>
+<td>change the whole line</td>
+</tr>
+<tr>
+<td>.</td>
+<td>repeats the last delete or change command</td>
+</tr>
+<tr>
+<td>J</td>
+<td>joins the current line with the next one</td>
+</tr>
+<tr>
+<td>r\&lt;x></td>
+<td>replaces the character under the cursor with \&lt;x></td>
+</tr>
+<tr>
+<td>q\&lt;x></td>
+<td>Start recording a macro in register x</td>
+</tr>
+<tr>
+<td>q</td>
+<td>Stop recording the macro</td>
+</tr>
+<tr>
+<td>:digraphs</td>
+<td>show available digraph symbols</td>
+</tr>
+</tbody>
+</table>
+<h2 id="searching">Searching<a class="headerlink" href="#searching" title="Permanent link">&para;</a></h2>
+<p>Special characters: *[]ˆ%/\?~$ has special meaning.</p>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/\&lt;string></td>
+<td>search \&lt;string></td>
+</tr>
+<tr>
+<td>/\&lt;Enter>, n</td>
+<td>find next result</td>
+</tr>
+<tr>
+<td>N</td>
+<td>find last result</td>
+</tr>
+<tr>
+<td>/\&lt;Up></td>
+<td>last search history</td>
+</tr>
+<tr>
+<td>/\&lt;Down></td>
+<td>next search history</td>
+</tr>
+<tr>
+<td>:set hlsearch</td>
+<td>highlight any strings found matching the search pattern</td>
+</tr>
+<tr>
+<td>:set nohlsearch</td>
+<td>turn off search highlighting</td>
+</tr>
+<tr>
+<td>:nohlsearch</td>
+<td>clear the current highlighting</td>
+</tr>
+<tr>
+<td>:set incsearch</td>
+<td>turn on incremental searches</td>
+</tr>
+<tr>
+<td>:set noincsearch</td>
+<td>turn off incremental searches</td>
+</tr>
+<tr>
+<td>?</td>
+<td>searches backward. ? and n commands work together</td>
+</tr>
+</tbody>
+</table>
+<h2 id="text-blocks-and-multiple-files">Text Blocks and Multiple Files<a class="headerlink" href="#text-blocks-and-multiple-files" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>p</td>
+<td>paste the text before the cursor</td>
+</tr>
+<tr>
+<td>m\&lt;a></td>
+<td>marks the place under the cursor as mark \&lt;a></td>
+</tr>
+<tr>
+<td>`\&lt;a></td>
+<td>go to mark \&lt;a></td>
+</tr>
+<tr>
+<td>:marks</td>
+<td>list all marks</td>
+</tr>
+<tr>
+<td>yy, Y</td>
+<td>yanks the current line into the buffer (copy operation)</td>
+</tr>
+<tr>
+<td>y`\&lt;a></td>
+<td>copy text between current cursor and mark \&lt;a></td>
+</tr>
+<tr>
+<td>\&lt;n>Y</td>
+<td>yank n lines into the registers</td>
+</tr>
+<tr>
+<td>!\&lt;motion> <br/> \&lt;command></td>
+<td>It runs the system command represented by command,<br/> giving it the block of text represented by motion as input.<br/> The output of this command then replaces the selected block.</td>
+</tr>
+<tr>
+<td>!10Gsort</td>
+<td>The result is that the sort program is run on the first 10 lines.<br/> The output of the programreplaces these lines.</td>
+</tr>
+<tr>
+<td>!!ls</td>
+<td>This puts the output of the ls command into current line.</td>
+</tr>
+<tr>
+<td>!!date</td>
+<td>This puts the output of the date command into current line.</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>For !!ls and !!date Using !! like this is technically not filtering <br/> because commands like ls and date don’t read standard input.</strong></td>
+</tr>
+<tr>
+<td>:vi file</td>
+<td>edit another file</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>The :e command can be used in place of :vi</strong></td>
+</tr>
+<tr>
+<td>:write</td>
+<td>save current file</td>
+</tr>
+<tr>
+<td>:vi! file.txt</td>
+<td>force Vim to discard your changes and edit the new file using the force (!) option</td>
+</tr>
+<tr>
+<td>:view file</td>
+<td>the new file is opened in read-only mode</td>
+</tr>
+<tr>
+<td>vim \&lt;file1> \&lt;file2> \&lt;...></td>
+<td>edit multiple files. By default, Vim displays just the first file.To edit the next file, you need to change files using the :next command</td>
+</tr>
+<tr>
+<td>:next</td>
+<td>edit the next file</td>
+</tr>
+<tr>
+<td>:wnext</td>
+<td>save file and edit the next file</td>
+</tr>
+<tr>
+<td>:next!</td>
+<td>edit the next file</td>
+</tr>
+<tr>
+<td>:set autowrite</td>
+<td>turn on auto write.</td>
+</tr>
+<tr>
+<td>:set noautowrite</td>
+<td>turn off auto write</td>
+</tr>
+<tr>
+<td>:2 next</td>
+<td>excute :next twice</td>
+</tr>
+<tr>
+<td>:args</td>
+<td>displays the list of the files currently being edited</td>
+</tr>
+<tr>
+<td>:previous :Next</td>
+<td>edit the previous file</td>
+</tr>
+<tr>
+<td>:wprevious</td>
+<td>save file and edit the previous file</td>
+</tr>
+<tr>
+<td>:wNext</td>
+<td>save file and edit the previous file</td>
+</tr>
+<tr>
+<td>:rewind :first</td>
+<td>edit the first file</td>
+</tr>
+<tr>
+<td>:last</td>
+<td>edit the last file</td>
+</tr>
+<tr>
+<td>ctrl+^</td>
+<td>switch editing from the current file to the alternate file</td>
+</tr>
+<tr>
+<td>\&lt;n>ctrl+^</td>
+<td>switch to \&lt;n>th file</td>
+</tr>
+</tbody>
+</table>
+<h2 id="window-buffer">Window &amp;&amp; Buffer<a class="headerlink" href="#window-buffer" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:split</td>
+<td>open a new window. You can view two different parts of a file simultaneously.</td>
+</tr>
+<tr>
+<td>ctrl+ww</td>
+<td>switch window</td>
+</tr>
+<tr>
+<td>ctrl+wj</td>
+<td>go down a window</td>
+</tr>
+<tr>
+<td>ctrl+wk</td>
+<td>go up a window</td>
+</tr>
+<tr>
+<td>ctrl+wc \&lt;br/> ZZ \&lt;br/>:q</td>
+<td>close current window</td>
+</tr>
+<tr>
+<td>:split \&lt;file></td>
+<td>open a new window and edit given \&lt;file></td>
+</tr>
+<tr>
+<td>:split +/printf three.c</td>
+<td></td>
+</tr>
+<tr>
+<td>:3 split \&lt;file> <br/> :3split \&lt;file></td>
+<td>Controlling Window Size.<br/> opens a new window three lines high.</td>
+</tr>
+<tr>
+<td>:count split +command file</td>
+<td>count:The size of the new window in lines. (Default is to split the current window into two equal sizes.)<br/> +command: An initial command.<br/> file: The name of the file to edit. (Default is the current file.)</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>This is a summary for split</strong></td>
+</tr>
+<tr>
+<td>:new</td>
+<td>open a new window and edit new file.<br/> The :new command works just like the :split command.</td>
+</tr>
+<tr>
+<td>:sview</td>
+<td>The :sview command acts like a combination of :split and :view</td>
+</tr>
+<tr>
+<td>ctrl w+</td>
+<td>increases the window size by count (default = 1).</td>
+</tr>
+<tr>
+<td>ctrl w-</td>
+<td>decreases the window’s size by count (default = 1).</td>
+</tr>
+<tr>
+<td>\&lt;n> ctrl w</td>
+<td>makes the current window n lines high</td>
+</tr>
+<tr>
+<td>:hide</td>
+<td>hide a window. ( But Vim still knows that you are editing this buffer)</td>
+</tr>
+<tr>
+<td>:buffers</td>
+<td>find a list of buffers</td>
+</tr>
+<tr>
+<td></td>
+<td>explanation for buffer:<br/><strong>The first column is the buffer number.<br/> The second is a series of flags indicating the state of the buffer.<br/> The third is the name of the file associated with the buffer.<br/> The state flags are as follows:<br/> - Inactive buffer.<br/> h Buffer is hidden.<br/> % Current buffer.<br/> # Alternate buffer.<br/> + File has been modified.</strong></td>
+</tr>
+<tr>
+<td>:buffer number</td>
+<td>Selecting a Buffer by number</td>
+</tr>
+<tr>
+<td>:buffer file</td>
+<td>Selecting a Buffer by file name</td>
+</tr>
+<tr>
+<td>:sbuffer number</td>
+<td>splits the window and starts editing the buffer</td>
+</tr>
+<tr>
+<td>:bnext</td>
+<td>Go to the next buffer.</td>
+</tr>
+<tr>
+<td>:count bnext</td>
+<td>Go to the next buffer count times.</td>
+</tr>
+<tr>
+<td>:count sbnext</td>
+<td>Shorthand for :split followed by :count bnext.</td>
+</tr>
+<tr>
+<td>:count bprevious <br/> :count bNext</td>
+<td>Go to previous buffer. If a count is specified, go to the count previous buffer.</td>
+</tr>
+<tr>
+<td>:count sbprevious<br/> :count sbNext</td>
+<td>Shorthand for :split and :count bprevious</td>
+</tr>
+<tr>
+<td>:blast</td>
+<td>Go to the last buffer in the list.</td>
+</tr>
+<tr>
+<td>:sblast</td>
+<td>Shorthand for :split and :blast.</td>
+</tr>
+<tr>
+<td>:brewind</td>
+<td>Go to the first buffer in the list.</td>
+</tr>
+<tr>
+<td>:sbrewind</td>
+<td>Shorthand for :split and :rewind.</td>
+</tr>
+<tr>
+<td>:bmodified count</td>
+<td>Go to count modified buffer on the list.</td>
+</tr>
+<tr>
+<td>:sbmodified count</td>
+<td>Shorthand for :split and :bmodified.</td>
+</tr>
+<tr>
+<td>:set hidden</td>
+<td>If the option hidden is set, files that leave the screen do not become inactive; instead they automatically become hidden.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="basic-visual-mode">Basic Visual Mode<a class="headerlink" href="#basic-visual-mode" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v</td>
+<td>starts a character-bycharacter visual mode.</td>
+</tr>
+<tr>
+<td>V</td>
+<td>starts linewise visual mode.</td>
+</tr>
+<tr>
+<td>ctrl V</td>
+<td>block visual mode</td>
+</tr>
+<tr>
+<td>:help v_d</td>
+<td>help on the commands that operate in visual mode</td>
+</tr>
+<tr>
+<td>\&lt;Esc> <br/> ctrl c</td>
+<td>Leaving Visual Mode</td>
+</tr>
+<tr>
+<td>&gt;</td>
+<td>indents the selected lines by one “shift width"</td>
+</tr>
+<tr>
+<td>&lt;</td>
+<td>reverse to &gt;</td>
+</tr>
+<tr>
+<td>ctrl V then Istring\&lt;Esc></td>
+<td>inserts the text on each line starting at the left side of the visual block</td>
+</tr>
+<tr>
+<td>ctrl V then c \&lt;Esc></td>
+<td>change each line in the visual block</td>
+</tr>
+<tr>
+<td>ctrl V then r\&lt;character> \&lt;Esc></td>
+<td>replace the selected characters with a single character</td>
+</tr>
+<tr>
+<td>ctrl V then &gt; \&lt;Esc></td>
+<td>The command &gt; shifts the text to the right one shift width <br/>The &lt; command removes one shift width of whitespace at the left side of the block</td>
+</tr>
+<tr>
+<td>:help v_b_r</td>
+<td>Help r command in Visual Block Mode</td>
+</tr>
+</tbody>
+</table>
+<h2 id="commands-for-programmers">Commands for Programmers<a class="headerlink" href="#commands-for-programmers" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>command</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:syntax on</td>
+<td>turns on syntax coloring</td>
+</tr>
+<tr>
+<td>:set filetype=c</td>
+<td>tells Vim which type of syntax highlighting to use</td>
+</tr>
+<tr>
+<td>&gt;&gt;</td>
+<td>shifts the current line one shift width to the right</td>
+</tr>
+<tr>
+<td>&lt;&lt;</td>
+<td>shifts the current line one shift width to the left</td>
+</tr>
+<tr>
+<td>:set shiftwidth=4</td>
+<td>set shiftwidth</td>
+</tr>
+<tr>
+<td>5&lt;&lt;</td>
+<td>shifts 5 lines</td>
+</tr>
+<tr>
+<td>&lt;motion</td>
+<td>shifts each line from the current cursor location to where motion carries you.</td>
+</tr>
+<tr>
+<td>=motion</td>
+<td>indents the selected text using Vim’s internal formatting program.</td>
+</tr>
+<tr>
+<td>[CTRL-I <br/> ]CTRL-I</td>
+<td>Search for a word under the cursor in the current file and any brought in by #include directives.<br/> The [CTRL-I command jumps to the word under the cursor. The search starts at the<br/> beginning of the file and also searches files brought in by #include directives.<br/> The ]CTRL-I does the same thing, starting at the cursor location.<br/></td>
+</tr>
+<tr>
+<td><strong>gd</strong><br/><strong>gD</strong></td>
+<td>Search for the definition of a variable.<br/> gd for local variable and gD for global variable.</td>
+</tr>
+<tr>
+<td><strong>]CTRL-D</strong><br/><strong>[CTRL-D</strong></td>
+<td>Jump to a macro definition.<br/>The [CTRL-D command searches for the first definition of the macro<br/>The ]CTRL-D command searches for the next definition of the macro<br/></td>
+</tr>
+<tr>
+<td><strong>]d</strong><br/> <strong>[d</strong><br/> <strong>]D</strong><br/> <strong>[D</strong><br/></td>
+<td>Display macro definitions.<br/> The [d command displays the first definition of the macro whose name is under the cursor.<br/> The ]d command does the same thing only it starts looking from the current cursor position and finds the next definition.<br/>The ]D and [D commands list all the definitions of a macro.<br/></td>
+</tr>
+<tr>
+<td><strong>%</strong></td>
+<td>The % command is designed to match pairs of (), {}, or [], /*, #ifndef, #if</td>
+</tr>
+<tr>
+<td><strong>&gt;%</strong></td>
+<td>Shifting a Block of Text Enclosed in {}</td>
+</tr>
+<tr>
+<td>1. Position the cursor on the first {.<br/> 2. Execute the command &gt;i{.<br/></td>
+<td>This shift right command (&gt;) shifts the selected text to the right one shift width. In this case, the selection command that follows is i{, which is the “inner {} block” command.</td>
+</tr>
+<tr>
+<td>1. Position the cursor on the left or right curly brace.<br/> 2. Start visual mode with the v command.<br/> 3. Select the inner {} block with the command i}.<br/>4. Indent the text with &gt;.</td>
+<td>indent a block using visual mode</td>
+</tr>
+<tr>
+<td>K</td>
+<td>The K command runs a UNIX man command using the word under the cursor as a subject.</td>
+</tr>
+<tr>
+<td>:tag function</td>
+<td>go to a function definition</td>
+</tr>
+<tr>
+<td>:tags</td>
+<td>The :tags command shows the list of the tags that you have traversed through</td>
+</tr>
+<tr>
+<td>CTRL-T</td>
+<td>The CTRL-T command goes the preceding tag.</td>
+</tr>
+<tr>
+<td>:<count>tag</td>
+<td>jump forward that many tags on the list</td>
+</tr>
+<tr>
+<td>:stag tag</td>
+<td>You can split the window using the :split command followed by the :tag command.</td>
+</tr>
+<tr>
+<td>:tag /\&lt;regular expression></td>
+<td>Finding a Procedure When You Only Know Part of the Name</td>
+</tr>
+</tbody>
+</table>
+<p>pocessing: 82</p>
+                
+                  
+                
+              
+              <!-- 
+                 
+ 
+ 
+<hr><blockquote class="page-copyright">
+  <span><i class="md-icon">build</i>本页面最近更新：</span><span class="facts_modified"></span>，<a class="edit_history">更新历史</a><br>
+  <span><i class="md-icon">edit</i>发现错误？想一起完善？ <a href="None" title="编辑此页" class="page_edit_url">在 GitHub 上编辑此页！</a></span><br>
+  <span><i class="md-icon">people</i>本页面贡献者：</span><span class="page_contributors">OI-wiki</span><br>
+  <span><i class="md-icon">copyright</i>本页面的全部内容在 <strong></strong> 协议之条款下提供，附加条款亦可能应用</span>
+</blockquote>
+
+               -->
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<script>function scrollFunction(){20<document.body.scrollTop||20<document.documentElement.scrollTop?document.getElementById("myBtn").style.display="block":document.getElementById("myBtn").style.display="none"}function topFunction(){document.body.scrollTop=0,document.documentElement.scrollTop=0}window.onscroll=function(){scrollFunction()}</script>
+<button onclick="topFunction()" id="myBtn" class="data-tip-left" data-tip="回到顶部">
+  <svg class="Zi Zi--BackToTop data-tip-left" data-tip="回到顶部" fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
+    <path d="M16.036 19.59a1 1 0 0 1-.997.995H9.032a.996.996 0 0 1-.997-.996v-7.005H5.03c-1.1 0-1.36-.633-.578-1.416L11.33 4.29a1.003 1.003 0 0 1 1.412 0l6.878 6.88c.782.78.523 1.415-.58 1.415h-3.004v7.005z"></path>
+  </svg>
+</button>
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../java-SE8-in-practice/" title="java-SE8-in-practice" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  上一页
+                </span>
+                java-SE8-in-practice
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../understanding-REST/" title="理解REST" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  下一页
+                </span>
+                理解REST
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+        <div id="miitbeian"></div>
+      </div>
+      
+      <span style="float:right" class="build_date_utc"><a href="https://github.com/24OI/OI-wiki">最近更新：, 2021-09-29</a></span>
+      <script>
+        /* miitbeian */
+        if (window.location.hostname == "oi-wiki.com") {
+          document.getElementById("miitbeian").innerHTML = `<a href="http://beian.miit.gov.cn/">黑ICP备19005132号-2</a>`;
+        }
+        /* Easter Egg */
+        console.log(`%c OI Wiki %c  %c`,"background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff","background:#41b883 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff","background:transparent");
+        console.log('少年，恭喜你囍提彩蛋，我们在做一些 OI 相关的有趣的事情，如果您对此感兴趣，欢迎访问 https://join-us.oi-wiki.org');
+      </script>
+      
+    </div>
+    <div class="sponsor" style="text-align:center;color:#fff;vertical-align:middle">
+      Supported by <span>
+      <a href="/intro/hulu/">
+        <img src="https://cdn.jsdelivr.net/npm/oicdn@0.0.1/hulu-white.png" style="vertical-align:-12px;width:125px;margin-left:5px">
+      </a>
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/application.ad30b88d.js"></script>
+      <script>app.initialize({version:"1.2.2",url:{base:"../.."}}),"serviceWorker"in navigator&&navigator.serviceWorker.register("/service-worker.js",{scope:"/"}).then(function(e){console.log("PWA Registration succeeded. Scope is "+e.scope)}).catch(function(e){console.log("PWA Registration failed with "+e)})</script>
+      
+    
+  </body>
+</html>

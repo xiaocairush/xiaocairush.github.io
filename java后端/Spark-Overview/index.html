@@ -1,0 +1,820 @@
+
+
+
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta http-equiv="x-dns-prefetch-control" content="on">
+      <link rel="dns-prefetch" href="//oi-wiki.org">
+      <link rel="dns-prefetch" href="//search.oi-wiki.org">
+      <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+      <link rel="dns-prefetch" href="//api.github.com">
+      <link rel="dns-prefetch" href="//cdn-for-oi-wiki.billchn.com">
+      <link rel="dns-prefetch" href="//www.google-analytics.com">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+        <link rel="canonical" href="https://xiaocairush.github.io/java%E5%90%8E%E7%AB%AF/Spark-Overview/">
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="复制">
+      
+        <meta name="lang:clipboard.copied" content="已复制">
+      
+        <meta name="lang:search.language" content="jp">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="没有找到符合条件的结果">
+      
+        <meta name="lang:search.result.one" content="找到 1 个符合条件的结果">
+      
+        <meta name="lang:search.result.other" content="# 个符合条件的结果">
+      
+        <meta name="lang:search.tokenizer" content="[\uff0c\u3002]+">
+      
+      <link rel="shortcut icon" href="../..">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-4.4.2">
+    
+    
+      
+        <title>Spark Overview</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/application.30686662.css">
+      
+        <link rel="stylesheet" href="../../assets/stylesheets/application-palette.a8b3c06d.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="">
+      
+    
+    
+      <script src="../../assets/javascripts/modernizr.27508f0e.js"></script>
+    
+    
+      
+        <style>@font-face{font-family:'Fira Sans';font-style:normal;font-weight:300;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.eot);src:local('Fira Sans'),local('FiraSans-Normal'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-300.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Sans';font-style:normal;font-weight:regular;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.eot);src:local('Fira Sans'),local('FiraSans-Normal'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-regular.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Sans';font-style:italic;font-weight:regular;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.eot);src:local('Fira Sans'),local('FiraSans-Italic'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-italic.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Sans';font-style:normal;font-weight:700;src:url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.eot);src:local('Fira Sans'),local('FiraSans-Normal'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-sans/fira-sans-700.svg#FiraSans) format('svg')}@font-face{font-family:'Fira Mono';font-style:normal;font-weight:regular;src:url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.eot);src:local('Fira Mono'),local('FiraMono-Normal'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.eot?#iefix) format('embedded-opentype'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.woff2) format('woff2'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.woff) format('woff'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.ttf) format('truetype'),url(//lib.baomitu.com/fonts/fira-mono/fira-mono-regular.svg#FiraMono) format('svg')}body,input{font-family:"Fira Sans","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Fira Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/material-icons@0.2.3/iconfont/material-icons.min.css">
+    
+      <link rel="manifest" href="../../manifest.webmanifest">
+    
+    
+    
+      
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="white" data-md-color-accent="red">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#spark-overview" tabindex="1" class="md-skip">
+        跳转至
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://xiaocairush.github.io/" title="知识总结" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon">school</i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              知识总结
+            </span>
+            <span class="md-header-nav__topic">
+              
+                Spark Overview
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            键入以开始搜索
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+        
+
+  
+
+<nav class="md-tabs md-tabs--active" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  <li class="md-tabs__item">
+    
+      <a href="../.." class="md-tabs__link">
+        Home
+      </a>
+    
+  </li>
+
+      
+        
+      
+        
+  
+  
+    <li class="md-tabs__item">
+      
+        <a href="../ZooKeeper-overview/" class="md-tabs__link md-tabs__link--active">
+          java后端
+        </a>
+      
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+      
+      <main class="md-main" role="main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://xiaocairush.github.io/" title="知识总结" class="md-nav__button md-logo">
+      
+        <i class="md-icon">school</i>
+      
+    </a>
+    知识总结
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../.." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../about.md" title="About" class="md-nav__link">
+      About
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+    
+    <label class="md-nav__link" for="nav-3">
+      java后端
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        java后端
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../ZooKeeper-overview/" title="ZooKeeper" class="md-nav__link">
+      ZooKeeper
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Spark
+      </label>
+    
+    <a href="./" title="Spark" class="md-nav__link md-nav__link--active">
+      Spark
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">目录</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    下载
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shell" class="md-nav__link">
+    运行例子和shell
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cluster" class="md-nav__link">
+    登陆cluster
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    读完这篇文档接下来去哪里
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#programming-guides" class="md-nav__link">
+    Programming Guides:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-docs" class="md-nav__link">
+    API Docs:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    发布指导:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    其它文档:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    外部资源:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      <!-- 
+      
+       -->
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Resources/" title="Resources" class="md-nav__link">
+      Resources
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../%E5%90%8C%E6%AD%A5%E5%B7%A5%E5%85%B7%E7%B1%BB/" title="同步工具类" class="md-nav__link">
+      同步工具类
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../java-SE8-in-practice/" title="java-SE8-in-practice" class="md-nav__link">
+      java-SE8-in-practice
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../vim-learning-notes/" title="vim" class="md-nav__link">
+      vim
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../understanding-REST/" title="理解REST" class="md-nav__link">
+      理解REST
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../spring-callstack/" title="spring" class="md-nav__link">
+      spring
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../BlockingQueue%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" title="BlockingQueue源码剖析" class="md-nav__link">
+      BlockingQueue源码剖析
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../ConcurrentHashMap%281.8%E7%89%88%E6%9C%AC%29%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" title="ConcurrentHashMap" class="md-nav__link">
+      ConcurrentHashMap
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../java.util.concurrent.locks%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/" title="java.util.concurrent.locks源码剖析" class="md-nav__link">
+      java.util.concurrent.locks源码剖析
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Redis-CheatSheet/" title="Redis" class="md-nav__link">
+      Redis
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">目录</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    下载
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shell" class="md-nav__link">
+    运行例子和shell
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cluster" class="md-nav__link">
+    登陆cluster
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    读完这篇文档接下来去哪里
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#programming-guides" class="md-nav__link">
+    Programming Guides:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-docs" class="md-nav__link">
+    API Docs:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    发布指导:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    其它文档:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    外部资源:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      <!-- 
+      
+       -->
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="spark-overview">Spark Overview(翻译)<a class="headerlink" href="#spark-overview" title="Permanent link">&para;</a></h1>
+<p>Apache Spark是一个快速并且通用的集群计算系统。它提供了high level的Java, Scala, Python 和 R 语言的api，以及一个经过优化的支持通用图表的引擎。它也支持非常丰富的工具库，例如<a href="http://spark.apache.org/docs/latest/sql-programming-guide.html">Spark SQL</a>用于sql和结构化数据的处理，<a href="http://spark.apache.org/docs/latest/ml-guide.html">MLlib</a>用于机器学习，<a href="http://spark.apache.org/docs/latest/graphx-programming-guide.html">GraphX</a>用于处理图，以及<a href="http://spark.apache.org/docs/latest/streaming-programming-guide.html">Spark Streaming</a></p>
+<h2 id="_1">下载<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>从<a href="http://spark.apache.org/downloads.html">下载页</a>获取Spark。这个文档对应于Spark 2.0.2. Spark使用Hadoop为HDFS和YARN做的客户端库。下载的压缩文件打包了一些流行版本的Hadoop。用户也可以下载Hadoop免费版的二进制文件，并通过<a href="http://spark.apache.org/docs/latest/hadoop-provided.html">参数化Spark的classpath</a>来使用任意版本的Hadoop来运行Spark</p>
+<p>如果你想编译Spark的源码，访问<a href="http://spark.apache.org/docs/latest/building-spark.html">Build Spark</a></p>
+<p>Spark既可以运行在Windows, Unix, Mac OS等系统中。在本地运行Spark是非常简单的--你只需要安装了java，并JAVA_HOME环境即可。</p>
+<p>Spark能够运行在Java 7+, Python 2.6+/3.4+ 以及 R 3.1+。Spark 2.0.2提供的Scala API需要使用 Scala 2.11。这意味着你需要一个兼容Scala 2.11的版本。</p>
+<h2 id="shell">运行例子和shell<a class="headerlink" href="#shell" title="Permanent link">&para;</a></h2>
+<p>Spark 有一系列的样例程序。Scala, Java, Python 和 R的例子在examples/src/main文件夹下面。为了运行Java或者Scala的样例程序，在Spark一级目录下使用<code>bin/run-example &lt;class&gt; [params]</code>(在幕后，这条命令调用了其它通用的<a href="http://spark.apache.org/docs/latest/submitting-applications.html">spark-submit 脚本</a>来登陆应用程序 )。例如，</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>./bin/run-example SparkPi 10
+</pre></div>
+</td></tr></table>
+<p>你也可以通过Scala Shell来运行Spark。这是学习框架非常好的方式。</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>./bin/spark-shell --master local[2]
+</pre></div>
+</td></tr></table>
+<p>--master选项确定了<a href="http://spark.apache.org/docs/latest/submitting-applications.html#master-urls">cluster的master的URL</a>，local在本地运行一个线程，local[N]在本地运行N个线程。你可以使用local来启动测一下这点。使用--help选项可以获得所有的选项。</p>
+<p>Spark也提供了Python API。要在Python接受器中运行Spark，使用bin/pyspark</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>./bin/pyspark --master local[2]
+</pre></div>
+</td></tr></table>
+<p>从1.4开始Spark也提供了实验性的<a href="http://spark.apache.org/docs/latest/sparkr.html">R API</a>（只包含了DataFrames APIs）。要在R解释器中运行Spark，使用<code>bin/sparkR</code>:</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>./bin/sparkR --master local[2]
+</pre></div>
+</td></tr></table>
+<p>也提供了R语言的样例应用程序。例如：</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span>./bin/spark-submit examples/src/main/r/dataframe.R
+</pre></div>
+</td></tr></table>
+<h2 id="cluster">登陆cluster<a class="headerlink" href="#cluster" title="Permanent link">&para;</a></h2>
+<p><a href="http://spark.apache.org/docs/latest/cluster-overview.html">cluster mode overview</a>解释了运行cluster的关键概念。Spark可以自己运行，也可以与几个已经存在的cluster manager一起运行。当前提供了几个发布的选项：</p>
+<ul>
+<li><a href="http://spark.apache.org/docs/latest/spark-standalone.html">独立运行模式发布</a>在私有cluster上发布Spark最简单的方式</li>
+<li><a href="http://spark.apache.org/docs/latest/running-on-mesos.html">Apache Mesos</a></li>
+<li><a href="http://spark.apache.org/docs/latest/running-on-yarn.html">Hadoop YARN</a></li>
+</ul>
+<h2 id="_2">读完这篇文档接下来去哪里<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h3 id="programming-guides">Programming Guides:<a class="headerlink" href="#programming-guides" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="http://spark.apache.org/docs/latest/quick-start.html">快速开始</a>: 简单介绍一下Spark API;</li>
+<li><a href="http://spark.apache.org/docs/latest/programming-guide.html">Spark编程指导</a>: 各种语言(Scala, Java, Python, R)详细的overview</li>
+<li>基于Spark的模块:<ul>
+<li><a href="http://spark.apache.org/docs/latest/streaming-programming-guide.html">Spark Streaming</a>: 实时处理数据流</li>
+<li><a href="http://spark.apache.org/docs/latest/sql-programming-guide.html">Spark SQL, Datasets, and DataFrames</a>: 支持结构化数据和关系查询</li>
+<li><a href="http://spark.apache.org/docs/latest/ml-guide.html">MLlib</a>: 内置的机器学习的库</li>
+<li><a href="http://spark.apache.org/docs/latest/graphx-programming-guide.html">GraphX</a>: Spark图表处理的最新的API</li>
+</ul>
+</li>
+</ul>
+<h3 id="api-docs">API Docs:<a class="headerlink" href="#api-docs" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.package">Spark Scala API (Scaladoc)</a></li>
+<li><a href="http://spark.apache.org/docs/latest/api/java/index.html">Spark Java API (Javadoc)</a></li>
+<li><a href="http://spark.apache.org/docs/latest/api/python/index.html">Spark Python API (Sphinx)</a></li>
+<li><a href="http://spark.apache.org/docs/latest/api/R/index.html">Spark R API (Roxygen2)</a></li>
+</ul>
+<h3 id="_3">发布指导:<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="http://spark.apache.org/docs/latest/cluster-overview.html">Cluster Overview</a>: 介绍当运行cluster的时候，你需要了解的概念和组件</li>
+<li><a href="http://spark.apache.org/docs/latest/submitting-applications.html">提交应用</a>: 介绍打包和发布应用</li>
+<li>发布模式:<ul>
+<li><a href="https://github.com/amplab/spark-ec2">Amazon EC2</a>: 介绍一些脚本帮你在5分钟内登陆运行在EC2上的cluster</li>
+<li><a href="http://spark.apache.org/docs/latest/spark-standalone.html">独立发布模式</a>: 介绍不使用第三方集群管理软件快速登陆一个独立的cluster</li>
+<li><a href="http://spark.apache.org/docs/latest/running-on-mesos.html">Mesos</a>: 介绍发布一个使用Apache Mesos的cluster</li>
+<li><a href="http://spark.apache.org/docs/latest/running-on-yarn.html">YARN</a>: 介绍在Hadoop NextGen (YARN)上发布Spark</li>
+</ul>
+</li>
+</ul>
+<h3 id="_4">其它文档:<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="http://spark.apache.org/docs/latest/configuration.html">配置</a></li>
+<li><a href="http://spark.apache.org/docs/latest/monitoring.html">监控</a>: 监控应用程序的行为</li>
+<li><a href="http://spark.apache.org/docs/latest/tuning.html">通信</a>: 优化性能和内存占用的最佳实践</li>
+<li><a href="http://spark.apache.org/docs/latest/job-scheduling.html">工作调度</a>: 在Spark应用之间或者应用内部调度资源</li>
+<li><a href="http://spark.apache.org/docs/latest/security.html">安全性</a></li>
+<li><a href="http://spark.apache.org/docs/latest/hardware-provisioning.html">硬件准备</a>: 推荐的集群硬件</li>
+<li>与其它存储系统集成:<ul>
+<li><a href="http://spark.apache.org/docs/latest/storage-openstack-swift.html">OpenStack Swift</a></li>
+</ul>
+</li>
+<li><a href="http://spark.apache.org/docs/latest/building-spark.html">编译Spark</a>: 使用Maven编译</li>
+<li><a href="https://cwiki.apache.org/confluence/display/SPARK/Contributing+to+Spark">Contributing to Spark</a></li>
+<li><a href="https://cwiki.apache.org/confluence/display/SPARK/Third+Party+Projects">第三方项目</a>: 相关的Spark项目</li>
+</ul>
+<h3 id="_5">外部资源:<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="http://spark.apache.org/">Spark Homepage</a></li>
+<li><a href="https://cwiki.apache.org/confluence/display/SPARK">Spark Wiki</a></li>
+<li><a href="http://spark.apache.org/community.html">Spark社区</a> 资源, 以及本地会议</li>
+<li><a href="http://stackoverflow.com/questions/tagged/apache-spark">StackOverflow tag apache-spark</a></li>
+<li><a href="http://spark.apache.org/mailing-lists.html">邮件列表</a>: 提问关于Spark的问题</li>
+<li><a href="http://ampcamp.berkeley.edu/">AMP Camps</a>: 一些列在美国伯克利的训练营，主要讨论关于Spark, Spark Streaming, Mesos等等的特性和训练.<a href="http://ampcamp.berkeley.edu/6/">视频</a>, <a href="http://ampcamp.berkeley.edu/6/">幻灯片</a> 以及<a href="http://ampcamp.berkeley.edu/6/exercises/">练习</a>在线上都是免费的。</li>
+<li><a href="http://spark.apache.org/examples.html">Code Examples</a>: 更多样例在Spark的子文件夹<code>example</code>下面都是可用的 (<a href="https://github.com/apache/spark/tree/master/examples/src/main/scala/org/apache/spark/examples">Scala</a>, <a href="https://github.com/apache/spark/tree/master/examples/src/main/java/org/apache/spark/examples">Java</a>, <a href="https://github.com/apache/spark/tree/master/examples/src/main/python">Python</a>, <a href="https://github.com/apache/spark/tree/master/examples/src/main/r">R</a>)</li>
+</ul>
+                
+                  
+                
+              
+              <!-- 
+                 
+ 
+ 
+<hr><blockquote class="page-copyright">
+  <span><i class="md-icon">build</i>本页面最近更新：</span><span class="facts_modified"></span>，<a class="edit_history">更新历史</a><br>
+  <span><i class="md-icon">edit</i>发现错误？想一起完善？ <a href="None" title="编辑此页" class="page_edit_url">在 GitHub 上编辑此页！</a></span><br>
+  <span><i class="md-icon">people</i>本页面贡献者：</span><span class="page_contributors">OI-wiki</span><br>
+  <span><i class="md-icon">copyright</i>本页面的全部内容在 <strong></strong> 协议之条款下提供，附加条款亦可能应用</span>
+</blockquote>
+
+               -->
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<script>function scrollFunction(){20<document.body.scrollTop||20<document.documentElement.scrollTop?document.getElementById("myBtn").style.display="block":document.getElementById("myBtn").style.display="none"}function topFunction(){document.body.scrollTop=0,document.documentElement.scrollTop=0}window.onscroll=function(){scrollFunction()}</script>
+<button onclick="topFunction()" id="myBtn" class="data-tip-left" data-tip="回到顶部">
+  <svg class="Zi Zi--BackToTop data-tip-left" data-tip="回到顶部" fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
+    <path d="M16.036 19.59a1 1 0 0 1-.997.995H9.032a.996.996 0 0 1-.997-.996v-7.005H5.03c-1.1 0-1.36-.633-.578-1.416L11.33 4.29a1.003 1.003 0 0 1 1.412 0l6.878 6.88c.782.78.523 1.415-.58 1.415h-3.004v7.005z"></path>
+  </svg>
+</button>
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../ZooKeeper-overview/" title="ZooKeeper" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  上一页
+                </span>
+                ZooKeeper
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../Resources/" title="Resources" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  下一页
+                </span>
+                Resources
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+        <div id="miitbeian"></div>
+      </div>
+      
+      <span style="float:right" class="build_date_utc"><a href="https://github.com/24OI/OI-wiki">最近更新：, 2021-09-29</a></span>
+      <script>
+        /* miitbeian */
+        if (window.location.hostname == "oi-wiki.com") {
+          document.getElementById("miitbeian").innerHTML = `<a href="http://beian.miit.gov.cn/">黑ICP备19005132号-2</a>`;
+        }
+        /* Easter Egg */
+        console.log(`%c OI Wiki %c  %c`,"background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff","background:#41b883 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff","background:transparent");
+        console.log('少年，恭喜你囍提彩蛋，我们在做一些 OI 相关的有趣的事情，如果您对此感兴趣，欢迎访问 https://join-us.oi-wiki.org');
+      </script>
+      
+    </div>
+    <div class="sponsor" style="text-align:center;color:#fff;vertical-align:middle">
+      Supported by <span>
+      <a href="/intro/hulu/">
+        <img src="https://cdn.jsdelivr.net/npm/oicdn@0.0.1/hulu-white.png" style="vertical-align:-12px;width:125px;margin-left:5px">
+      </a>
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/application.ad30b88d.js"></script>
+      <script>app.initialize({version:"1.2.2",url:{base:"../.."}}),"serviceWorker"in navigator&&navigator.serviceWorker.register("/service-worker.js",{scope:"/"}).then(function(e){console.log("PWA Registration succeeded. Scope is "+e.scope)}).catch(function(e){console.log("PWA Registration failed with "+e)})</script>
+      
+    
+  </body>
+</html>
