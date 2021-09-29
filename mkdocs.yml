@@ -1,0 +1,83 @@
+site_name: 知识总结
+site_url: https://xiaocairush.github.io/
+
+nav:
+    - Home: index.md
+    - About: about.md
+    - java后端:
+        - ZooKeeper: java后端/ZooKeeper-overview.markdown
+        - Spark: java后端/Spark-Overview.markdown
+        - Resources: java后端/Resources.markdown
+        - 同步工具类: java后端/同步工具类.markdown
+        - java-SE8-in-practice: java后端/java-SE8-in-practice.markdown
+        - vim: java后端/vim-learning-notes.markdown
+        - 理解REST: java后端/understanding-REST.markdown
+        - spring: java后端/spring-callstack.markdown
+        - BlockingQueue源码剖析: java后端/BlockingQueue源码剖析.markdown
+        - ConcurrentHashMap: java后端/ConcurrentHashMap(1.8版本)源码剖析.markdown
+        - java.util.concurrent.locks源码剖析: java后端/java.util.concurrent.locks源码剖析.markdown
+        - Redis: java后端/Redis-CheatSheet.markdown
+
+# Theme
+theme:
+  name: null
+  custom_dir: 'mkdocs-material/material'
+  static_templates:
+    - 404.html
+  language: 'zh'
+  palette:
+    primary: 'white'
+    accent: 'red'
+  include_search_page: false
+  search_index_only: true
+
+  logo:
+    icon: 'school'
+  feature:
+    tabs: true
+  font:
+    text: 'Fira Sans'
+    code: 'Fira Mono'
+
+# Customization
+extra:
+  search:
+    language: 'jp'
+  pagetime: 'on'
+  manifest: 'manifest.webmanifest'
+
+  
+# Extensions
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+      linenums: true
+  - def_list
+  - footnotes
+  - meta
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - pymdownx.highlight:
+      linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.snippets
+  - pymdownx.progressbar
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: math
+          class: arithmatex
+          format: !!python/name:pymdownx.arithmatex.fence_mathjax_format
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
