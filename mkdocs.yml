@@ -33,6 +33,11 @@ edit_uri: ""
 # Copyright
 copyright: Copyright &copy; 2016 - 2021 xiaocairush
 
+extra_javascript:
+  - javascripts/config.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
 # Configuration
 theme:
   name: null
@@ -57,7 +62,7 @@ theme:
     # - navigation.instant
     - navigation.sections
     - navigation.tabs
-    # - navigation.tabs.sticky
+    - navigation.tabs.sticky
     - navigation.top
     - navigation.tracking
     - search.highlight
@@ -66,7 +71,7 @@ theme:
     # - toc.integrate
   palette:
     - scheme: default
-      primary: indigo
+      primary: white
       accent: indigo
       toggle:
         icon: material/toggle-switch-off-outline
@@ -146,6 +151,9 @@ markdown_extensions:
         - name: mermaid
           class: mermaid-experimental
           format: !!python/name:pymdownx.superfences.fence_code_format
+        - name: math
+          class: arithmatex
+          format: !!python/name:pymdownx.arithmatex.fence_mathjax_format
   - pymdownx.tabbed
   - pymdownx.tasklist:
       custom_checkbox: true
@@ -167,6 +175,52 @@ nav:
     - ConcurrentHashMap: java后端/ConcurrentHashMap(1.8版本)源码剖析.markdown
     - java.util.concurrent.locks源码剖析: java后端/java.util.concurrent.locks源码剖析.markdown
     - Redis: java后端/Redis-CheatSheet.markdown
+  - 比赛相关:
+    - 比赛相关简介: contest/index.md
+    - 赛事:
+      - OI 赛事与赛制: contest/oi.md
+      - ICPC/CCPC 赛事与赛制: contest/icpc.md
+    - 题型:
+      - 题型概述: contest/problems.md
+      - 交互题: contest/interaction.md
+    - 学习路线: contest/roadmap.md
+    - 学习资源: contest/resources.md
+    - 技巧:
+      - 读入、输出优化: contest/io.md
+      - 常见错误: contest/common-mistakes.md
+      - 常见技巧: contest/common-tricks.md
+    - 出题相关:
+      - 出题: contest/problemsetting.md
+  - 工具软件:
+    - 工具软件简介: tools/index.md
+    - 代码编辑工具:
+      - Vim: tools/editor/vim.md
+      - Emacs: tools/editor/emacs.md
+      - VS Code: tools/editor/vscode.md
+      - Atom: tools/editor/atom.md
+      - Eclipse: tools/editor/eclipse.md
+      - Notepad++: tools/editor/npp.md
+      - Kate: tools/editor/kate.md
+      - Dev-C++: tools/editor/devcpp.md
+      - Geany: tools/editor/geany.md
+      - Xcode: tools/editor/xcode.md
+      - GUIDE: tools/editor/guide.md
+      - Sublime Text 3: tools/editor/sublime3.md
+    - 评测工具: tools/judgers.md
+    - 命令行: tools/cmd.md
+    - WSL (Windows 10): tools/wsl.md
+    - Special Judge: tools/special-judge.md
+    - Testlib:
+      - Testlib 简介: tools/testlib/index.md
+      - 通用: tools/testlib/general.md
+      - Generator: tools/testlib/generator.md
+      - Validator: tools/testlib/validator.md
+      - Interactor: tools/testlib/interactor.md
+      - Checker: tools/testlib/checker.md
+    - Polygon: tools/polygon.md
+    - OJ 工具: tools/oj-tool.md
+    - LaTeX 入门: tools/latex.md
+    - Git: tools/git.md
   - 语言基础:
     - 语言基础简介: lang/index.md
     - C++ 基础:
