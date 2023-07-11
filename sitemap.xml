@@ -116,6 +116,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://xiaocairush.github.io/basic/tim-sort/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://xiaocairush.github.io/basic/tournament-sort/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
@@ -137,6 +142,11 @@
     </url>
     <url>
          <loc>https://xiaocairush.github.io/contest/common-tricks/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/contest/dictionary/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -281,6 +291,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://xiaocairush.github.io/ds/b-tree/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://xiaocairush.github.io/ds/balanced-in-seg/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
@@ -302,6 +317,11 @@
     </url>
     <url>
          <loc>https://xiaocairush.github.io/ds/block-list/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/ds/bplus-tree/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -366,12 +386,22 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://xiaocairush.github.io/ds/huffman-tree/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://xiaocairush.github.io/ds/kdt/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://xiaocairush.github.io/ds/lct/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/ds/leafy-tree/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -461,6 +491,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://xiaocairush.github.io/ds/rbtree/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://xiaocairush.github.io/ds/sbt/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
@@ -472,6 +507,11 @@
     </url>
     <url>
          <loc>https://xiaocairush.github.io/ds/seg-in-balanced/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/ds/seg-in-bit/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -656,6 +696,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://xiaocairush.github.io/graph/connectivity/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://xiaocairush.github.io/graph/cut/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
@@ -731,12 +776,17 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://xiaocairush.github.io/graph/max-clique/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://xiaocairush.github.io/graph/mdst/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/graph/min-circle/</loc>
+         <loc>https://xiaocairush.github.io/graph/min-cycle/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -822,6 +872,11 @@
     </url>
     <url>
          <loc>https://xiaocairush.github.io/graph/tree-hash/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/graph/tree-random-walk/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -966,17 +1021,17 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/lang/c-cpp/</loc>
-         <lastmod>2023-07-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://xiaocairush.github.io/lang/class/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://xiaocairush.github.io/lang/const/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/lang/cpp-other-langs/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -996,7 +1051,17 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://xiaocairush.github.io/lang/java-pro/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://xiaocairush.github.io/lang/java/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/lang/lambda/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1022,6 +1087,11 @@
     </url>
     <url>
          <loc>https://xiaocairush.github.io/lang/op/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/lang/optimizations/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1146,7 +1216,7 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/basis/</loc>
+         <loc>https://xiaocairush.github.io/math/berlekamp-massey/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1156,12 +1226,17 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/bit/</loc>
+         <loc>https://xiaocairush.github.io/math/binary-exponentiation/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/char-poly/</loc>
+         <loc>https://xiaocairush.github.io/math/binary-set/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/bit/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1171,17 +1246,7 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/dictionary/</loc>
-         <lastmod>2023-07-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://xiaocairush.github.io/math/expectation/</loc>
-         <lastmod>2023-07-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://xiaocairush.github.io/math/fibonacci/</loc>
+         <loc>https://xiaocairush.github.io/math/coordinate/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1191,42 +1256,12 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/game-theory/</loc>
-         <lastmod>2023-07-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://xiaocairush.github.io/math/gauss/</loc>
-         <lastmod>2023-07-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://xiaocairush.github.io/math/group-theory/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/integral/</loc>
-         <lastmod>2023-07-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://xiaocairush.github.io/math/linear-programming/</loc>
-         <lastmod>2023-07-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://xiaocairush.github.io/math/linear-recurrence/</loc>
-         <lastmod>2023-07-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://xiaocairush.github.io/math/matrix/</loc>
-         <lastmod>2023-07-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://xiaocairush.github.io/math/newton/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1241,12 +1276,12 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/permutation-group/</loc>
+         <loc>https://xiaocairush.github.io/math/permulation/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/quick-pow/</loc>
+         <loc>https://xiaocairush.github.io/math/permutation-group/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1257,11 +1292,6 @@
     </url>
     <url>
          <loc>https://xiaocairush.github.io/math/simplex/</loc>
-         <lastmod>2023-07-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://xiaocairush.github.io/math/vector/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1296,12 +1326,32 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://xiaocairush.github.io/math/combinatorics/derangement/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://xiaocairush.github.io/math/combinatorics/drawer-principle/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://xiaocairush.github.io/math/combinatorics/entringer/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://xiaocairush.github.io/math/combinatorics/eulerian/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/combinatorics/fibonacci/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/combinatorics/graph-enumeration/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1321,22 +1371,87 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/gen-func/dgf/</loc>
+         <loc>https://xiaocairush.github.io/math/combinatorics/vandermonde-convolution/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/gen-func/egf/</loc>
+         <loc>https://xiaocairush.github.io/math/game-theory/impartial-game/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/gen-func/intro/</loc>
+         <loc>https://xiaocairush.github.io/math/game-theory/intro/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/gen-func/ogf/</loc>
+         <loc>https://xiaocairush.github.io/math/game-theory/misere-game/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/game-theory/partizan-game/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/linear-algebra/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/linear-algebra/basis/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/linear-algebra/char-poly/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/linear-algebra/determinant/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/linear-algebra/diagonalization/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/linear-algebra/elementary-operations/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/linear-algebra/jordan/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/linear-algebra/linear-mapping/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/linear-algebra/matrix/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/linear-algebra/product/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/linear-algebra/vector-space/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/linear-algebra/vector/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1351,17 +1466,17 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/number-theory/bsgs/</loc>
-         <lastmod>2023-07-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://xiaocairush.github.io/math/number-theory/continued-fraction/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://xiaocairush.github.io/math/number-theory/crt/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/number-theory/discrete-logarithm/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1436,6 +1551,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://xiaocairush.github.io/math/number-theory/periodic-continued-fraction/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://xiaocairush.github.io/math/number-theory/pollard-rho/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
@@ -1457,6 +1577,16 @@
     </url>
     <url>
          <loc>https://xiaocairush.github.io/math/number-theory/quad-residue/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/number-theory/quadratic/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/number-theory/residue/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1486,17 +1616,52 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://xiaocairush.github.io/math/numerical/gauss/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/numerical/integral/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/numerical/lagrange/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/numerical/newton/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://xiaocairush.github.io/math/poly/czt/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/poly/div-mod/</loc>
+         <loc>https://xiaocairush.github.io/math/poly/dgf/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/poly/egf/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/poly/elementary-func/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://xiaocairush.github.io/math/poly/fft/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/poly/fundamental/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1511,22 +1676,7 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/poly/inv-tri-func/</loc>
-         <lastmod>2023-07-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://xiaocairush.github.io/math/poly/inv/</loc>
-         <lastmod>2023-07-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://xiaocairush.github.io/math/poly/lagrange/</loc>
-         <lastmod>2023-07-11</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
-         <loc>https://xiaocairush.github.io/math/poly/ln-exp/</loc>
+         <loc>https://xiaocairush.github.io/math/poly/linear-recurrence/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1546,17 +1696,42 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://xiaocairush.github.io/math/poly/ogf/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://xiaocairush.github.io/math/poly/shift/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/poly/sqrt/</loc>
+         <loc>https://xiaocairush.github.io/math/poly/symbolic-method/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/math/poly/tri-func/</loc>
+         <loc>https://xiaocairush.github.io/math/probability/basic-conception/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/probability/concentration-inequality/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/probability/conditional-probability/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/probability/exp-var/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/math/probability/random-variable/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1631,7 +1806,17 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://xiaocairush.github.io/misc/kahan-summation/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://xiaocairush.github.io/misc/main-element/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/misc/mo-algo-2dimen/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1642,6 +1827,11 @@
     </url>
     <url>
          <loc>https://xiaocairush.github.io/misc/mo-algo-on-tree/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/misc/mo-algo-secondary-offline/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1657,6 +1847,11 @@
     </url>
     <url>
          <loc>https://xiaocairush.github.io/misc/modifiable-mo-algo/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/misc/odt/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1687,6 +1882,11 @@
     </url>
     <url>
          <loc>https://xiaocairush.github.io/misc/simulated-annealing/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/misc/two-pointer/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1876,12 +2076,12 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/tools/git/</loc>
+         <loc>https://xiaocairush.github.io/tools/compiler/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/tools/judgers/</loc>
+         <loc>https://xiaocairush.github.io/tools/git/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1912,6 +2112,16 @@
     </url>
     <url>
          <loc>https://xiaocairush.github.io/tools/editor/atom/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/tools/editor/clion/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/tools/editor/cpeditor/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1951,7 +2161,7 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://xiaocairush.github.io/tools/editor/sublime3/</loc>
+         <loc>https://xiaocairush.github.io/tools/editor/sublime/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -1967,6 +2177,31 @@
     </url>
     <url>
          <loc>https://xiaocairush.github.io/tools/editor/xcode/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/tools/judger/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/tools/judger/arbiter/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/tools/judger/ccr-plus/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/tools/judger/cena/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/tools/judger/lemon/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -2012,6 +2247,11 @@
     </url>
     <url>
          <loc>https://xiaocairush.github.io/topic/rmq/</loc>
+         <lastmod>2023-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://xiaocairush.github.io/topic/segment-tree-offline/</loc>
          <lastmod>2023-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
