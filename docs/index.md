@@ -14,3 +14,11 @@ pip install mkdocs-minify-plugin
 2. 在mkdocs.yml中的nav中添加内容
 3. mkdocs serve预览一下是否有问题
 4. mkdocs gh-deploy发布
+
+
+```
+git add .
+git commit -m 'feat;publish article'
+git push
+```
+
