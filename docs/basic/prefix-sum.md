@@ -1,12 +1,14 @@
 ## 前缀和
 
-前缀和是一种重要的预处理，能大大降低查询的时间复杂度。可以简单理解为“数列的前 $n$ 项的和”。[^note1]
+### 定义
+
+前缀和可以简单理解为「数列的前 $n$ 项的和」，是一种重要的预处理方式，能大大降低查询的时间复杂度。[^note1]
 
 C++ 标准库中实现了前缀和函数 [`std::partial_sum`](https://zh.cppreference.com/w/cpp/algorithm/partial_sum)，定义于头文件 `<numeric>` 中。
 
 ### 例题
 
-!!! 例题
+??? 例题
     有 $N$ 个的正整数放到数组 $A$ 里，现在要求一个新的数组 $B$，新数组的第 $i$ 个数 $B[i]$ 是原数组 $A$ 第 $0$ 到第 $i$ 个数的和。
     
     输入：
@@ -26,15 +28,23 @@ C++ 标准库中实现了前缀和函数 [`std::partial_sum`](https://zh.cpprefe
     递推：`B[0] = A[0]`，对于 $i \ge 1$ 则 `B[i] = B[i-1] + A[i]`。
 
 ??? note "参考代码"
-    ```cpp
-    --8<-- "docs/basic/code/prefix-sum/prefix-sum_1.cpp"
-    ```
+    === "C++"
+    
+        ```cpp
+        --8<-- "docs/basic/code/prefix-sum/prefix-sum_1.cpp"
+        ```
+    
+    === "Python"
+    
+        ```python
+        --8<-- "docs/basic/code/prefix-sum/prefix-sum_1.py"
+        ```
 
 ### 二维/多维前缀和
 
 多维前缀和的普通求解方法几乎都是基于容斥原理。
 
-???+note "示例：一维前缀和扩展到二维前缀和"
+???+ note "示例：一维前缀和扩展到二维前缀和"
     比如我们有这样一个矩阵 $a$，可以视为二维数组：
     
     ```text
@@ -62,13 +72,21 @@ C++ 标准库中实现了前缀和函数 [`std::partial_sum`](https://zh.cpprefe
 
 #### 例题
 
-???+note "[洛谷 P1387 最大正方形](https://www.luogu.com.cn/problem/P1387)"
+???+ note "[洛谷 P1387 最大正方形](https://www.luogu.com.cn/problem/P1387)"
     在一个 $n\times m$ 的只包含 $0$ 和 $1$ 的矩阵里找出一个不包含 $0$ 的最大正方形，输出边长。
 
 ??? note "参考代码"
-    ```cpp
-    --8<-- "docs/basic/code/prefix-sum/prefix-sum_2.cpp"
-    ```
+    === "C++"
+    
+        ```cpp
+        --8<-- "docs/basic/code/prefix-sum/prefix-sum_2.cpp"
+        ```
+    
+    === "Python"
+    
+        ```python
+        --8<-- "docs/basic/code/prefix-sum/prefix-sum_2.py"
+        ```
 
 ### 基于 DP 计算高维前缀和
 
@@ -80,36 +98,42 @@ C++ 标准库中实现了前缀和函数 [`std::partial_sum`](https://zh.cpprefe
 
 一种实现的伪代码如下：
 
-    for state
-      sum[state] = f[state];
-    for(i = 0;i <= D;i += 1)
-      for 以字典序从小到大枚举 state
-        sum[state] += sum[state'];
+$$
+\begin{array}{ll}
+\textbf{for } state \\
+\qquad sum[state] \gets f[state] \\
+\textbf{for } i \gets 0 \textbf{ to } D \\
+\qquad \textbf{for } state' \textbf{ in } \text{lexicographical order} \\
+\qquad \qquad sum[state] \gets sum[state] + sum[state']
+\end{array}
+$$
 
 ### 树上前缀和
 
 设 $\textit{sum}_i$ 表示结点 $i$ 到根节点的权值总和。  
 然后：
 
-- 若是点权，$x,y$ 路径上的和为 $\textit{sum}_x + \textit{sum}_y - \textit{sum}_\textit{lca} - \textit{sum}_{\textit{fa}_\textit{lca}}$。
+-   若是点权，$x,y$ 路径上的和为 $\textit{sum}_x + \textit{sum}_y - \textit{sum}_\textit{lca} - \textit{sum}_{\textit{fa}_\textit{lca}}$。
 -   若是边权，$x,y$ 路径上的和为 $\textit{sum}_x + \textit{sum}_y - 2\cdot\textit{sum}_{lca}$。
 
     LCA 的求法参见 [最近公共祖先](../graph/lca.md)。
 
 ## 差分
 
+### 解释
+
 差分是一种和前缀和相对的策略，可以当做是求和的逆运算。
 
 这种策略的定义是令 $b_i=\begin{cases}a_i-a_{i-1}\,&i \in[2,n] \\ a_1\,&i=1\end{cases}$
 
-简单性质：
+### 性质
 
-- $a_i$ 的值是 $b_i$ 的前缀和，即 $a_n=\sum\limits_{i=1}^nb_i$
-- 计算 $a_i$ 的前缀和 $sum=\sum\limits_{i=1}^na_i=\sum\limits_{i=1}^n\sum\limits_{j=1}^{i}b_j=\sum\limits_{i}^n(n-i+1)b_i$
+-   $a_i$ 的值是 $b_i$ 的前缀和，即 $a_n=\sum\limits_{i=1}^nb_i$
+-   计算 $a_i$ 的前缀和 $sum=\sum\limits_{i=1}^na_i=\sum\limits_{i=1}^n\sum\limits_{j=1}^{i}b_j=\sum\limits_{i}^n(n-i+1)b_i$
 
 它可以维护多次对序列的一个区间加上一个数，并在最后询问某一位的数或是多次询问某一位的数。注意修改操作一定要在查询操作之前。
 
-???+note "示例"
+???+ note "示例"
     譬如使 $[l,r]$ 中的每个数加上一个 $k$，即
     
     $$
@@ -130,7 +154,7 @@ C++ 标准库中实现了差分函数 [`std::adjacent_difference`](https://zh.cp
 
 #### 点差分
 
-举例：对域树上的一些路径 $\delta(s_1,t_1), \delta(s_2,t_2), \delta(s_3,t_3)\dots$ 进行访问，问一条路径 $\delta(s,t)$ 上的点被访问的次数。
+举例：对树上的一些路径 $\delta(s_1,t_1), \delta(s_2,t_2), \delta(s_3,t_3)\dots$ 进行访问，问一条路径 $\delta(s,t)$ 上的点被访问的次数。
 
 对于一次 $\delta(s,t)$ 的访问，需要找到 $s$ 与 $t$ 的公共祖先，然后对这条路径上的点进行访问（点的权值加一），若采用 DFS 算法对每个点进行访问，由于有太多的路径需要访问，时间上承受不了。这里进行差分操作：
 
@@ -167,7 +191,7 @@ $$
 
 ### 例题
 
-???+note "[洛谷 3128 最大流](https://www.luogu.com.cn/problem/P3128)"
+???+ note "[洛谷 3128 最大流](https://www.luogu.com.cn/problem/P3128)"
     FJ 给他的牛棚的 $N(2 \le N \le 50,000)$ 个隔间之间安装了 $N-1$ 根管道，隔间编号从 $1$ 到 $N$。所有隔间都被管道连通了。
     
     FJ 有 $K(1 \le K \le 100,000)$ 条运输牛奶的路线，第 $i$ 条路线从隔间 $s_i$ 运输到隔间 $t_i$。一条运输路线会给它的两个端点处的隔间以及中间途径的所有隔间带来一个单位的运输压力，你需要计算压力最大的隔间的压力是多少。
@@ -182,48 +206,55 @@ $$
 
 ## 习题
 
-* * *
-
 前缀和：
 
-- [洛谷 U53525 前缀和（例题）](https://www.luogu.com.cn/problem/U53525)
-- [洛谷 U69096 前缀和的逆](https://www.luogu.com.cn/problem/U69096)
-- [AT2412 最大の和](https://vjudge.net/problem/AtCoder-joi2007ho_a#author=wuyudi)
-- [「USACO16JAN」子共七 Subsequences Summing to Sevens](https://www.luogu.com.cn/problem/P3131)
+-   [洛谷 B3612【深进 1. 例 1】求区间和](https://www.luogu.com.cn/problem/B3612)
+-   [洛谷 U69096 前缀和的逆](https://www.luogu.com.cn/problem/U69096)
+-   [AT2412 最大の和](https://vjudge.net/problem/AtCoder-joi2007ho_a#author=wuyudi)
+-   [「USACO16JAN」子共七 Subsequences Summing to Sevens](https://www.luogu.com.cn/problem/P3131)
+-   [「USACO05JAN」Moo Volume S](https://www.luogu.com.cn/problem/P6067)
 
-* * *
+***
 
 二维/多维前缀和：
 
-- [HDU 6514 Monitor](http://acm.hdu.edu.cn/showproblem.php?pid=6514)
-- [洛谷 P1387 最大正方形](https://www.luogu.com.cn/problem/P1387)
-- [「HNOI2003」激光炸弹](https://www.luogu.com.cn/problem/P2280)
+-   [HDU 6514 Monitor](https://vjudge.net/problem/HDU-6514)
+-   [洛谷 P1387 最大正方形](https://www.luogu.com.cn/problem/P1387)
+-   [「HNOI2003」激光炸弹](https://www.luogu.com.cn/problem/P2280)
 
-* * *
+***
+
+基于 DP 计算高维前缀和：
+
+-   [CF 165E Compatible Numbers](https://codeforces.com/contest/165/problem/E)
+-   [CF 383E Vowels](https://codeforces.com/problemset/problem/383/E)
+-   [ARC 100C Or Plus Max](https://atcoder.jp/contests/arc100/tasks/arc100_c)
+
+***
 
 树上前缀和：
 
-- [LOJ 10134.Dis](https://loj.ac/problem/10134)
-- [LOJ 2491. 求和](https://loj.ac/problem/2491)
+-   [LOJ 10134.Dis](https://loj.ac/problem/10134)
+-   [LOJ 2491. 求和](https://loj.ac/problem/2491)
 
-* * *
+***
 
 差分：
 
-- [树状数组 3：区间修改，区间查询](https://loj.ac/problem/132)
-- [P3397 地毯](https://www.luogu.com.cn/problem/P3397)
-- [「Poetize6」IncDec Sequence](https://www.luogu.com.cn/problem/P4552)
+-   [树状数组 3：区间修改，区间查询](https://loj.ac/problem/132)
+-   [P3397 地毯](https://www.luogu.com.cn/problem/P3397)
+-   [「Poetize6」IncDec Sequence](https://www.luogu.com.cn/problem/P4552)
 
-* * *
+***
 
 树上差分：
 
-- [洛谷 3128 最大流](https://www.luogu.com.cn/problem/P3128)
-- [JLOI2014 松鼠的新家](https://loj.ac/problem/2236)
-- [NOIP2015 运输计划](http://uoj.ac/problem/150)
-- [NOIP2016 天天爱跑步](http://uoj.ac/problem/261)
+-   [洛谷 3128 最大流](https://www.luogu.com.cn/problem/P3128)
+-   [JLOI2014 松鼠的新家](https://loj.ac/problem/2236)
+-   [NOIP2015 运输计划](http://uoj.ac/problem/150)
+-   [NOIP2016 天天爱跑步](http://uoj.ac/problem/261)
 
-* * *
+***
 
 ## 参考资料与注释
 

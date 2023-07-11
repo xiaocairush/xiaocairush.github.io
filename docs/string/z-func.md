@@ -2,45 +2,50 @@ author: LeoJacob, Marcythm, minghu6
 
 约定：字符串下标以 $0$ 为起点。
 
+## 定义
+
 对于个长度为 $n$ 的字符串 $s$。定义函数 $z[i]$ 表示 $s$ 和 $s[i,n-1]$（即以 $s[i]$ 开头的后缀）的最长公共前缀（LCP）的长度。$z$ 被称为 $s$ 的 **Z 函数**。特别地，$z[0] = 0$。
 
 国外一般将计算该数组的算法称为 **Z Algorithm**，而国内则称其为 **扩展 KMP**。
 
 这篇文章介绍在 $O(n)$ 时间复杂度内计算 Z 函数的算法以及其各种应用。
 
-## 样例
+## 解释
 
 下面若干样例展示了对于不同字符串的 Z 函数：
 
-- $z(\mathtt{aaaaa}) = [0, 4, 3, 2, 1]$
-- $z(\mathtt{aaabaab}) = [0, 2, 1, 0, 2, 1, 0]$
-- $z(\mathtt{abacaba}) = [0, 0, 1, 0, 3, 0, 1]$
+-   $z(\mathtt{aaaaa}) = [0, 4, 3, 2, 1]$
+-   $z(\mathtt{aaabaab}) = [0, 2, 1, 0, 2, 1, 0]$
+-   $z(\mathtt{abacaba}) = [0, 0, 1, 0, 3, 0, 1]$
 
 ## 朴素算法
 
 Z 函数的朴素算法复杂度为 $O(n^2)$：
 
-```cpp
-// C++ Version
-vector<int> z_function_trivial(string s) {
-  int n = (int)s.length();
-  vector<int> z(n);
-  for (int i = 1; i < n; ++i)
-    while (i + z[i] < n && s[z[i]] == s[i + z[i]]) ++z[i];
-  return z;
-}
-```
-
-```python
-# Python Version
-def z_function_trivial(s):
-    n = len(s)
-    z = [0] * n
-    for i in range(1, n):
-        while i + z[i] < n and s[z[i]] == s[i + z[i]]:
-            z[i] += 1
-    return z
-```
+???+ note "实现"
+    === "C++"
+    
+        ```cpp
+        vector<int> z_function_trivial(string s) {
+          int n = (int)s.length();
+          vector<int> z(n);
+          for (int i = 1; i < n; ++i)
+            while (i + z[i] < n && s[z[i]] == s[i + z[i]]) ++z[i];
+          return z;
+        }
+        ```
+    
+    === "Python"
+    
+        ```python
+        def z_function_trivial(s):
+            n = len(s)
+            z = [0] * n
+            for i in range(1, n):
+                while i + z[i] < n and s[z[i]] == s[i + z[i]]:
+                    z[i] += 1
+            return z
+        ```
 
 ## 线性算法
 
@@ -55,51 +60,53 @@ def z_function_trivial(s):
 在计算 $z[i]$ 的过程中：
 
 -   如果 $i\le r$，那么根据 $[l,r]$ 的定义有 $s[i,r] = s[i-l,r-l]$，因此 $z[i]\ge \min(z[i-l],r-i+1)$。这时：
-    - 若 $z[i-l] < r-i+1$，则 $z[i] = z[i-l]$。
-    - 否则 $z[i-l]\ge r-i+1$，这时我们令 $z[i] = r-i+1$，然后暴力枚举下一个字符扩展 $z[i]$ 直到不能扩展为止。
-- 如果 $i>r$，那么我们直接按照朴素算法，从 $s[i]$ 开始比较，暴力求出 $z[i]$。
-- 在求出 $z[i]$ 后，如果 $i+z[i]-1>r$，我们就需要更新 $[l,r]$，即令 $l=i, r=i+z[i]-1$。
+    -   若 $z[i-l] < r-i+1$，则 $z[i] = z[i-l]$。
+    -   否则 $z[i-l]\ge r-i+1$，这时我们令 $z[i] = r-i+1$，然后暴力枚举下一个字符扩展 $z[i]$ 直到不能扩展为止。
+-   如果 $i>r$，那么我们直接按照朴素算法，从 $s[i]$ 开始比较，暴力求出 $z[i]$。
+-   在求出 $z[i]$ 后，如果 $i+z[i]-1>r$，我们就需要更新 $[l,r]$，即令 $l=i, r=i+z[i]-1$。
 
 可以访问 [这个网站](https://personal.utdallas.edu/~besp/demo/John2010/z-algorithm.htm) 来看 Z 函数的模拟过程。
 
-## 实现
+### 实现
 
-```cpp
-// C++ Version
-vector<int> z_function(string s) {
-  int n = (int)s.length();
-  vector<int> z(n);
-  for (int i = 1, l = 0, r = 0; i < n; ++i) {
-    if (i <= r && z[i - l] < r - i + 1) {
-      z[i] = z[i - l];
-    } else {
-      z[i] = max(0, r - i + 1);
-      while (i + z[i] < n && s[z[i]] == s[i + z[i]]) ++z[i];
+=== "C++"
+
+    ```cpp
+    vector<int> z_function(string s) {
+      int n = (int)s.length();
+      vector<int> z(n);
+      for (int i = 1, l = 0, r = 0; i < n; ++i) {
+        if (i <= r && z[i - l] < r - i + 1) {
+          z[i] = z[i - l];
+        } else {
+          z[i] = max(0, r - i + 1);
+          while (i + z[i] < n && s[z[i]] == s[i + z[i]]) ++z[i];
+        }
+        if (i + z[i] - 1 > r) l = i, r = i + z[i] - 1;
+      }
+      return z;
     }
-    if (i + z[i] - 1 > r) l = i, r = i + z[i] - 1;
-  }
-  return z;
-}
-```
+    ```
 
-```python
-# Python Version
-def z_function(s):
-    n = len(s)
-    z = [0] * n
-    l, r = 0, 0
-    for i in range(1, n):
-        if i <= r and z[i - l] < r - i + 1:
-            z[i] = z[i - l]
-        else:
-            z[i] = max(0, r - i + 1)
-            while i + z[i] < n and s[z[i]] == s[i + z[i]]:
-                z[i] += 1
-        if i + z[i] - 1 > r:
-            l = i
-            r = i + z[i] - 1
-    return z
-```
+=== "Python"
+
+    ```python
+    def z_function(s):
+        n = len(s)
+        z = [0] * n
+        l, r = 0, 0
+        for i in range(1, n):
+            if i <= r and z[i - l] < r - i + 1:
+                z[i] = z[i - l]
+            else:
+                z[i] = max(0, r - i + 1)
+                while i + z[i] < n and s[z[i]] == s[i + z[i]]:
+                    z[i] += 1
+            if i + z[i] - 1 > r:
+                l = i
+                r = i + z[i] - 1
+        return z
+    ```
 
 ## 复杂度分析
 
@@ -151,14 +158,15 @@ def z_function(s):
 
 ## 练习题目
 
-- [CF126B Password](http://codeforces.com/problemset/problem/126/B)
-- [UVA # 455 Periodic Strings](http://uva.onlinejudge.org/index.php?option=onlinejudge&page=show_problem&problem=396)
-- [UVA # 11022 String Factoring](http://uva.onlinejudge.org/index.php?option=onlinejudge&page=show_problem&problem=1963)
-- [UVa 11475 - Extend to Palindrome](http://uva.onlinejudge.org/index.php?option=com_onlinejudge&Itemid=8&category=24&page=show_problem&problem=2470)
-- [LA 6439 - Pasti Pas!](https://icpcarchive.ecs.baylor.edu/index.php?option=com_onlinejudge&Itemid=8&category=588&page=show_problem&problem=4450)
-- [Codechef - Chef and Strings](https://www.codechef.com/problems/CHSTR)
-- [Codeforces - Prefixes and Suffixes](http://codeforces.com/problemset/problem/432/D)
+-   [CF126B Password](http://codeforces.com/problemset/problem/126/B)
+-   [UVA # 455 Periodic Strings](http://uva.onlinejudge.org/index.php?option=onlinejudge&page=show_problem&problem=396)
+-   [UVA # 11022 String Factoring](http://uva.onlinejudge.org/index.php?option=onlinejudge&page=show_problem&problem=1963)
+-   [UVa 11475 - Extend to Palindrome](http://uva.onlinejudge.org/index.php?option=com_onlinejudge&Itemid=8&category=24&page=show_problem&problem=2470)
+-   [LA 6439 - Pasti Pas!](https://icpcarchive.ecs.baylor.edu/index.php?option=com_onlinejudge&Itemid=8&category=588&page=show_problem&problem=4450)
+-   [Codechef - Chef and Strings](https://www.codechef.com/problems/CHSTR)
+-   [Codeforces - Prefixes and Suffixes](http://codeforces.com/problemset/problem/432/D)
+-   [Leetcode 2223 - Sum of Scores of Built Strings](https://leetcode.com/problems/sum-of-scores-of-built-strings/)
 
-* * *
+***
 
 **本页面主要译自博文 [Z-функция строки и её вычисление](http://e-maxx.ru/algo/z_function) 与其英文翻译版 [Z-function and its calculation](https://cp-algorithms.com/string/z-function.html)。其中俄文版版权协议为 Public Domain + Leave a Link；英文版版权协议为 CC-BY-SA 4.0。**

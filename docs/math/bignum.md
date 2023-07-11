@@ -1,8 +1,10 @@
-## 前言
-
 > 太长不看版：结尾自取模板……
 
+## 定义
+
 高精度计算（Arbitrary-Precision Arithmetic），也被称作大整数（bignum）计算，运用了一些算法结构来支持更大整数间的运算（数字大小超过语言内建整型）。
+
+## 引入
 
 高精度问题包含很多小的细节，实现上也有很多讲究。
 
@@ -11,15 +13,15 @@
 ???+ note "任务"
     输入：一个形如 `a <op> b` 的表达式。
     
-    - `a`、`b` 分别是长度不超过 $1000$ 的十进制非负整数；
-    - `<op>` 是一个字符（`+`、`-`、`*` 或 `/`），表示运算。
-    - 整数与运算符之间由一个空格分隔。
+    -   `a`、`b` 分别是长度不超过 $1000$ 的十进制非负整数；
+    -   `<op>` 是一个字符（`+`、`-`、`*` 或 `/`），表示运算。
+    -   整数与运算符之间由一个空格分隔。
     
     输出：运算结果。
     
-    - 对于 `+`、`-`、`*` 运算，输出一行表示结果；
-    - 对于 `/` 运算，输出两行分别表示商和余数。
-    - 保证结果均为非负整数。
+    -   对于 `+`、`-`、`*` 运算，输出一行表示结果；
+    -   对于 `/` 运算，输出两行分别表示商和余数。
+    -   保证结果均为非负整数。
 
 ## 存储
 
@@ -64,7 +66,7 @@ void print(int a[]) {
 
 拼起来就是一个完整的复读机程序咯。
 
-??? " `copycat.cpp` "
+??? "`copycat.cpp`"
     ```cpp
     #include <cstdio>
     #include <cstring>
@@ -138,7 +140,7 @@ void add(int a[], int b[], int c[]) {
 
 试着和上一部分结合，可以得到一个加法计算器。
 
-??? " `adder.cpp` "
+??? "`adder.cpp`"
     ```cpp
     #include <cstdio>
     #include <cstring>
@@ -218,7 +220,7 @@ void sub(int a[], int b[], int c[]) {
 
 将上一个程序中的 `add()` 替换成 `sub()`，就有了一个减法计算器。
 
-??? " `subtractor.cpp` "
+??? "`subtractor.cpp`"
     ```cpp
     #include <cstdio>
     #include <cstring>
@@ -360,7 +362,7 @@ void mul(int a[], int b[], int c[]) {
 ```cpp
 // 被除数 a 以下标 last_dg 为最低位，是否可以再减去除数 b 而保持非负
 // len 是除数 b 的长度，避免反复计算
-inline bool greater_eq(int a[], int b[], int last_dg, int len) {
+bool greater_eq(int a[], int b[], int last_dg, int len) {
   // 有可能被除数剩余的部分比除数长，这个情况下最多多出 1 位，故如此判断即可
   if (a[last_dg + len] != 0) return true;
   // 从高位到低位，逐位比较
@@ -413,7 +415,7 @@ void div(int a[], int b[], int c[], int d[]) {
 
 将上面介绍的四则运算的实现结合，即可完成开头提到的计算器程序。
 
-??? " `calculator.cpp` "
+??? "`calculator.cpp`"
     ```cpp
     #include <cstdio>
     #include <cstring>
@@ -481,7 +483,7 @@ void div(int a[], int b[], int c[], int d[]) {
       }
     }
     
-    inline bool greater_eq(int a[], int b[], int last_dg, int len) {
+    bool greater_eq(int a[], int b[], int last_dg, int len) {
       if (a[last_dg + len] != 0) return true;
       for (int i = len - 1; i >= 0; --i) {
         if (a[last_dg + i] > b[i]) return true;
@@ -555,6 +557,8 @@ void div(int a[], int b[], int c[], int d[]) {
 
 ## 压位高精度
 
+### 引入
+
 在一般的高精度加法，减法，乘法运算中，我们都是将参与运算的数拆分成一个个单独的数码进行运算。
 
 例如计算 $8192\times 42$ 时，如果按照高精度乘高精度的计算方式，我们实际上算的是 $(8000+100+90+2)\times(40+2)$。
@@ -564,6 +568,8 @@ void div(int a[], int b[], int c[], int d[]) {
 有没有办法作出一些优化呢？
 
 注意到拆分数字的方式并不影响最终的结果，因此我们可以将若干个数码进行合并。
+
+### 过程
 
 还是以上面这个例子为例，如果我们每两位拆分一个数，我们可以拆分成 $(8100+92)\times 42$。
 
@@ -577,14 +583,14 @@ void div(int a[], int b[], int c[], int d[]) {
 
 ??? note "压位高精度加法参考实现"
     ```cpp
-    //这里的 a,b,c 数组均为 p 进制下的数
-    //最终输出答案时需要将数字转为十进制
+    // 这里的 a,b,c 数组均为 p 进制下的数
+    // 最终输出答案时需要将数字转为十进制
     void add(int a[], int b[], int c[]) {
       clear(c);
     
       for (int i = 0; i < LEN - 1; ++i) {
         c[i] += a[i] + b[i];
-        if (c[i] >= p) {  //在普通高精度运算下，p=10
+        if (c[i] >= p) {  // 在普通高精度运算下，p=10
           c[i + 1] += 1;
           c[i] -= p;
         }
@@ -600,26 +606,26 @@ void div(int a[], int b[], int c[], int d[]) {
 
 另外，由于估的商总是小于等于实际商，所以还有再进一步优化的空间。绝大多数情况下每个位只估商一次，这样在下一个位估商时，虽然得到的商有可能因为前一位的误差造成试商结果大于等于 base，但这没有关系，只要在最后再最后做统一进位便可。举个例子，假设 base 是 10，求 $395081/9876$，试商计算步骤如下：
 
-1. 首先试商计算得到 $3950/988=3$，于是 $395081-(9876 \times 3 \times 10^1) = 98801$，这一步出现了误差，但不用管，继续下一步计算。
-2. 对余数 98801 继续试商计算得到 $9880/988=10$，于是 $98801-(9876 \times 10 \times 10^0) = 41$，这就是最终余数。
-3. 把试商过程的结果加起来并处理进位，即 $3 \times 10^1 + 10 \times 10^0 = 40$ 便是准确的商。
+1.  首先试商计算得到 $3950/988=3$，于是 $395081-(9876 \times 3 \times 10^1) = 98801$，这一步出现了误差，但不用管，继续下一步计算。
+2.  对余数 98801 继续试商计算得到 $9880/988=10$，于是 $98801-(9876 \times 10 \times 10^0) = 41$，这就是最终余数。
+3.  把试商过程的结果加起来并处理进位，即 $3 \times 10^1 + 10 \times 10^0 = 40$ 便是准确的商。
 
 方法虽然看着简单，但具体实现上很容易进坑，所以以下提供一个经过多番验证确认没有问题的实现供大家参考，要注意的细节也写在注释当中。
 
 ??? note "压位高精度高效竖式除法参考实现"
     ```cpp
-    //完整模板和实现 https://baobaobear.github.io/post/20210228-bigint1/
-    //对b乘以mul再左移offset的结果相减，为除法服务
+    // 完整模板和实现 https://baobaobear.github.io/post/20210228-bigint1/
+    // 对b乘以mul再左移offset的结果相减，为除法服务
     BigIntSimple &sub_mul(const BigIntSimple &b, int mul, int offset) {
       if (mul == 0) return *this;
       int borrow = 0;
-      //与减法不同的是，borrow可能很大，不能使用减法的写法
+      // 与减法不同的是，borrow可能很大，不能使用减法的写法
       for (size_t i = 0; i < b.v.size(); ++i) {
         borrow += v[i + offset] - b.v[i] * mul - BIGINT_BASE + 1;
         v[i + offset] = borrow % BIGINT_BASE + BIGINT_BASE - 1;
         borrow /= BIGINT_BASE;
       }
-      //如果还有借位就继续处理
+      // 如果还有借位就继续处理
       for (size_t i = b.v.size(); borrow; ++i) {
         borrow += v[i + offset] - BIGINT_BASE + 1;
         v[i + offset] = borrow % BIGINT_BASE + BIGINT_BASE - 1;
@@ -627,18 +633,19 @@ void div(int a[], int b[], int c[], int d[]) {
       }
       return *this;
     }
+    
     BigIntSimple div_mod(const BigIntSimple &b, BigIntSimple &r) const {
       BigIntSimple d;
       r = *this;
       if (absless(b)) return d;
       d.v.resize(v.size() - b.v.size() + 1);
-      //提前算好除数的最高三位+1的倒数，若最高三位是a3,a2,a1
-      //那么db是a3+a2/base+(a1+1)/base^2的倒数，最后用乘法估商的每一位
-      //此法在BIGINT_BASE<=32768时可在int32范围内用
-      //但即使使用int64，那么也只有BIGINT_BASE<=131072时可用（受double的精度限制）
-      //能保证估计结果q'与实际结果q的关系满足q'<=q<=q'+1
-      //所以每一位的试商平均只需要一次，只要后面再统一处理进位即可
-      //如果要使用更大的base，那么需要更换其它试商方案
+      // 提前算好除数的最高三位+1的倒数，若最高三位是a3,a2,a1
+      // 那么db是a3+a2/base+(a1+1)/base^2的倒数，最后用乘法估商的每一位
+      // 此法在BIGINT_BASE<=32768时可在int32范围内用
+      // 但即使使用int64，那么也只有BIGINT_BASE<=131072时可用（受double的精度限制）
+      // 能保证估计结果q'与实际结果q的关系满足q'<=q<=q'+1
+      // 所以每一位的试商平均只需要一次，只要后面再统一处理进位即可
+      // 如果要使用更大的base，那么需要更换其它试商方案
       double t = (b.get((unsigned)b.v.size() - 2) +
                   (b.get((unsigned)b.v.size() - 3) + 1.0) / BIGINT_BASE);
       double db = 1.0 / (b.v.back() + t / BIGINT_BASE);
@@ -647,17 +654,17 @@ void div(int a[], int b[], int c[], int d[]) {
         int m = std::max((int)(db * rm), r.get(i + 1));
         r.sub_mul(b, m, j);
         d.v[j] += m;
-        if (!r.get(i + 1))  //检查最高位是否已为0，避免极端情况
+        if (!r.get(i + 1))  // 检查最高位是否已为0，避免极端情况
           --i, --j;
       }
       r.trim();
-      //修正结果的个位
+      // 修正结果的个位
       int carry = 0;
       while (!r.absless(b)) {
         r.subtract(b);
         ++carry;
       }
-      //修正每一位的进位
+      // 修正每一位的进位
       for (size_t i = 0; i < d.v.size(); ++i) {
         carry += d.v[i];
         d.v[i] = carry % BIGINT_BASE;
@@ -767,10 +774,18 @@ $$
     }
     ```
 
-??? " 关于 `new` 和 `delete` "
-    见 [内存池](../contest/common-tricks.md#_5)。
+??? " 关于 `new` 和 `delete`"
+    见 [内存池](../contest/common-tricks.md#内存池)。
 
 但是这样的实现存在一个问题：在 $b$ 进制下，多项式的每一个系数都有可能达到 $n \cdot b^2$ 量级，在压位高精度实现中可能造成整数溢出；而若在多项式乘法的过程中处理进位问题，则 $x_1 + x_0$ 与 $y_1 + y_0$ 的结果可能达到 $2 \cdot b^m$，增加一个位（如果采用 $x_1 - x_0$ 的计算方式，则不得不特殊处理负数的情况）。因此，需要依照实际的应用场景来决定采用何种实现方式。
+
+## 基于多项式的高效大整数乘法
+
+如果数据规模达到了 $10^{10^5}$ 或更大，普通的高精度乘法可能会超时。本节将介绍用多项式优化此类乘法的方法。
+
+对于一个 $n$ 位的十进制整数 $a$，可以将它看作一个每位系数均为整数且不超过 $10$ 的多项式 $A=a_{0} 10^0+a_{1} 10^1+\cdots+a_{n-1} 10^{n-1}$。这样，我们就将两个整数乘法转化为了两个多项式乘法。
+
+普通的多项式乘法时间复杂度仍是 $O(n^2)$，但可以用多项式一节中的 [快速傅里叶变换](poly/fft.md)、[快速数论变换](poly/ntt.md) 等算法优化，优化后的时间复杂度是 $O(n\log n)$。
 
 ### Reference
 
@@ -787,15 +802,18 @@ $$
     #define MAXSIZE 10024
     // MAXSIZE 是位数
     #define DLEN 4
+    
     // DLEN 记录压几位
     struct Big {
       int a[MAXSIZE], len;
       bool flag;  // 标记符号'-'
+    
       Big() {
         len = 1;
         memset(a, 0, sizeof a);
         flag = 0;
       }
+    
       Big(const int);
       Big(const char*);
       Big(const Big&);
@@ -814,8 +832,9 @@ $$
       // TODO: Big ^ Big;
       bool operator<(const Big&) const;
       bool operator<(const int& t) const;
-      inline void print() const;
+      void print() const;
     };
+    
     Big::Big(const int b) {
       int c, d = b;
       len = 0;
@@ -828,6 +847,7 @@ $$
       }
       a[len++] = d;
     }
+    
     Big::Big(const char* s) {
       int t, k, index, l;
       CLR(a);
@@ -843,17 +863,20 @@ $$
         a[index++] = t;
       }
     }
+    
     Big::Big(const Big& T) : len(T.len) {
       CLR(a);
       f(i, 0, len) a[i] = T.a[i];
       // TODO:重载此处？
     }
+    
     Big& Big::operator=(const Big& T) {
       CLR(a);
       len = T.len;
       f(i, 0, len) a[i] = T.a[i];
       return *this;
     }
+    
     Big Big::operator+(const Big& T) const {
       Big t(*this);
       int big = len;
@@ -871,6 +894,7 @@ $$
         t.len = big;
       return t;
     }
+    
     Big Big::operator-(const Big& T) const {
       int big;
       bool ctf;
@@ -905,6 +929,7 @@ $$
       if (ctf) t1.a[big - 1] = -t1.a[big - 1];
       return t1;
     }
+    
     Big Big::operator*(const Big& T) const {
       Big res;
       int up;
@@ -928,6 +953,7 @@ $$
       while (res.len > 1 && res.a[res.len - 1] == 0) --res.len;
       return res;
     }
+    
     Big Big::operator/(const int& b) const {
       Big res;
       int down = 0;
@@ -939,11 +965,13 @@ $$
       while (res.len > 1 && res.a[res.len - 1] == 0) --res.len;
       return res;
     }
+    
     int Big::operator%(const int& b) const {
       int d = 0;
       gd(i, len - 1, 0) d = (d * (MAXN + 1) % b + a[i]) % b;
       return d;
     }
+    
     Big Big::operator^(const int& n) const {
       Big t(n), res(1);
       int y = n;
@@ -954,6 +982,7 @@ $$
       }
       return res;
     }
+    
     bool Big::operator<(const Big& T) const {
       int ln;
       if (len < T.len) return 233;
@@ -965,28 +994,31 @@ $$
       }
       return 0;
     }
-    inline bool Big::operator<(const int& t) const {
+    
+    bool Big::operator<(const int& t) const {
       Big tee(t);
       return *this < tee;
     }
-    inline void Big::print() const {
+    
+    void Big::print() const {
       printf("%d", a[len - 1]);
       gd(i, len - 2, 0) { printf("%04d", a[i]); }
     }
     
-    inline void print(const Big& s) {
+    void print(const Big& s) {
       int len = s.len;
       printf("%d", s.a[len - 1]);
       gd(i, len - 2, 0) { printf("%04d", s.a[i]); }
     }
+    
     char s[100024];
     ```
 
 ## 习题
 
-- [NOIP 2012 国王游戏](https://loj.ac/problem/2603)
-- [SPOJ - Fast Multiplication](http://www.spoj.com/problems/MUL/en/)
-- [SPOJ - GCD2](http://www.spoj.com/problems/GCD2/)
-- [UVA - Division](https://uva.onlinejudge.org/index.php?option=onlinejudge&page=show_problem&problem=1024)
-- [UVA - Fibonacci Freeze](https://uva.onlinejudge.org/index.php?option=com_onlinejudge&Itemid=8&page=show_problem&problem=436)
-- [Codeforces - Notepad](http://codeforces.com/contest/17/problem/D)
+-   [NOIP 2012 国王游戏](https://loj.ac/problem/2603)
+-   [SPOJ - Fast Multiplication](http://www.spoj.com/problems/MUL/en/)
+-   [SPOJ - GCD2](http://www.spoj.com/problems/GCD2/)
+-   [UVA - Division](https://uva.onlinejudge.org/index.php?option=onlinejudge&page=show_problem&problem=1024)
+-   [UVA - Fibonacci Freeze](https://uva.onlinejudge.org/index.php?option=com_onlinejudge&Itemid=8&page=show_problem&problem=436)
+-   [Codeforces - Notepad](http://codeforces.com/contest/17/problem/D)

@@ -1,4 +1,4 @@
-author: Xeonacid, NachtgeistW, 2014CAIS01, sshwy, Chrogeek
+author: Xeonacid, NachtgeistW, 2014CAIS01, sshwy, Chrogeek, Menci
 
 本页面主要介绍部分评测工具/OJ 的 spj 编写方法。
 
@@ -14,7 +14,7 @@ author: Xeonacid, NachtgeistW, 2014CAIS01, sshwy, Chrogeek
     在对选手文件进行读入操作时应该要检查是否正确读入了所需的内容，防止造成 spj 的运行错误。（部分 OJ 会将 spj 的运行错误作为系统错误处理）
 
 ???+ note
-    以下均以 C++ 作为编程语言，以“要求标准答案与选手答案差值小于 1e-3，文件名为 num，单个测试点满分为 10 分”为例。
+    以下均以 C++ 作为编程语言，以「要求标准答案与选手答案差值小于 1e-3，文件名为 num，单个测试点满分为 10 分」为例。
 
 ## Testlib
 
@@ -24,7 +24,7 @@ Testlib 是一个 C++ 的库，用于辅助出题人使用 C++ 编写算法竞�
 
 必须使用 Testlib 作为 spj 的 评测工具/OJ：Codeforces、洛谷、UOJ 等。
 
-可以使用 Testlib 作为 spj 的 评测工具/OJ：LibreOJ (SYZOJ 2)、Lemon、牛客网等。
+可以使用 Testlib 作为 spj 的 评测工具/OJ：LibreOJ ([Lyrio](https://github.com/lyrio-dev))、Lemon、牛客网等。
 
 SYZOJ 2 所需的修改版 Testlib 托管于 [pastebin](https://pastebin.com/3GANXMG7)[^1]。
 

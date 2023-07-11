@@ -1,4 +1,4 @@
-author: Marcythm, zyf0726, hsfzLZH1, MingqiHuang, Ir1d, greyqz, billchenchina, Chrogeek, StudyingFather
+author: Marcythm, zyf0726, hsfzLZH1, MingqiHuang, Ir1d, greyqz, billchenchina, Chrogeek, StudyingFather, NFLSCode
 
 ## 区间类（2D1D）动态规划中的应用
 
@@ -10,8 +10,8 @@ $$
 
 直接简单实现状态转移，总时间复杂度将会达到 $O(n^3)$，但当函数 $w(l,r)$ 满足一些特殊的性质时，我们可以利用决策的单调性进行优化。
 
-- **区间包含单调性**：如果对于任意 $l \leq l' \leq r' \leq r$，均有 $w(l',r') \leq w(l,r)$ 成立，则称函数 $w$ 对于区间包含关系具有单调性。
-- **四边形不等式**：如果对于任意 $l_1\leq l_2 \leq r_1 \leq r_2$，均有 $w(l_1,r_1)+w(l_2,r_2) \leq w(l_1,r_2) + w(l_2,r_1)$ 成立，则称函数 $w$ 满足四边形不等式（简记为“交叉小于包含”）。若等号永远成立，则称函数 $w$ 满足 **四边形恒等式**。
+-   **区间包含单调性**：如果对于任意 $l \leq l' \leq r' \leq r$，均有 $w(l',r') \leq w(l,r)$ 成立，则称函数 $w$ 对于区间包含关系具有单调性。
+-   **四边形不等式**：如果对于任意 $l_1\leq l_2 \leq r_1 \leq r_2$，均有 $w(l_1,r_1)+w(l_2,r_2) \leq w(l_1,r_2) + w(l_2,r_1)$ 成立，则称函数 $w$ 满足四边形不等式（简记为「交叉小于包含」）。若等号永远成立，则称函数 $w$ 满足 **四边形恒等式**。
 
 **引理 1**：若 $w(l, r)$ 满足区间包含单调性和四边形不等式，则状态 $f_{l,r}$ 满足四边形不等式。
 
@@ -143,50 +143,52 @@ $$
 \sum_{1\leq l<r\leq n} m_{l+1,r} - m_{l,r-1} = \sum_{i=1}^n m_{i,n} - m_{1,i}\leq n^2
 $$
 
-???+note "核心代码"
-    ```cpp
-    // C++ Version
-    for (int len = 2; len <= n; ++len)  // 枚举区间长度
-      for (int l = 1, r = len; r <= n; ++l, ++r) {
-        // 枚举长度为len的所有区间
-        f[l][r] = INF;
-        for (int k = m[l][r - 1]; k <= m[l + 1][r]; ++k)
-          if (f[l][r] > f[l][k] + f[k + 1][r] + w(l, r)) {
-            f[l][r] = f[l][k] + f[k + 1][r] + w(l, r);  // 更新状态值
-            m[l][r] = k;  // 更新（最小）最优决策点
-          }
-      }
-    ```
+???+ note "核心代码"
+    === "C++"
     
-    ```python
-    # Python Version
-    for len in range(2, n + 1): # 枚举区间长度
-        r = len
-        l = 1
-        while(r <= n):
-            # 枚举长度为len的所有区间
-            r += 1
-            l += 1
-            f[l][r] = INF
-            k = m[l][r - 1]
-            while k <= m[l + 1][r]:
-                if f[l][r] > f[l][k] + f[k + 1][r] + w(l, r):
-                    f[l][r] = f[l][k] + f[k + 1][r] + w(l, r) # 更新状态值
-                    m[l][r] = k # 更新（最小）最优决策点
-                k += 1
-    ```
+        ```cpp
+        for (int len = 2; len <= n; ++len)  // 枚举区间长度
+        for (int l = 1, r = len; r <= n; ++l, ++r) {
+            // 枚举长度为len的所有区间
+            f[l][r] = INF;
+            for (int k = m[l][r - 1]; k <= m[l + 1][r]; ++k)
+            if (f[l][r] > f[l][k] + f[k + 1][r] + w(l, r)) {
+                f[l][r] = f[l][k] + f[k + 1][r] + w(l, r);  // 更新状态值
+                m[l][r] = k;  // 更新（最小）最优决策点
+            }
+        }
+        ```
+    
+    === "Python"
+    
+        ```python
+        for len in range(2, n + 1): # 枚举区间长度
+            r = len
+            l = 1
+            while(r <= n):
+                # 枚举长度为len的所有区间
+                r += 1
+                l += 1
+                f[l][r] = INF
+                k = m[l][r - 1]
+                while k <= m[l + 1][r]:
+                    if f[l][r] > f[l][k] + f[k + 1][r] + w(l, r):
+                        f[l][r] = f[l][k] + f[k + 1][r] + w(l, r) # 更新状态值
+                        m[l][r] = k # 更新（最小）最优决策点
+                    k += 1
+        ```
 
-### 另一种常见的形式
+### 基于分治的决策单调性优化
 
-某些 dp 问题有着如下的形式：
+某些 dp 问题形式如下：
 
 $$
 f_{i,j} = \min_{k \leq j}\{f_{i-1,k}\} + w(k,j)\qquad\left(1 \leq i \leq n,1 \leq j \leq m\right)
 $$
 
-总共有 $n \times m$ 个状态，每个状态要有 $m$ 次转换，上述 dp 问题的时间复杂度就是 $O(n m^2)$。
+总共有 $n \times m$ 个状态，每个状态有 $O(m)$ 个决策，上述 dp 问题的时间复杂度就是 $O(n m^2)$。
 
-> 实际上此形式也有同样的结论，可以在 $O(n m)$ 复杂度解决，读者可以模仿 2D1D 类似的给出证明。
+> 实际上此形式也有同样的结论，可以在 $O((n+m)m)$ 复杂度解决（且 **只需要满足四边形不等式即可**），读者可以模仿 2D1D 类似的给出证明。
 
 令 $opt(i, j)$ 为使上述表达式最小化的 $k$ 的值。如果对于所有的 $i, j$ 都有 $opt(i, j) \leq opt(i, j + 1)$，那么我们就可以用分治法来优化 dp 问题。
 
@@ -199,6 +201,7 @@ $$
     int n;
     long long C(int i, int j);
     vector<long long> dp_before(n), dp_cur(n);
+    
     // compute dp_cur[l], ... dp_cur[r] (inclusive)
     void compute(int l, int r, int optl, int optr) {
       if (l > r) return;
@@ -258,43 +261,45 @@ $$
 
 在这种情况下，我们定义过程 $\textsf{DP}(l, r, k_l, k_r)$ 表示求解 $f_{l}\sim f_{r}$ 的状态值，并且已知这些状态的最优决策点必定位于 $[k_l, k_r]$ 中，然后使用分治算法如下：
 
-???+note "代码实现"
-    ```cpp
-    // C++ Version
-    void DP(int l, int r, int k_l, int k_r) {
-      int mid = (l + r) / 2, k = k_l;
-      // 求状态f[mid]的最优决策点
-      for (int i = k_l; i <= min(k_r, mid - 1); ++i)
-        if (w(i, mid) < w(k, mid)) k = i;
-      f[mid] = w(k, mid);
-      // 根据决策单调性得出左右两部分的决策区间，递归处理
-      if (l < mid) DP(l, mid - 1, k_l, k);
-      if (r > mid) DP(mid + 1, r, k, k_r);
-    }
-    ```
+???+ note "代码实现"
+    === "C++"
     
-    ```python
-    # Python Version
-    def DP(l, r, k_l, k_r):
-        mid = int((l + r) / 2)
-        k = k_l
-        # 求状态f[mid]的最优决策点
-        for i in range(k_l, min(k_r, mid - 1)):
-            if w(i, mid) < w(k, mid):
-                k = i
-        f[mid] = w(k, mid)
-        # 根据决策单调性得出左右两部分的决策区间，递归处理
-        if l < mid:
-            DP(l, mid - 1, k_l, k)
-        if r > mid:
-            DP(mid + 1, r, k, k_r)
-    ```
+        ```cpp
+        void DP(int l, int r, int k_l, int k_r) {
+          int mid = (l + r) / 2, k = k_l;
+          // 求状态f[mid]的最优决策点
+          for (int i = k_l; i <= min(k_r, mid - 1); ++i)
+            if (w(i, mid) < w(k, mid)) k = i;
+          f[mid] = w(k, mid);
+          // 根据决策单调性得出左右两部分的决策区间，递归处理
+          if (l < mid) DP(l, mid - 1, k_l, k);
+          if (r > mid) DP(mid + 1, r, k, k_r);
+        }
+        ```
+    
+    === "Python"
+    
+        ```python
+        def DP(l, r, k_l, k_r):
+            mid = int((l + r) / 2)
+            k = k_l
+            # 求状态f[mid]的最优决策点
+            for i in range(k_l, min(k_r, mid - 1)):
+                if w(i, mid) < w(k, mid):
+                    k = i
+            f[mid] = w(k, mid)
+            # 根据决策单调性得出左右两部分的决策区间，递归处理
+            if l < mid:
+                DP(l, mid - 1, k_l, k)
+            if r > mid:
+                DP(mid + 1, r, k, k_r)
+        ```
 
 使用递归树的方法，容易分析出该分治算法的复杂度为 $O(n\log n)$，因为递归树每一层的决策区间总长度不超过 $2n$，而递归层数显然为 $O(\log n)$ 级别。
 
 ### [「POI2011」Lightning Conductor](https://loj.ac/problem/2157)
 
-???+note "题目大意"
+???+ note "题目大意"
     给定一个长度为 $n$（$n\leq 5\times 10^5$）的序列 $a_1, a_2, \cdots, a_n$，要求对于每一个 $1 \leq r \leq n$，找到最小的非负整数 $f_r$ 满足
     
     $$
@@ -309,7 +314,7 @@ $$
 
 根据 $-\sqrt{x}$ 的凸性，我们很容易得出（后文将详细描述）函数 $w(l, r) = -a_l - \sqrt{r-l} + a_r$ 满足四边形不等式，因此套用上述的分治算法便可在 $O(n\log n)$ 的时间内解决此题了。
 
-现在处理一般情况，即转移函数的值是在动态规划的过程中按照一定的拓扑序逐步确定的。此时我们需要改变思维方式，由“确定一个状态的最优决策”转化为“确定一个决策是哪些状态的最优决策“。具体可见上文的「单调栈优化 DP」。
+现在处理一般情况，即转移函数的值是在动态规划的过程中按照一定的拓扑序逐步确定的。此时我们需要改变思维方式，由「确定一个状态的最优决策」转化为「确定一个决策是哪些状态的最优决策」。具体可见上文的「单调栈优化 DP」。
 
 ## 满足四边形不等式的函数类
 
@@ -365,7 +370,7 @@ $$
 
 ### [「HNOI2008」玩具装箱 toy](https://loj.ac/problem/10188)
 
-???+note "题目大意"
+???+ note "题目大意"
     有 $n$ 个玩具需要装箱，要求每个箱子中的玩具编号必须是连续的。每个玩具有一个长度 $C_i$，如果一个箱子中有多个玩具，那么每两个玩具之间要加入一个单位长度的分隔物。形式化地说，如果将编号在 $[l,r]$ 间的玩具装在一个箱子里，那么这个箱子的长度为 $r-l+\sum_{k=l}^r C_k$。现在需要制定一个装箱方案，使得所有容器的长度与 $K$ 差值的平方之和最小。
 
 设 $f_{r}$ 表示将前 $r$ 个玩具装箱的最小代价，则枚举第 $r$ 个玩具与哪些玩具放在一个箱子中，可以得到状态转移方程为
@@ -378,19 +383,19 @@ $$
 
 ## 习题
 
-- [「IOI2000」邮局](https://www.luogu.com.cn/problem/P4767)
-- [Codeforces - Ciel and Gondolas](https://codeforces.com/contest/321/problem/E)(Be careful with I/O!)
-- [SPOJ - LARMY](https://www.spoj.com/problems/LARMY/)
-- [Codechef - CHEFAOR](https://www.codechef.com/problems/CHEFAOR)
-- [Hackerrank - Guardians of the Lunatics](https://www.hackerrank.com/contests/ioi-2014-practice-contest-2/challenges/guardians-lunatics-ioi14)
-- [ACM ICPC World Finals 2017 - Money](https://open.kattis.com/problems/money)
+-   [「IOI2000」邮局](https://www.luogu.com.cn/problem/P4767)
+-   [Codeforces - Ciel and Gondolas](https://codeforces.com/contest/321/problem/E)(Be careful with I/O!)
+-   [SPOJ - LARMY](https://www.spoj.com/problems/LARMY/)
+-   [Codechef - CHEFAOR](https://www.codechef.com/problems/CHEFAOR)
+-   [Hackerrank - Guardians of the Lunatics](https://www.hackerrank.com/contests/ioi-2014-practice-contest-2/challenges/guardians-lunatics-ioi14)
+-   [ACM ICPC World Finals 2017 - Money](https://open.kattis.com/problems/money)
 
 ## 参考资料
 
-- [noiau 的 CSDN 博客](https://blog.csdn.net/noiau/article/details/72514812)
-- [Quora Answer by Michael Levin](https://www.quora.com/What-is-divide-and-conquer-optimization-in-dynamic-programming)
-- [Video Tutorial by "Sothe" the Algorithm Wolf](https://www.youtube.com/watch?v=wLXEWuDWnzI)
+-   [noiau 的 CSDN 博客](https://blog.csdn.net/noiau/article/details/72514812)
+-   [Quora Answer by Michael Levin](https://www.quora.com/What-is-divide-and-conquer-optimization-in-dynamic-programming)
+-   [Video Tutorial by "Sothe" the Algorithm Wolf](https://www.youtube.com/watch?v=wLXEWuDWnzI)
 
-* * *
+***
 
 **本页面主要译自英文版博文 [Divide and Conquer DP](https://cp-algorithms.com/dynamic_programming/divide-and-conquer-dp.html)。版权协议为 CC-BY-SA 4.0。**

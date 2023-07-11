@@ -40,7 +40,7 @@ const int &r2 = a;
 const int &r4 = b;
 ```
 
-另外需要区分开的是“常类型指针”和“常指针变量”（即常指针、指针常量），例如下列声明
+另外需要区分开的是「常类型指针」和「常指针变量」（即常指针、指针常量），例如下列声明
 
 ```cpp
 int* const p1;        // 类型为int的常指针，需要初始化
@@ -60,7 +60,7 @@ int const* (*const f5)(int) = some_func;  // 指向返回常指针的函数的�
 
 ### 常参数
 
-在函数参数里限定参数为常类型可以避免在类型里意外修改参数，该方法通常用于引用参数。此外，在类型参数中添加 const 修饰符还能增加代码可读性，能区分输入和输出参数。
+在函数参数里限定参数为常类型可以避免在函数里意外修改参数，该方法通常用于引用参数。此外，在类型参数中添加 const 修饰符还能增加代码可读性，能区分输入和输出参数。
 
 ```cpp
 void sum(const std::vector<int> &data, int &total) {
@@ -74,30 +74,44 @@ void sum(const std::vector<int> &data, int &total) {
 常成员指的是类型中被 const 修饰的成员，常成员可以用来限制对常对象的修改。其中，常成员变量与常量声明相同，而常成员函数声明方法为在成员函数声明的 **末尾**（参数列表的右括号的右边）添加 const 修饰符。
 
 ```cpp
-// 常成员的例子
-struct X {
-  X();
-  const int* p;  // 类型为 int* 的常成员
-  int* const q;  // 类型为 const int* 的可变成员
+#include <iostream>
 
-  const int r() const;
-  // 第一个 const 修饰返回值，而最后的 const 修饰的是这个成员函数。
+struct ConstMember {
+  const int *p;  // 常类型指针成员
+  int *const q;  // 常指针变量成员
+  int s;
+
+  void func() { std::cout << "General Function" << std::endl; }
+
+  void constFunc1() const { std::cout << "Const Function 1" << std::endl; }
+
+  void constFunc2(int ss) const {
+    // func(); // 常成员函数不能调用普通成员函数
+    constFunc1();  // 常成员函数可以调用常成员函数
+
+    // s = ss; // 常成员函数不能改变普通成员变量
+    // p = &ss; // 常成员函数不能改变常成员变量
+  }
 };
 
-X a;
-*(a.p)++;  // 可行
-// *(a.q)++; // 报错，不可修改 const int 类型变量
-
-// 常成员函数的例子
-const std::vector<int> c{1, 2};
-// c.push_back(3); // 报错，不可访问常量的可变成员
-// vector::push_back() 不是常成员
-int s = c.size();  // vector::size() 是常成员，可以访问
+int main() {
+  const int a = 1;
+  int b = 1;
+  struct ConstMember c = {.p = &a, .q = &b};  // 指派初始化器是C++20中的一种语法
+  // *(c.p) = 2; // 常类型指针无法改变指向的值
+  c.p = &b;    // 常类型指针可以改变指针指向
+  *(c.q) = 2;  // 常指针变量可以改变指向的值
+  // c.q = &a; // 常指针变量无法改变指针指向
+  const struct ConstMember d = c;
+  // d.func(); // 常对象不能调用普通成员函数
+  d.constFunc2(b);  // 常对象可以调用常成员函数
+  return 0;
+}
 ```
 
 ## 常表达式 constexpr（C++11）
 
-constexpr 说明符的作用是声明可以在编译时求得函数或变量的值，它的行为和 C 语言中的 const 关键字是一致的，会将变量结果直接编译到栈空间中。constexpr 还可以用来替换宏定义的常量，规避 [宏定义的风险](./basic.md#define)。constexpr 修饰的是变量和函数，而 const 修饰的是类型。
+constexpr 说明符的作用是声明可以在编译时求得函数或变量的值，它的行为和 C 语言中的 const 关键字是一致的，会将变量结果直接编译到栈空间中。constexpr 还可以用来替换宏定义的常量，规避 [宏定义的风险](./basic.md#define-命令)。constexpr 修饰的是变量和函数，而 const 修饰的是类型。
 
 > 实际上把 const 理解成 **"readonly"**，而把 constexpr 理解成 **"const"** 更加直观。
 
@@ -114,5 +128,5 @@ void test(const int x) {
 
 ## 参考资料
 
-- [C++ 关键字——const](https://zh.cppreference.com/w/cpp/keyword/const)
-- [C++ 关键字——constexpr](https://zh.cppreference.com/w/cpp/keyword/constexpr)
+-   [C++ 关键字——const](https://zh.cppreference.com/w/cpp/keyword/const)
+-   [C++ 关键字——constexpr](https://zh.cppreference.com/w/cpp/keyword/constexpr)

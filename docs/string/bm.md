@@ -6,7 +6,7 @@ author: minghu6
 
 而 BM 算法背后的基本思想是通过后缀匹配获得比前缀匹配更多的信息来实现更快的字符跳转。
 
-## 基础介绍
+## 引入
 
 想象一下，如果我们的的模式字符串 $pat$，被放在文本字符串 $string$ 的左手起头部，使它们的第一个字符对齐。
 
@@ -26,11 +26,11 @@ $string$ 的长度 $stringlen$，$stringlastpos = stringlen-1$。
 
 假如我们知道了 $string$ 的第 $patlen$ 个字符 $char$（与 $pat$ 的最后一个字符对齐）考虑我们能得到什么信息：
 
-**观察 1**：
+### 观察 1
 
 如果我们知道 $char$ 这个字符不在 $pat$ 中，我们就不用考虑 $pat$ 从 $string$ 的第 $1$ 个、第 $2$ 个……第 $patlen$ 个字符起出现的情况，，而可以直接将 $pat$ 向下滑动 $patlen$ 个字符。
 
-**观察 2**：
+### 观察 2
 
 更一般地，**如果出现在 $pat$ 最末尾（也就是最右边）的那一个 $char$ 字符的位置是离末尾端差了 $delta_1$ 个字符**，
 
@@ -56,7 +56,7 @@ $$
 
 或者，我们也可能会在匹配完 $pat$ 的倒数第 $m$ 个字符后，在倒数第 $m+1$ 个字符上失配，这时我们就希望把 $pat$ 向后滑动到下一个可能会实现匹配的位置，当然我们希望滑动得越远越好。
 
-**观察 3(a)**：
+### 观察 3(a)
 
 在 **观察 2** 中提到，当匹配完 $pat$ 的倒数 $m$ 个字符后，如果在倒数第 $m+1$ 个字符失配，为了使得 $string$ 中的失配字符与 $pat$ 上对应字符对齐，
 
@@ -68,7 +68,7 @@ $$
 
 然而，我们有机会跳过更多的字符，请继续看下去。
 
-**观察 3(b)**：
+### 观察 3(b)
 
 如果我们知道 $string$ 接下来的 $m$ 个字符和 $pat$ 的最后 $m$ 个字符匹配，假设这个子串为 $subpat$，
 
@@ -91,7 +91,7 @@ $$
 
 于是我们在失配时，可以把把 $string$ 上的注意力往后跳过 $\max(delta_1,delta_2)$ 个字符
 
-## 实例说明：
+## 过程
 
 箭头指向失配字符 $char$：
 
@@ -172,6 +172,8 @@ $$
 
 ### 最初的匹配算法
 
+#### 解释
+
 现在看这样一个利用 $delta_1$ 和 $delta_2$ 进行字符串匹配的算法：
 
 $$
@@ -203,14 +205,16 @@ $$
 
 也就是说需要找到一个最好的 $k$, 使得 $pat[k\dots k+patlastpos-j-1]=pat[j+1\dots patlastpos]$，另外要考虑两种特殊情况：
 
-1. 当 $k<0$ 时，相当于在 $pat$ 前面补充了一段虚拟的前缀，实际上也符合 $delta_2$ 跳转的原理。
+1.  当 $k<0$ 时，相当于在 $pat$ 前面补充了一段虚拟的前缀，实际上也符合 $delta_2$ 跳转的原理。
 2.  当 $k>0$ 时，如果 $pat[k-1]=pat[j]$，则这个 $pat[k\dots k+patlastpos-j-1]$ 不能作为 $subpat$ 的合理重现。
     原因是 $pat[j]$ 本身是失配字符，所以 $pat$ 向下滑动 $k$ 个字符后，在后缀匹配过程中仍然会在 $pat[k-1]$ 处失配。
 
 还要注意两个限制条件：
 
-1. $k < j$。因为当 $k=j$ 时，有 $pat[k]=pat[j]$，在 $pat[j]$ 上失配的字符也会在 $pat[k]$ 上失配。
-2. 考虑到 $delta_2(patlastpos)= 0$，所以规定 $rpr(patlastpos) = patlastpos$。
+1.  $k < j$。因为当 $k=j$ 时，有 $pat[k]=pat[j]$，在 $pat[j]$ 上失配的字符也会在 $pat[k]$ 上失配。
+2.  考虑到 $delta_2(patlastpos)= 0$，所以规定 $rpr(patlastpos) = patlastpos$。
+
+#### 过程
 
 由于理解 $rpr(j)$ 是实现 BoyerMoore 算法的核心，所以我们使用如下两个例子进行详细说明：
 
@@ -320,84 +324,85 @@ $$
 
 ## $delta_2$ 构建细节
 
-### 历史细节
+### 引入
 
 说起 $delta_2$ 的实现，发表在 1977 年 10 月的*Communications of the ACM*上的在 Boyer、Moor 的论文[^bm]里只描述了这个静态表，并没有说明如何产生它。
 
-而构造 $delta_2$ 的具体实现的讨论出现在 1977 年 6 月 Knuth、Morris、Pratt 在*SIAM Journal on Computing*上正式联合发表的 KMP 算法的论文[^kmp]里（这篇论文是个宝藏，除了 KMP，其中还提及了若干字符串搜索的算法构想和介绍，其中就包括了本文介绍的 BM 算法），听力来有点儿魔幻，嗯哼？这就不得不稍微介绍一点历史细节了：
+而构造 $delta_2$ 的具体实现的讨论出现在 1977 年 6 月 Knuth、Morris、Pratt 在*SIAM Journal on Computing*上正式联合发表的 KMP 算法的论文[^kmp]里（这篇论文是个宝藏，除了 KMP，其中还提及了若干字符串搜索的算法构想和介绍，其中就包括了本文介绍的 BM 算法），听起来有点儿魔幻，嗯哼？这就不得不稍微介绍一点历史细节了：
 
-1. 1969 年夏天 Morris 为某个大型机编写文本编辑器时利用有限自动机的理论发明了等价于 KMP 算法的字符串匹配算法，而他的算法由于过于复杂，被不理解他算法的同事当做 bug 修改得一团糟，哈哈。
+1.  1969 年夏天 Morris 为某个大型机编写文本编辑器时利用有限自动机的理论发明了等价于 KMP 算法的字符串匹配算法，而他的算法由于过于复杂，被不理解他算法的同事当做 bug 修改得一团糟，哈哈。
 
-2. 1970 年 KMP 中的“带头人”Knuth 在研究 Cook 的关于两路确定下推自动机（two-way deterministic pushdown automaton）的理论时受到启发，也独立发明了 KMP 算法的雏形，并把它展示给他的同事 Pratt，Pratt 改进了算法的数据结构。
+2.  1970 年 KMP 中的「带头人」Knuth 在研究 Cook 的关于两路确定下推自动机（two-way deterministic pushdown automaton）的理论时受到启发，也独立发明了 KMP 算法的雏形，并把它展示给他的同事 Pratt，Pratt 改进了算法的数据结构。
 
-3. 1974 年 Boyer、Moor 发现通过更快地跳过不可能匹配的文本能实现比 KMP 更快的字符串匹配，（Gosper 也独立地发现了这一点），而一个只有原始 $delta_1$ 定义的匹配算法是 BM 算法的最原始版本。
+3.  1974 年 Boyer、Moor 发现通过更快地跳过不可能匹配的文本能实现比 KMP 更快的字符串匹配，（Gosper 也独立地发现了这一点），而一个只有原始 $delta_1$ 定义的匹配算法是 BM 算法的最原始版本。
 
-4. 1975 年 Boyer、Moor 提出了原始的 $delta_2$ 表，而这个版本的 $delta_2$ 表不仅不会对性能有所改善，还会在处理小字符表时拖累性能表现，而同年 MIT 人工智能实验室的 Kuipers 和我们熟悉的 Knuth 向他们提出了类似的关于 $delta_2$ 的改进建议，于是 Boyer、Moor 在论文的下一次修改中提到了这个建议，并提出一个用二维表代替 $delta_1$ 和 $delta_2$ 的想法。
+4.  1975 年 Boyer、Moor 提出了原始的 $delta_2$ 表，而这个版本的 $delta_2$ 表不仅不会对性能有所改善，还会在处理小字符表时拖累性能表现，而同年 MIT 人工智能实验室的 Kuipers 和我们熟悉的 Knuth 向他们提出了类似的关于 $delta_2$ 的改进建议，于是 Boyer、Moor 在论文的下一次修改中提到了这个建议，并提出一个用二维表代替 $delta_1$ 和 $delta_2$ 的想法。
 
-5. 1976 年 1 月 Knuth 证明了关于 $delta_2$ 的改进会得到更好的性能，于是 Boyer、Moor 两人又一次修改了论文，得到了现在版本的 $delta_2$ 定义。同年 4 月，斯坦福的 Floyd 又发现了 Boyer、Moor 两人第一版本的公式中的严重的统计错误，并给出了现在版本的公式。
+5.  1976 年 1 月 Knuth 证明了关于 $delta_2$ 的改进会得到更好的性能，于是 Boyer、Moor 两人又一次修改了论文，得到了现在版本的 $delta_2$ 定义。同年 4 月，斯坦福的 Floyd 又发现了 Boyer、Moor 两人第一版本的公式中的严重的统计错误，并给出了现在版本的公式。
 
-6. Standish 又为 Boyer、Moor 提供了现在的匹配算法的改进。
+6.  Standish 又为 Boyer、Moor 提供了现在的匹配算法的改进。
 
-7. 1977 年 6 月 Knuth、Morris、Pratt 正式联合发表了 KMP 算法的论文，其中在提及比 KMP 表现更好的算法中提出了 $delta_2$ 的构建方式。（其中也感谢了 Boyer、Moor 对于证明线性定理（linearity theorem）提供的帮助）
+7.  1977 年 6 月 Knuth、Morris、Pratt 正式联合发表了 KMP 算法的论文，其中在提及比 KMP 表现更好的算法中提出了 $delta_2$ 的构建方式。（其中也感谢了 Boyer、Moor 对于证明线性定理（linearity theorem）提供的帮助）
 
-这个 BM 算法的发展的故事，切实地向我们展示了团结、友谊、协作，以及谦虚好学不折不挠“在平凡中实现伟大”！😂😂😂
+这个 BM 算法的发展的故事，切实地向我们展示了团结、友谊、协作，以及谦虚好学不折不挠「在平凡中实现伟大」！😂😂😂
 
 ### 时间复杂度为 $O(n^3)$ 的构建 $delta_2$ 的朴素算法
 
 在介绍 Knuth 的 $delta_2$ 构建算法之前，根据定义，我们会有一个原始、简单但有时可能已经够用的朴素算法（除非你需要构建长度成百上千的 $pat$）：
 
-1. 对于 `[0, patlen)` 区间的每一个位置 `i`，根据 `subpat` 的长度确定其重现位置的区间，也就是 `[-subpatlen, i]`；
-2. 可能的重现位置按照从右到左进行逐字符比较，寻找符合 $delta_2$ 要求的最右边 $subpat$ 的重现位置；
-3. 最后别忘了令 $delta_2(lastpos)= 0$。
+1.  对于 `[0, patlen)` 区间的每一个位置 `i`，根据 `subpat` 的长度确定其重现位置的区间，也就是 `[-subpatlen, i]`；
+2.  可能的重现位置按照从右到左进行逐字符比较，寻找符合 $delta_2$ 要求的最右边 $subpat$ 的重现位置；
+3.  最后别忘了令 $delta_2(lastpos)= 0$。
 
-```Rust
-use std::cmp::PartialEq;
-
-pub fn build_delta_2_table_naive(p: &[impl PartialEq]) -> Vec<usize> {
-    let patlen = p.len();
-    let lastpos = patlen - 1;
-    let mut delta_2 = vec![];
-
-    for i in 0..patlen {
-        let subpatlen = (lastpos - i) as isize;
-
-        if subpatlen == 0 {
-            delta_2.push(0);
-            break;
-        }
-
-        for j in (-subpatlen..(i + 1) as isize).rev() {
-            // subpat 匹配
-            if (j..j + subpatlen)
-            .zip(i + 1..patlen)
-            .all(|(rpr_index, subpat_index)| {
-                if rpr_index < 0 {
-                    return true;
-                }
-
-                if p[rpr_index as usize] == p[subpat_index] {
-                    return true;
-                }
-
-                false
-            })
-            && (j <= 0 || p[(j - 1) as usize] != p[i])
-            {
-                delta_2.push((lastpos as isize - j) as usize);
+???+ note "实现"
+    ```Rust
+    use std::cmp::PartialEq;
+    
+    pub fn build_delta_2_table_naive(p: &[impl PartialEq]) -> Vec<usize> {
+        let patlen = p.len();
+        let lastpos = patlen - 1;
+        let mut delta_2 = vec![];
+    
+        for i in 0..patlen {
+            let subpatlen = (lastpos - i) as isize;
+    
+            if subpatlen == 0 {
+                delta_2.push(0);
                 break;
             }
+    
+            for j in (-subpatlen..(i + 1) as isize).rev() {
+                // subpat 匹配
+                if (j..j + subpatlen)
+                .zip(i + 1..patlen)
+                .all(|(rpr_index, subpat_index)| {
+                    if rpr_index < 0 {
+                        return true;
+                    }
+    
+                    if p[rpr_index as usize] == p[subpat_index] {
+                        return true;
+                    }
+    
+                    false
+                })
+                && (j <= 0 || p[(j - 1) as usize] != p[i])
+                {
+                    delta_2.push((lastpos as isize - j) as usize);
+                    break;
+                }
+            }
         }
+    
+        delta_2
     }
-
-    delta_2
-}
-```
+    ```
 
 特别地，对 Rust 语言特性进行必要地解释，下不赘述：
 
-- `usize` 和 `isize` 是和内存指针同字节数的无符号整数和有符号整数，在 32 位机上相当于 `u32` 和 `i32`，64 位机上相当于 `u64` 和 `i64`。
-- 索引数组、向量、分片时使用 `usize` 类型的数字（因为在做内存上的随机访问并且下标不能为负值），所以如果需要处理负值要用 `isize`，而进行索引时又要用 `usize`，这就看到使用 `as` 关键字进行二者之间的显式转换。
-- `impl PartialEq` 只是用作泛型，可以同时支持 `Unicode` 编码的 `char` 和二进制的 `u8`。
+-   `usize` 和 `isize` 是和内存指针同字节数的无符号整数和有符号整数，在 32 位机上相当于 `u32` 和 `i32`，64 位机上相当于 `u64` 和 `i64`。
+-   索引数组、向量、分片时使用 `usize` 类型的数字（因为在做内存上的随机访问并且下标不能为负值），所以如果需要处理负值要用 `isize`，而进行索引时又要用 `usize`，这就看到使用 `as` 关键字进行二者之间的显式转换。
+-   `impl PartialEq` 只是用作泛型，可以同时支持 `Unicode` 编码的 `char` 和二进制的 `u8`。
 
 显见这是个时间复杂度为 $O(n^3)$ 的暴力算法。
 
@@ -409,9 +414,9 @@ pub fn build_delta_2_table_naive(p: &[impl PartialEq]) -> Vec<usize> {
 
 Rytter 在 1980 年*SIAM Journal on Computing*上发表的文章[^rytter]对此提出了修正，但是 Rytter 的这篇文章在细节上有些令人疑惑的地方，包括不限于：
 
-- 示例中奇怪的 $delta_2$ 数值（不清楚他依据的 $delta_2$ 是否和最终版 $delta_2$ 定义有微妙的差别，但我实在不想因为这事儿继续考古了😱）
-- 明显的在复述 Knuth 算法时的笔误、算法上错误的缩进（可能是文章录入时的问题？）
-- 奇妙的变量命名（考虑到那个时代的标签：`goto` 语句、汇编语言、大型机，随性的变量命名也很合理）
+-   示例中奇怪的 $delta_2$ 数值（不清楚他依据的 $delta_2$ 是否和最终版 $delta_2$ 定义有微妙的差别，但我实在不想因为这事儿继续考古了😱）
+-   明显的在复述 Knuth 算法时的笔误、算法上错误的缩进（可能是文章录入时的问题？）
+-   奇妙的变量命名（考虑到那个时代的标签：`goto` 语句、汇编语言、大型机，随性的变量命名也很合理）
 
 总之就是你绝对不想看他的那个修正算法的具体实现，不过好在他在用文字描述的时候比用伪代码清晰多了呢，现在我们用更清晰的思路和代码结构整理这么一个
 
@@ -421,12 +426,12 @@ $delta_2$ 的构建算法：
 
 按照重现位置由远到近，也就是偏移量由大到小，分成如下几类：
 
-1. 整个 $subpat$ 重现位置完全在 $pat$ 左边的，比如 $\texttt{[(EYX)]ABYXCDEYX}$，此时 $delta_2(j) = patlastpos\times 2 - j$；
+1.  整个 $subpat$ 重现位置完全在 $pat$ 左边的，比如 $\texttt{[(EYX)]ABYXCDEYX}$，此时 $delta_2(j) = patlastpos\times 2 - j$；
 
 2.  $subpat$ 的重现有一部分在 $pat$ 左边，有一部分是 $pat$ 头部，比如 $\texttt{[(XX)ABC]XXXABC}$，此时 $patlastpos < delta_2(j) < patlastpos\times 2 - j$；
     我们把 $subpat$ 完全在 $pat$ 头部的的边际情况也归类在这里（当然根据实现也可以归类在下边），比如 $\texttt{[ABC]XXXABC}$，此时 $patlastpos = delta_2(j)$；
 
-3. $subpat$ 的重现完全在 $pat$ 中，比如 $\texttt{AB[YX]CDEYX}$，此时 $delta_2(j) < patlastpos$。
+3.  $subpat$ 的重现完全在 $pat$ 中，比如 $\texttt{AB[YX]CDEYX}$，此时 $delta_2(j) < patlastpos$。
 
 现在来讨论如何高效地计算这三种情况：
 
@@ -494,8 +499,8 @@ $subpat$ 的重现不在别的地方，恰好就在 $pat$ 中（不包括 $pat$ 
 
 这就很好地启发了我们（起码很好地启发了 Knuth）使用类似于计算前缀函数的过程计算第三种情况，只不过是左右反过来的前缀函数：
 
-- 两个指针分别指向子串的左端点和子串最长公共前后缀的“前缀”位置，从右向左移动，在发现指向的两个字符相等时继续移动，此时相当于“前缀”变大；
-- 当两个字符不相等时，之前相等的部分就满足了 $delta_2$ 对重现的要求，并且回退指向“前缀”位置的指针直到构成新的字符相等或者出界。
+-   两个指针分别指向子串的左端点和子串最长公共前后缀的「前缀」位置，从右向左移动，在发现指向的两个字符相等时继续移动，此时相当于「前缀」变大；
+-   当两个字符不相等时，之前相等的部分就满足了 $delta_2$ 对重现的要求，并且回退指向「前缀」位置的指针直到构成新的字符相等或者出界。
 
 同前缀函数一样，需要一个辅助数组，用于回退，可以使用之前计算第二种情况所生成的前缀数组的空间。
 
@@ -579,9 +584,9 @@ pub fn build_delta_2_table_improved_minghu6(p: &[impl PartialEq]) -> Vec<usize> 
 
 比如一个极端的例子：$pat$：$\texttt{AAA}$，$string$：$\texttt{AAAAA}\dots$。
 
-对此 Knuth 提出来的一个方法是用一个“数量有限”的状态的集合来记录 $patlen$ 长度的字符，这种算法保证 $string$ 上每一个字符最多比较一次，但代价是这个“数量有限”的状态可能数目并不怎么“有限”，比如立刻就能想到它的上限是 $2^{m}$ 个，但并不清楚它到底能变得多大，对于一个字符彼此不相等的 $pat$，需要 $\dfrac{1}{2}m^{2}+m$ 个状态。这个算法思路同在 1977 年 6 月的发表 KMP 论文[^kmp]里被介绍，也许在未来某个节点匹配代价很高但状态存储代价很低的新场景能重新得到应用，但对于现在简单的字符串匹配，这个设计并不特别合适。
+对此 Knuth 提出来的一个方法是用一个「数量有限」的状态的集合来记录 $patlen$ 长度的字符，这种算法保证 $string$ 上每一个字符最多比较一次，但代价是这个「数量有限」的状态可能数目并不怎么「有限」，比如立刻就能想到它的上限是 $2^{m}$ 个，但并不清楚它到底能变得多大，对于一个字符彼此不相等的 $pat$，需要 $\dfrac{1}{2}m^{2}+m$ 个状态。这个算法思路同在 1977 年 6 月的发表 KMP 论文[^kmp]里被介绍，也许在未来某个节点匹配代价很高但状态存储代价很低的新场景能重新得到应用，但对于现在简单的字符串匹配，这个设计并不特别合适。
 
-而 Knuth 提出的另一个方法，嗯这里就不介绍了，同在上面的 Knuth 那篇“宝藏”论文里被介绍，缺点是除了过于复杂以外主要是构建辅助的数据结构需要的预处理时间太大：$O(qm)$
+而 Knuth 提出的另一个方法，嗯这里就不介绍了，同在上面的 Knuth 那篇「宝藏」论文里被介绍，缺点是除了过于复杂以外主要是构建辅助的数据结构需要的预处理时间太大：$O(qm)$
 
 $q$ 为全字符集的大小，而且 $qm$ 前面的系数很大。
 
@@ -691,7 +696,7 @@ impl<'a> BMPattern<'a> {
 
 这个部分要讨论实践中的具体问题。
 
-尽管前面给出了一些算法的实现代码，但并没有真正讨论过完整实现可能面临的一些“小问题”。
+尽管前面给出了一些算法的实现代码，但并没有真正讨论过完整实现可能面临的一些「小问题」。
 
 ### 字符类型的考虑
 
@@ -709,48 +714,49 @@ impl<'a> BMPattern<'a> {
 
 于是挫折使我困惑，困惑使我思考，终于一束阳光照进了石头缝里：
 
-1. 字符串匹配算法高效的关键在于字符索引的快速跳转
-2. 字符索引一定要建立在等宽字符的基础上，
+1.  字符串匹配算法高效的关键在于字符索引的快速跳转
+2.  字符索引一定要建立在等宽字符的基础上，
 
 基于这两条原则思考，我就发现二进制字节本身：1 字节等宽、字符全集大小是 256，就是符合条件的完美字符！在这个基础上完成了一系列后缀匹配算法的高效实现。
 
-### Simplified Boyer-Moore 算法
+### Simplified Boyer–Moore 算法
 
 BM 算法最复杂的地方就在于 $delta_2$ 表（通俗的名字是好后缀表）的构建，而实践中发现，在一般的字符集上的匹配性能主要依靠 $delta_1$ 表（通俗的名字是坏字符表），于是出现了仅仅使用 $delta_1$ 表的简化版 BM 算法，通常表现和完整版差距很小。
 
-### Boyer-Moore-Horspol 算法
+### Boyer–Moore–Horspol 算法
 
 Horspol 算法同样是基于坏字符的规则，不过是在与 $pat$ 尾部对齐的字符上应用 $delta_1$，这个效果类似于前文对匹配算法的改进，所以它的通常表现优于原始 BM 和匹配算法改进后的 BM 差不多。
 
-```rust
-pub struct HorspoolPattern<'a> {
-    pat_bytes: &'a [u8],
-    bm_bc: [usize; 256],
-}
-
-impl<'a> HorspoolPattern<'a> {
-    // ...
-    pub fn find_all(&self, string: &str) -> Vec<usize> {
-        let mut result = vec![];
-        let string_bytes = string.as_bytes();
-        let stringlen = string_bytes.len();
-        let pat_last_pos = self.pat_bytes.len() - 1;
-        let mut string_index = pat_last_pos;
-
-        while string_index < stringlen {
-            if &string_bytes[string_index-pat_last_pos..string_index+1] == self.pat_bytes {
-                result.push(string_index-pat_last_pos);
-            }
-
-            string_index += self.bm_bc[string_bytes[string_index] as usize];
-        }
-
-        result
+???+ note "实现"
+    ```rust
+    pub struct HorspoolPattern<'a> {
+        pat_bytes: &'a [u8],
+        bm_bc: [usize; 256],
     }
-}
-```
+    
+    impl<'a> HorspoolPattern<'a> {
+        // ...
+        pub fn find_all(&self, string: &str) -> Vec<usize> {
+            let mut result = vec![];
+            let string_bytes = string.as_bytes();
+            let stringlen = string_bytes.len();
+            let pat_last_pos = self.pat_bytes.len() - 1;
+            let mut string_index = pat_last_pos;
+    
+            while string_index < stringlen {
+                if &string_bytes[string_index-pat_last_pos..string_index+1] == self.pat_bytes {
+                    result.push(string_index-pat_last_pos);
+                }
+    
+                string_index += self.bm_bc[string_bytes[string_index] as usize];
+            }
+    
+            result
+        }
+    }
+    ```
 
-### Boyer-Moore-Sunday 算法
+### Boyer–Moore–Sunday 算法
 
 Sunday 算法同样是利用坏字符规则，只不过相比 Horspool 它更进一步，直接关注 $pat$ 尾部对齐的那个字符的下一个字符。
 
@@ -758,59 +764,60 @@ Sunday 算法同样是利用坏字符规则，只不过相比 Horspool 它更进
 
 Sunday 算法通常用作一般情况下实现最简单而且平均表现最好之一的实用算法，通常表现比 Horspool、BM 都要快一点。
 
-```rust
-pub struct SundayPattern<'a> {
-    pat_bytes: &'a [u8],
-    sunday_bc: [usize; 256],
-}
-
-impl<'a> SundayPattern<'a> {
-    // ...
-    fn build_sunday_bc(p: &'a [u8]) -> [usize; 256] {
-        let mut sunday_bc_table = [p.len() + 1; 256];
-
-        for i in 0..p.len() {
-            sunday_bc_table[p[i] as usize] = p.len() - i;
-        }
-
-        sunday_bc_table
+???+ note "实现"
+    ```rust
+    pub struct SundayPattern<'a> {
+        pat_bytes: &'a [u8],
+        sunday_bc: [usize; 256],
     }
-
-    pub fn find_all(&self, string: &str) -> Vec<usize> {
-        let mut result = vec![];
-        let string_bytes = string.as_bytes();
-        let pat_last_pos = self.pat_bytes.len() - 1;
-        let stringlen = string_bytes.len();
-        let mut string_index = pat_last_pos;
-
-        while string_index < stringlen {
-            if &string_bytes[string_index - pat_last_pos..string_index+1] == self.pat_bytes {
-                result.push(string_index - pat_last_pos);
+    
+    impl<'a> SundayPattern<'a> {
+        // ...
+        fn build_sunday_bc(p: &'a [u8]) -> [usize; 256] {
+            let mut sunday_bc_table = [p.len() + 1; 256];
+    
+            for i in 0..p.len() {
+                sunday_bc_table[p[i] as usize] = p.len() - i;
             }
-
-            if string_index + 1 == stringlen {
-                break;
-            }
-
-            string_index += self.sunday_bc[string_bytes[string_index + 1] as usize];
+    
+            sunday_bc_table
         }
-
-        result
+    
+        pub fn find_all(&self, string: &str) -> Vec<usize> {
+            let mut result = vec![];
+            let string_bytes = string.as_bytes();
+            let pat_last_pos = self.pat_bytes.len() - 1;
+            let stringlen = string_bytes.len();
+            let mut string_index = pat_last_pos;
+    
+            while string_index < stringlen {
+                if &string_bytes[string_index - pat_last_pos..string_index+1] == self.pat_bytes {
+                    result.push(string_index - pat_last_pos);
+                }
+    
+                if string_index + 1 == stringlen {
+                    break;
+                }
+    
+                string_index += self.sunday_bc[string_bytes[string_index + 1] as usize];
+            }
+    
+            result
+        }
     }
-}
-```
+    ```
 
 ### BMHBNFS 算法
 
-该算法结合了 Horspool 和 Sunday，是 CPython 实现 `stringlib` 模块时用到的 `find` 的算法[^b5s]，似乎国内更有名气，不清楚为何叫这个名字，怎么就“AKA”了？
+该算法结合了 Horspool 和 Sunday，是 CPython 实现 `stringlib` 模块时用到的 `find` 的算法[^b5s]，似乎国内更有名气，不清楚为何叫这个名字，怎么就「AKA」了？
 
 以下简称 B5S。
 
 B5S 基本想法是：
 
-1. 按照后缀匹配的思路，首先比较 $patlastpos$ 位置对应的字符是否相等，如果相等就比较 $0\dots patlastpos-1$ 对应位置的字符是否相等，如果仍然相等，那么就发现一个匹配；
+1.  按照后缀匹配的思路，首先比较 $patlastpos$ 位置对应的字符是否相等，如果相等就比较 $0\dots patlastpos-1$ 对应位置的字符是否相等，如果仍然相等，那么就发现一个匹配；
 
-2. 如果任何一个阶段发生不匹配，就进入跳转阶段；
+2.  如果任何一个阶段发生不匹配，就进入跳转阶段；
 
 3.  在跳转阶段，首先观察 $patlastpos$ 位置的下一个字符是否在 $pat$ 中，如果不在，直接向右滑动 $patlen+1$，这是 Sunday 算法的最大利用；
 
@@ -820,79 +827,80 @@ B5S 基本想法是：
 
 #### 时间节省版本
 
-```rust
-pub struct B5STimePattern<'a> {
-    pat_bytes: &'a [u8],
-    alphabet: [bool;256],
-    bm_bc: [usize;256],
-    k: usize
-}
-
-impl<'a> B5STimePattern<'a> {
-    pub fn new(pat: &'a str) -> Self {
-        assert_ne!(pat.len(), 0);
-
-        let pat_bytes = pat.as_bytes();
-        let (alphabet, bm_bc, k) = B5STimePattern::build(pat_bytes);
-
-        B5STimePattern { pat_bytes, alphabet, bm_bc, k }
+???+ note "实现"
+    ```rust
+    pub struct B5STimePattern<'a> {
+        pat_bytes: &'a [u8],
+        alphabet: [bool;256],
+        bm_bc: [usize;256],
+        k: usize
     }
-
-    fn build(p: &'a [u8]) -> ([bool;256], [usize;256], usize)  {
-        let mut alphabet = [false;256];
-        let mut bm_bc = [p.len(); 256];
-        let lastpos = p.len() - 1;
-
-        for i in 0..lastpos {
-            alphabet[p[i] as usize] = true;
-            bm_bc[p[i] as usize] = lastpos - i;
+    
+    impl<'a> B5STimePattern<'a> {
+        pub fn new(pat: &'a str) -> Self {
+            assert_ne!(pat.len(), 0);
+    
+            let pat_bytes = pat.as_bytes();
+            let (alphabet, bm_bc, k) = B5STimePattern::build(pat_bytes);
+    
+            B5STimePattern { pat_bytes, alphabet, bm_bc, k }
         }
-
-        alphabet[p[lastpos] as usize] = true;
-
-        (alphabet, bm_bc, compute_k(p))
-    }
-
-    pub fn find_all(&self, string: &str) -> Vec<usize> {
-        let mut result = vec![];
-        let string_bytes = string.as_bytes();
-        let pat_last_pos = self.pat_bytes.len() - 1;
-        let patlen = self.pat_bytes.len();
-        let stringlen = string_bytes.len();
-        let mut string_index = pat_last_pos;
-        let mut offset = pat_last_pos;
-        let offset0 = self.k - 1;
-
-        while string_index < stringlen {
-            if string_bytes[string_index] == self.pat_bytes[pat_last_pos] {
-                if &string_bytes[string_index-offset..string_index] == &self.pat_bytes[pat_last_pos-offset..pat_last_pos] {
-                    result.push(string_index-pat_last_pos);
-
-                    offset = offset0;
-
-                    // Galil rule
-                    string_index += self.k;
-                    continue;
+    
+        fn build(p: &'a [u8]) -> ([bool;256], [usize;256], usize)  {
+            let mut alphabet = [false;256];
+            let mut bm_bc = [p.len(); 256];
+            let lastpos = p.len() - 1;
+    
+            for i in 0..lastpos {
+                alphabet[p[i] as usize] = true;
+                bm_bc[p[i] as usize] = lastpos - i;
+            }
+    
+            alphabet[p[lastpos] as usize] = true;
+    
+            (alphabet, bm_bc, compute_k(p))
+        }
+    
+        pub fn find_all(&self, string: &str) -> Vec<usize> {
+            let mut result = vec![];
+            let string_bytes = string.as_bytes();
+            let pat_last_pos = self.pat_bytes.len() - 1;
+            let patlen = self.pat_bytes.len();
+            let stringlen = string_bytes.len();
+            let mut string_index = pat_last_pos;
+            let mut offset = pat_last_pos;
+            let offset0 = self.k - 1;
+    
+            while string_index < stringlen {
+                if string_bytes[string_index] == self.pat_bytes[pat_last_pos] {
+                    if &string_bytes[string_index-offset..string_index] == &self.pat_bytes[pat_last_pos-offset..pat_last_pos] {
+                        result.push(string_index-pat_last_pos);
+    
+                        offset = offset0;
+    
+                        // Galil rule
+                        string_index += self.k;
+                        continue;
+                    }
+                }
+    
+                if string_index + 1 == stringlen {
+                    break;
+                }
+    
+                offset = pat_last_pos;
+    
+                if !self.alphabet[string_bytes[string_index+1] as usize] {
+                    string_index += patlen + 1;  // sunday
+                } else {
+                    string_index += self.bm_bc[string_bytes[string_index] as usize];  // horspool
                 }
             }
-
-            if string_index + 1 == stringlen {
-                break;
-            }
-
-            offset = pat_last_pos;
-
-            if !self.alphabet[string_bytes[string_index+1] as usize] {
-                string_index += patlen + 1;  // sunday
-            } else {
-                string_index += self.bm_bc[string_bytes[string_index] as usize];  // horspool
-            }
+    
+            result
         }
-
-        result
     }
-}
-```
+    ```
 
 这个版本的 B5S 性能表现非常理想，是通常情况下，目前介绍的后缀匹配系列算法中最快的。
 
@@ -902,31 +910,35 @@ impl<'a> B5STimePattern<'a> {
 
 ##### 用一个简单的 Bloom 过滤器取代字符表（alphabet）
 
-```rust
-pub struct BytesBloomFilter {
-    mask: u64,
-}
-
-impl BytesBloomFilter {
-    pub fn new() -> Self {
-        SimpleBloomFilter {
-            mask: 0,
+???+ note "实现"
+    ```rust
+    pub struct BytesBloomFilter {
+        mask: u64,
+    }
+    ```
+    
+    impl BytesBloomFilter {pub fn new() -> Self {
+    SimpleBloomFilter {
+    mask: 0,
+    }
+    }
+    
+        fn insert(&mut self, byte: &u8) {
+            (self.mask) |= 1u64 << (byte & 63);
         }
+    
+        fn contains(&self, char: &u8) -> bool {
+            (self.mask & (1u64 << (byte & 63))) != 0
+        }
+    
     }
-
-    fn insert(&mut self, byte: &u8) {
-        (self.mask) |= 1u64 << (byte & 63);
-    }
-
-    fn contains(&self, char: &u8) -> bool {
-        (self.mask & (1u64 << (byte & 63))) != 0
-    }
-}
-```
+    
+    ```
+    ```
 
 Bloom 过滤器设设计通过牺牲准确率（实际还有运行时间）来极大地节省存储空间的 `Set` 类型的数据结构，它的特点是会将集合中不存在的项误判为存在（False Positives，简称 FP），但不会把集合中存在的项判断为不存在（False Negatives，简称 FN），因此使用它可能会因为 FP 而没有得到最大的字符跳转，但不会因为 FN 而跳过本应匹配的字符。
 
-理论上分析，上述“Bloom 过滤器”的实现在 $pat$ 长度在 50 个 Bytes 时，FP 概率约为 0.5，而 $pat$ 长度在 10 个 Bytes 时，FP 概率约为 0.15。
+理论上分析，上述「Bloom 过滤器」的实现在 $pat$ 长度在 50 个 Bytes 时，FP 概率约为 0.5，而 $pat$ 长度在 10 个 Bytes 时，FP 概率约为 0.15。
 
 当然这不是一个标准的 Bloom 过滤器，首先它实际上没有使用一个真正的哈希函数，实际上它只是一个字符映射，就是将 0-255 的字节映射为它的前六位构成的数，考虑到我们在做内存上的字符搜索，这样的简化就非常重要，因为即使用目前已知最快的非加密哈希算法 [xxHash](https://cyan4973.github.io/xxHash/)，计算所需要的时间都要比它高一个数量级。
 
@@ -938,82 +950,83 @@ Bloom 过滤器设设计通过牺牲准确率（实际还有运行时间）来�
 
 在第一阶段不匹配时，直接向下滑动 `skip` 个字符；但当第二阶段不配时，因为缺乏整个 $delta_1$ 的信息，只能向下滑动一个字符。
 
-```rust
-pub struct B5SSpacePattern<'a> {
-    pat_bytes: &'a [u8],
-    alphabet: BytesBloomFilter,
-    skip: usize,
-}
-
-impl<'a> B5SSpacePattern<'a> {
-    pub fn new(pat: &'a str) -> Self {
-        assert_ne!(pat.len(), 0);
-
-        let pat_bytes = pat.as_bytes();
-        let (alphabet, skip) = B5SSpacePattern::build(pat_bytes);
-
-        B5SSpacePattern { pat_bytes, alphabet, skip}
+???+ note "实现"
+    ```rust
+    pub struct B5SSpacePattern<'a> {
+        pat_bytes: &'a [u8],
+        alphabet: BytesBloomFilter,
+        skip: usize,
     }
-
-    fn build(p: &'a [u8]) -> (BytesBloomFilter, usize)  {
-        let mut alphabet = BytesBloomFilter::new();
-        let lastpos = p.len() - 1;
-        let mut skip = p.len();
-
-        for i in 0..p.len()-1 {
-            alphabet.insert(&p[i]);
-
-            if p[i] == p[lastpos] {
-                skip = lastpos - i;
-            }
+    
+    impl<'a> B5SSpacePattern<'a> {
+        pub fn new(pat: &'a str) -> Self {
+            assert_ne!(pat.len(), 0);
+    
+            let pat_bytes = pat.as_bytes();
+            let (alphabet, skip) = B5SSpacePattern::build(pat_bytes);
+    
+            B5SSpacePattern { pat_bytes, alphabet, skip}
         }
-
-        alphabet.insert(&p[lastpos]);
-
-        (alphabet, skip)
-    }
-
-    pub fn find_all(&self, string: &'a str) -> Vec<usize> {
-        let mut result = vec![];
-        let string_bytes = string.as_bytes();
-        let pat_last_pos = self.pat_bytes.len() - 1;
-        let patlen = self.pat_bytes.len();
-        let stringlen = string_bytes.len();
-        let mut string_index = pat_last_pos;
-
-        while string_index < stringlen {
-            if string_bytes[string_index] == self.pat_bytes[pat_last_pos] {
-                if &string_bytes[string_index-pat_last_pos..string_index] == &self.pat_bytes[..patlen-1] {
-                    result.push(string_index-pat_last_pos);
-                }
-
-                if string_index + 1 == stringlen {
-                    break;
-                }
-
-                if !self.alphabet.contains(&string_bytes[string_index+1]) {
-                    string_index += patlen + 1;  // sunday
-                } else {
-                    string_index += self.skip;  // horspool
-                }
-            } else {
-                if string_index + 1 == stringlen {
-                    break;
-                }
-
-                if !self.alphabet.contains(&string_bytes[string_index+1]) {
-                    string_index += patlen + 1;  // sunday
-                } else {
-                    string_index += 1;
+    
+        fn build(p: &'a [u8]) -> (BytesBloomFilter, usize)  {
+            let mut alphabet = BytesBloomFilter::new();
+            let lastpos = p.len() - 1;
+            let mut skip = p.len();
+    
+            for i in 0..p.len()-1 {
+                alphabet.insert(&p[i]);
+    
+                if p[i] == p[lastpos] {
+                    skip = lastpos - i;
                 }
             }
-
+    
+            alphabet.insert(&p[lastpos]);
+    
+            (alphabet, skip)
         }
-
-        result
+    
+        pub fn find_all(&self, string: &'a str) -> Vec<usize> {
+            let mut result = vec![];
+            let string_bytes = string.as_bytes();
+            let pat_last_pos = self.pat_bytes.len() - 1;
+            let patlen = self.pat_bytes.len();
+            let stringlen = string_bytes.len();
+            let mut string_index = pat_last_pos;
+    
+            while string_index < stringlen {
+                if string_bytes[string_index] == self.pat_bytes[pat_last_pos] {
+                    if &string_bytes[string_index-pat_last_pos..string_index] == &self.pat_bytes[..patlen-1] {
+                        result.push(string_index-pat_last_pos);
+                    }
+    
+                    if string_index + 1 == stringlen {
+                        break;
+                    }
+    
+                    if !self.alphabet.contains(&string_bytes[string_index+1]) {
+                        string_index += patlen + 1;  // sunday
+                    } else {
+                        string_index += self.skip;  // horspool
+                    }
+                } else {
+                    if string_index + 1 == stringlen {
+                        break;
+                    }
+    
+                    if !self.alphabet.contains(&string_bytes[string_index+1]) {
+                        string_index += patlen + 1;  // sunday
+                    } else {
+                        string_index += 1;
+                    }
+                }
+    
+            }
+    
+            result
+        }
     }
-}
-```
+    ```
 
 这个版本的算法相对于前面的后缀匹配算法不够快，但差距并不大，仍然比 KMP 这种快得多，特别是考虑到它极为优秀的空间复杂度：至多两个 `u64` 的整数，这确实是极为实用的适合作为标准库实现的一种算法！
 
@@ -1069,26 +1082,26 @@ $$
 
 1.  当 $k = 1$ 时：
 
-    1. 失配字符对应位置的下一个字符恰好等于失配字符；
+    1.  失配字符对应位置的下一个字符恰好等于失配字符；
 
-    2. 失配字符已经是 $pat$ 右手起最后一个字符。
+    2.  失配字符已经是 $pat$ 右手起最后一个字符。
 
-2. 当 $1 < k < patlen-m$ 时，$pat$ 在失配字符对应位置的左边还有与失配字符相等的字符，并且不满足情况 1；
+2.  当 $1 < k < patlen-m$ 时，$pat$ 在失配字符对应位置的左边还有与失配字符相等的字符，并且不满足情况 1；
 
-3. 当 $k = patlen - m$ 时，$pat$ 在失配字符对应位置左边找不到另一个与失配字符相等的字符，并且不满足情况 1，这时 $pat$ 有最大可能的向下滑动距离；
+3.  当 $k = patlen - m$ 时，$pat$ 在失配字符对应位置左边找不到另一个与失配字符相等的字符，并且不满足情况 1，这时 $pat$ 有最大可能的向下滑动距离；
 
-4. 当 $k > patlen - m$ 时，显然对于 $delta_1$，这是不可能存在的情况。
+4.  当 $k > patlen - m$ 时，显然对于 $delta_1$，这是不可能存在的情况。
 
 于是有计算 $delta_1$ 的概率函数：
 
 $$
 probdelta1(m,k) =
-\left\{ \begin{array}{lcl}
-(1-p)^m\times \left\{ \begin{array}{lcl} 1  & \text{for} &m+1=patlen \\ p &\text{for}&m+1\neq patlen  \\\end{array}\right. & \text{for} & k = 1 \\
-(1-p)^{m+k-1}\times p & \text{for} & 1 < k < patlen - m\\
-(1-p)^{patlen-1} & \text{for} & k = patlen - m\\
-0 & \text{for} & patlen patlen - m < k \leqslant patlen
-\end{array}\right.
+\begin{cases}{lcl}
+(1-p)^m\times \begin{cases}{lcl} 1  & \text{for}~m+1=patlen \\ p &\text{for}~m+1\neq patlen  \\\end{cases} & \text{for}~ k = 1 \\
+(1-p)^{m+k-1}\times p & \text{for}~ 1 < k < patlen - m\\
+(1-p)^{patlen-1} & \text{for}~ k = patlen - m\\
+0 & \text{for}~ patlen patlen - m < k \leqslant patlen
+\end{cases}
 $$
 
 #### $delta_2$
@@ -1097,10 +1110,10 @@ $$
 
 $$
 probpr(m,k) =
-\left\{ \begin{array}{lcl}
-(1-p)\times p^m & \text{for} & 1 \leqslant k < patlen - m\\
-p^{patlen-k} & \text{for} & patlen - m \leqslant k \leqslant patlen
-\end{array}\right.
+\begin{cases}{lcl}
+(1-p)\times p^m & \text{for}~ 1 \leqslant k < patlen - m\\
+p^{patlen-k} & \text{for}~ patlen - m \leqslant k \leqslant patlen
+\end{cases}
 $$
 
 于是 $delta_2(m,k)$ 就可以通过保证 $pr(m,k)$ 存在并且 $k$ 更小的 $delta_2$ 不存在，来递归计算：
@@ -1119,26 +1132,22 @@ $$
 
 $$
 probdelta2'(m,k) =
-\left\{ \begin{array}{lcl}
-0 & \text{for} & k = 1\\
-probpr(m,k)(1-\sum_{n=2}^{k-1}probdelta2'(m, n)) & \text{for} & 1 \leqslant k \leqslant patlen
-\end{array}\right.
+\begin{cases}
+0 & \text{for}~ k = 1\\
+probpr(m,k)\left(1-\sum_{n=2}^{k-1}probdelta2'(m, n)\right) & \text{for}~ 1 \leqslant k \leqslant patlen
+\end{cases}
 $$
 
 于是通过组合 $delta_1$ 和 $delta_2$ 起作用的情况，我们就得到了 BoyerMoore 算法的 $skip$ 概率函数：
 
 $$
-skip(m,k) = \left\{\begin{array}{lcl}
-probdelta1(m, 1) \times probdelta2(m, 1) & \text{for} & k = 1\\
-\\
-\\
-\\
-\textit{prodelta1_worthless}(m)\times probdelta2'(m, 1)\\
-+\ probdelta1(m, k)\times \sum_{n=1}^{k-1}probdelta2(m, n)\\
-+\ probdelta2(m, k)\times \sum_{n=1}^{k-1}probdelta1(m,n)\\
-+\ probdelta1(m, k)\times probdelta2(m, k)
-& \text{for} & 1 < k \leqslant patlen
-\end{array}\right.
+skip(m,k) = \begin{cases}
+probdelta1(m, 1) \times probdelta2(m, 1) & \text{for}~k = 1\\
+\textit{prodelta1\_worthless}(m) \times probdelta2'(m, 1)\\
++~probdelta1(m, k) \times \sum_{n=1}^{k-1} probdelta2(m, n)\\
++~probdelta2(m, k) \times \sum_{n=1}^{k-1} probdelta1(m,n)\\
++~probdelta1(m, k) \times probdelta2(m, k) & \text{for}~1 < k \leqslant patlen
+\end{cases}
 $$
 
 ### 分析比较
@@ -1336,11 +1345,11 @@ def plot(p, title, N=30):
 
 <img src="../images/BM/plot256.svg" style="zoom: 200%;" />
 
-观察这个图像，令人印象深刻的首先就是抬头的一条大兰线，几乎笔直地画出了算法性能的下限，不愧是 KMP 算法，$O(n)$ 的时间复杂度，一看就很真实（ﾟ▽ﾟ)/。
+观察这个图像，令人印象深刻的首先就是抬头的一条大兰线，几乎笔直地画出了算法性能的下限，不愧是 KMP 算法，$O(n)$ 的时间复杂度，一看就很真实。
 
 接着会发现 BoyerMoore 算法与简化版 BoyerMoore 算法高度重叠的这条红绿紫曲线，同时也是 $\dfrac{1}{patlen}$，
 
-这就是在一般字符集下随机文本搜索能达到的 $O(\dfrac{n}{m})$ 的强力算法吗？(ﾟ△ﾟ;ﾉ)ﾉ
+这就是在一般字符集下随机文本搜索能达到的 $O(\dfrac{n}{m})$ 的强力算法吗？
 
 另外此时可以绝大多数的字符跳转依靠 $delta_1$（比 $delta_2$ 高几个数量），这也是基于 $delta_1$ 表的 BM 变种算法最佳的应用场景！
 
@@ -1348,13 +1357,13 @@ def plot(p, title, N=30):
 
 <img src="../images/BM/plot4.svg" style="zoom:200%;" />
 
-曲线出现了明显的分化，当然 KMP 还是一如既往地稳定（ﾟ▽ﾟ)/，如果此时在测试中监控一下一下 $delta_1$ 表和 $delta_2$ 表作用情况会发现：$delta_2$ 起作用的次数超过了 $delta_1$，而且 $delta_2$ 贡献的跳过字符数更是远超 $delta_1$，思考下，这件事其实也很好理解。
+曲线出现了明显的分化，当然 KMP 还是一如既往地稳定，如果此时在测试中监控一下一下 $delta_1$ 表和 $delta_2$ 表作用情况会发现：$delta_2$ 起作用的次数超过了 $delta_1$，而且 $delta_2$ 贡献的跳过字符数更是远超 $delta_1$，思考下，这件事其实也很好理解。
 
 总结一下，通过概率模型的计算，一方面看到了在较大的字符集，比如日常搜索的过程中 BoyerMoore 系列算法的优越表现，其中主要依赖 $delta_1$ 表实现字符跳转；另一方面，在较小的字符集里，$delta_1$ 的作用下降，而 $delta_2$ 的作用得到了体现。如果有一定富裕空间的情况下，使用完整的空间复杂度为 $O(m)$ 的 BoyerMoore 算法应该是一种适用各种情况、综合表现都很优异的算法选择。
 
 ## 引用
 
-[^bm]: [1977 年 Boyer-Moore 算法论文](https://dl.acm.org/doi/10.1145/359842.359859)
+[^bm]: [1977 年 Boyer–Moore 算法论文](https://dl.acm.org/doi/10.1145/359842.359859)
 
 [^kmp]: [1977 年 KMP 算法论文](https://epubs.siam.org/doi/abs/10.1137/0206024)
 

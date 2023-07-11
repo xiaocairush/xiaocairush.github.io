@@ -38,9 +38,9 @@ $$
 
 对于无根树 $T_1(V_1, E_1)$ 和 $T_2(V_2,E_2)$，先分别找出它们的 **所有** 重心。
 
-- 如果这两棵无根树重心数量不同，那么这两棵树不同构。
-- 如果这两颗无根树重心数量都为 $1$，分别记为 $c_1$ 和 $c_2$，那么如果有根树 $T_1(V_1,E_1,c_1)$ 和有根树 $T_2(V_2,E_2,c_2)$ 同构，那么无根树 $T_1(V_1, E_1)$ 和 $T_2(V_2,E_2)$ 同构，反之则不同构。
-- 如果这两颗无根树重心数量都为 $2$，分别记为 $c_1,c^\prime_1$ 和 $c_2,c^\prime_2$，那么如果有根树 $T_1(V_1,E_1,c_1)$ 和有根树 $T_2(V_2,E_2,c_2)$ 同构 **或者** 有根树 $T_1(V_1,E_1,c^\prime_1)$ 和 $T_2(V_2,E_2,c_2)$ 同构，那么无根树 $T_1(V_1, E_1)$ 和 $T_2(V_2,E_2)$ 同构，反之则不同构。
+-   如果这两棵无根树重心数量不同，那么这两棵树不同构。
+-   如果这两颗无根树重心数量都为 $1$，分别记为 $c_1$ 和 $c_2$，那么如果有根树 $T_1(V_1,E_1,c_1)$ 和有根树 $T_2(V_2,E_2,c_2)$ 同构，那么无根树 $T_1(V_1, E_1)$ 和 $T_2(V_2,E_2)$ 同构，反之则不同构。
+-   如果这两颗无根树重心数量都为 $2$，分别记为 $c_1,c'_1$ 和 $c_2,c'_2$，那么如果有根树 $T_1(V_1,E_1,c_1)$ 和有根树 $T_2(V_2,E_2,c_2)$ 同构 **或者** 有根树 $T_1(V_1,E_1,c'_1)$ 和 $T_2(V_2,E_2,c_2)$ 同构，那么无根树 $T_1(V_1, E_1)$ 和 $T_2(V_2,E_2)$ 同构，反之则不同构。
 
 所以，只要解决了有根树同构问题，我们就可以把无根树同构问题根据上述方法转化成有根树同构的问题，进而解决无根树同构的问题。
 
@@ -66,37 +66,39 @@ $$
 
 ### 命名算法
 
-$$
-\begin{array}{ll}
-1 & \textbf{Input. } \text{A rooted tree }T\\
-2 & \textbf{Output. } \text{The name of rooted tree }T\\
-3 & \text{ASSIGN-NAME(u)}\\
-4 & \qquad \text{if  } u \text{  is a leaf}\\
-5 & \qquad \qquad \text{NAME(} u \text{) = (0)}\\
-6 & \qquad \text{else }\\
-7 & \qquad \qquad \text{for all child } v \text{ of } u\\
-8 & \qquad \qquad \qquad \text{ASSIGN-NAME(}v\text{)}\\
-9 & \qquad \text{sort the names of the children of }u\\
-10 & \qquad \text{concatenate the names of all children }u\text{ to temp}\\
-11 & \qquad \text{NAME(} u \text{) = (temp)}
-\end{array}
-$$
+???+ note "实现"
+    $$
+    \begin{array}{ll}
+    1 & \textbf{Input. } \text{A rooted tree }T\\
+    2 & \textbf{Output. } \text{The name of rooted tree }T\\
+    3 & \text{ASSIGN-NAME(u)}\\
+    4 & \qquad \text{if  } u \text{  is a leaf}\\
+    5 & \qquad \qquad \text{NAME(} u \text{) = (0)}\\
+    6 & \qquad \text{else }\\
+    7 & \qquad \qquad \text{for all child } v \text{ of } u\\
+    8 & \qquad \qquad \qquad \text{ASSIGN-NAME(}v\text{)}\\
+    9 & \qquad \text{sort the names of the children of }u\\
+    10 & \qquad \text{concatenate the names of all children }u\text{ to temp}\\
+    11 & \qquad \text{NAME(} u \text{) = (temp)}
+    \end{array}
+    $$
 
 ### AHU 算法
 
-$$
-\begin{array}{ll}
-1 & \textbf{Input. } \text{Two rooted trees }T_1(V_1,E_1,r_1)\text{ and }T_2(V_2,E_2,r_2) \\
-2 & \textbf{Output. } \text{Whether these two trees are isomorphic}\\
-3 & \text{AHU}(T_1(V_1,E_1,r_1), T_2(V_2,E_2,r_2))\\
-4 & \qquad \text{ASSIGN-NAME(}r_1\text{)}\\
-5 & \qquad \text{ASSIGN-NAME(}r_2\text{)}\\
-6 & \qquad \text{if  NAME}(r_1) = \text{NAME}(r_2)\\
-7 & \qquad \qquad \text{return true}\\
-8 & \qquad \text{else}\\
-10 & \qquad \qquad \text{return false}
-\end{array}
-$$
+???+ note "实现"
+    $$
+    \begin{array}{ll}
+    1 & \textbf{Input. } \text{Two rooted trees }T_1(V_1,E_1,r_1)\text{ and }T_2(V_2,E_2,r_2) \\
+    2 & \textbf{Output. } \text{Whether these two trees are isomorphic}\\
+    3 & \text{AHU}(T_1(V_1,E_1,r_1), T_2(V_2,E_2,r_2))\\
+    4 & \qquad \text{ASSIGN-NAME(}r_1\text{)}\\
+    5 & \qquad \text{ASSIGN-NAME(}r_2\text{)}\\
+    6 & \qquad \text{if  NAME}(r_1) = \text{NAME}(r_2)\\
+    7 & \qquad \qquad \text{return true}\\
+    8 & \qquad \text{else}\\
+    10 & \qquad \qquad \text{return false}
+    \end{array}
+    $$
 
 ### 复杂度证明
 
@@ -126,8 +128,8 @@ $$
 
 首先注意到第 $i$ 层由拼接得到的 $NAME$ 的总长度为第 $i$ 层点的度数之和，即第 $i+1$ 层的总点数，以下用 $L_i$ 表示。算法的下一步会将这些 $NAME$ 看成字符串（数组）并排序，然后将它们替换为其在层内的排名（即重新映射为一个数）。以下引理表明了对总长为 $L$ 的 $m$ 个字符串排序的复杂度：
 
-1. 我们可以使用基数排序在 $O(L+|\Sigma|)$ 的时间内完成排序，其中 $|\Sigma|$ 为字符集的大小。（有一些实现细节，参见参考资料）
-2. 我们可以使用快速排序在 $O(L \log m)$ 的时间内完成排序。证明的大致思路为快排递归树的高度为 $O(\log m)$，且暴力比较长度为 $\ell_1$ 和 $\ell_2$ 的两个字符串的复杂度为 $O(\min\{\ell_1,\ell_2\})$。
+1.  我们可以使用基数排序在 $O(L+|\Sigma|)$ 的时间内完成排序，其中 $|\Sigma|$ 为字符集的大小。（有一些实现细节，参见参考资料）
+2.  我们可以使用快速排序在 $O(L \log m)$ 的时间内完成排序。证明的大致思路为快排递归树的高度为 $O(\log m)$，且暴力比较长度为 $\ell_1$ 和 $\ell_2$ 的两个字符串的复杂度为 $O(\min\{\ell_1,\ell_2\})$。
 
 在 AHU 算法中，第 $i$ 层字符串的字符集大小最多为第 $i+1$ 层的点数，即 $L_i$，所以基数排序的复杂度是线性的。根据 $\sum_i L_i=O(n)$，并将每层的复杂度相加后可以看出，若使用字符串的基数排序，则算法的总复杂度为 $T(n)=O(n)$。同理，如果使用快排排序字符串，那么 $T(n)=O(n \log n)$。
 
@@ -139,136 +141,7 @@ $$
 
 ???+ note "参考代码"
     ```cpp
-    // Tree Isomorphism, O(nlogn)
-    // replace quick sort with radix sort ==> O(n)
-    // Author: _Backl1ght
-    #include <bits/stdc++.h>
-    using namespace std;
-    typedef long long ll;
-    const int N = 1e5 + 5;
-    const int maxn = N << 1;
-    
-    int n;
-    struct Edge {
-      int v, nxt;
-    } e[maxn << 1];
-    int head[maxn], sz[maxn], f[maxn], maxv[maxn], tag[maxn], tot, Max;
-    vector<int> center[2], L[maxn], subtree_tags[maxn];
-    void addedge(int u, int v) {
-      e[tot].v = v;
-      e[tot].nxt = head[u];
-      head[u] = tot++;
-      e[tot].v = u;
-      e[tot].nxt = head[v];
-      head[v] = tot++;
-    }
-    
-    void dfs_size(int u, int fa) {
-      sz[u] = 1;
-      maxv[u] = 0;
-      for (int i = head[u]; i; i = e[i].nxt) {
-        int v = e[i].v;
-        if (v == fa) continue;
-        dfs_size(v, u);
-        sz[u] += sz[v];
-        maxv[u] = max(maxv[u], sz[v]);
-      }
-    }
-    
-    void dfs_center(int rt, int u, int fa, int id) {
-      maxv[u] = max(maxv[u], sz[rt] - sz[u]);
-      if (Max > maxv[u]) {
-        center[id].clear();
-        Max = maxv[u];
-      }
-      if (Max == maxv[u]) center[id].push_back(u);
-      for (int i = head[u]; i; i = e[i].nxt) {
-        int v = e[i].v;
-        if (v == fa) continue;
-        dfs_center(rt, v, u, id);
-      }
-    }
-    
-    int dfs_height(int u, int fa, int depth) {
-      L[depth].push_back(u);
-      f[u] = fa;
-      int h = 0;
-      for (int i = head[u]; i; i = e[i].nxt) {
-        int v = e[i].v;
-        if (v == fa) continue;
-        h = max(h, dfs_height(v, u, depth + 1));
-      }
-      return h + 1;
-    }
-    
-    void init(int n) {
-      for (int i = 1; i <= 2 * n; i++) head[i] = 0;
-      tot = 1;
-      center[0].clear();
-      center[1].clear();
-    
-      int u, v;
-      for (int i = 1; i <= n - 1; i++) {
-        scanf("%d %d", &u, &v);
-        addedge(u, v);
-      }
-      dfs_size(1, -1);
-      Max = n;
-      dfs_center(1, 1, -1, 0);
-    
-      for (int i = 1; i <= n - 1; i++) {
-        scanf("%d %d", &u, &v);
-        addedge(u + n, v + n);
-      }
-      dfs_size(1 + n, -1);
-      Max = n;
-      dfs_center(1 + n, 1 + n, -1, 1);
-    }
-    
-    bool cmp(int u, int v) { return subtree_tags[u] < subtree_tags[v]; }
-    
-    bool rootedTreeIsomorphism(int rt1, int rt2) {
-      for (int i = 0; i <= 2 * n + 1; i++) L[i].clear(), subtree_tags[i].clear();
-      int h1 = dfs_height(rt1, -1, 0);
-      int h2 = dfs_height(rt2, -1, 0);
-      if (h1 != h2) return false;
-      int h = h1 - 1;
-      for (int j = 0; j < (int)L[h].size(); j++) tag[L[h][j]] = 0;
-      for (int i = h - 1; i >= 0; i--) {
-        for (int j = 0; j < (int)L[i + 1].size(); j++) {
-          int v = L[i + 1][j];
-          subtree_tags[f[v]].push_back(tag[v]);
-        }
-    
-        sort(L[i].begin(), L[i].end(), cmp);
-    
-        for (int j = 0, cnt = 0; j < (int)L[i].size(); j++) {
-          if (j && subtree_tags[L[i][j]] != subtree_tags[L[i][j - 1]]) ++cnt;
-          tag[L[i][j]] = cnt;
-        }
-      }
-      return subtree_tags[rt1] == subtree_tags[rt2];
-    }
-    
-    bool treeIsomorphism() {
-      if (center[0].size() == center[1].size()) {
-        if (rootedTreeIsomorphism(center[0][0], center[1][0])) return true;
-        if (center[0].size() > 1)
-          return rootedTreeIsomorphism(center[0][0], center[1][1]);
-      }
-      return false;
-    }
-    
-    int main() {
-      int T;
-      scanf("%d", &T);
-      while (T--) {
-        scanf("%d", &n);
-        init(n);
-        puts(treeIsomorphism() ? "YES" : "NO");
-      }
-      return 0;
-    }
+    --8<-- "docs/graph/code/tree-ahu/tree-ahu_1.cpp"
     ```
 
 ## 参考资料

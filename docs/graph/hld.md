@@ -6,7 +6,7 @@ author: Ir1d, Marcythm, ouuan, hsfzLZH1, Xeonacid, greyqz, Chrogeek, ftxj, sshwy
 
 具体来说，将整棵树剖分为若干条链，使它组合成线性结构，然后用其他的数据结构维护信息。
 
-**树链剖分**（树剖/链剖）有多种形式，如 **重链剖分**，**长链剖分** 和用于 Link/cut Tree 的剖分（有时被称作“实链剖分”），大多数情况下（没有特别说明时），“树链剖分”都指“重链剖分”。
+**树链剖分**（树剖/链剖）有多种形式，如 **重链剖分**，**长链剖分** 和用于 Link/cut Tree 的剖分（有时被称作「实链剖分」），大多数情况下（没有特别说明时），「树链剖分」都指「重链剖分」。
 
 重链剖分可以将树上的任意一条路径划分成不超过 $O(\log n)$ 条连续的链，每条链上的点深度互不相同（即是自底向上的一条链，链上所有点的 LCA 为链的一个端点）。
 
@@ -14,8 +14,8 @@ author: Ir1d, Marcythm, ouuan, hsfzLZH1, Xeonacid, greyqz, Chrogeek, ftxj, sshwy
 
 如：
 
-1. 修改 **树上两点之间的路径上** 所有点的值。
-2. 查询 **树上两点之间的路径上** 节点权值的 **和/极值/其它（在序列上可以用数据结构维护，便于合并的信息）**。
+1.  修改 **树上两点之间的路径上** 所有点的值。
+2.  查询 **树上两点之间的路径上** 节点权值的 **和/极值/其它（在序列上可以用数据结构维护，便于合并的信息）**。
 
 除了配合数据结构来维护树上路径信息，树剖还可以用来 $O(\log n)$（且常数较小）地求 LCA。在某些题目中，还可以利用其性质来灵活地运用树剖。
 
@@ -86,13 +86,13 @@ $$
 
 我们先给出一些定义：
 
-- $fa(x)$ 表示节点 $x$ 在树上的父亲。
-- $dep(x)$ 表示节点 $x$ 在树上的深度。
-- $siz(x)$ 表示节点 $x$ 的子树的节点个数。
-- $son(x)$ 表示节点 $x$ 的 **重儿子**。
-- $top(x)$ 表示节点 $x$ 所在 **重链** 的顶部节点（深度最小）。
-- $dfn(x)$ 表示节点 $x$ 的 **DFS 序**，也是其在线段树中的编号。
-- $rnk(x)$ 表示 DFS 序所对应的节点编号，有 $rnk(dfn(x))=x$。
+-   $fa(x)$ 表示节点 $x$ 在树上的父亲。
+-   $dep(x)$ 表示节点 $x$ 在树上的深度。
+-   $siz(x)$ 表示节点 $x$ 的子树的节点个数。
+-   $son(x)$ 表示节点 $x$ 的 **重儿子**。
+-   $top(x)$ 表示节点 $x$ 所在 **重链** 的顶部节点（深度最小）。
+-   $dfn(x)$ 表示节点 $x$ 的 **DFS 序**，也是其在线段树中的编号。
+-   $rnk(x)$ 表示 DFS 序所对应的节点编号，有 $rnk(dfn(x))=x$。
 
 我们进行两遍 DFS 预处理出这些值，其中第一次 DFS 求出 $fa(x)$，$dep(x)$，$siz(x)$，$son(x)$，第二次 DFS 求出 $top(x)$，$dfn(x)$，$rnk(x)$。
 
@@ -109,6 +109,7 @@ void dfs1(int o) {
       if (son[o] == -1 || siz[p[j]] > siz[son[o]]) son[o] = p[j];
     }
 }
+
 void dfs2(int o, int t) {
   top[o] = t;
   cnt++;
@@ -214,9 +215,9 @@ int lca(int u, int v) {
 
 对一棵有 $n$ 个节点，节点带权值的静态树，进行三种操作共 $q$ 次：
 
-1. 修改单个节点的权值；
-2. 查询 $u$ 到 $v$ 的路径上的最大权值；
-3. 查询 $u$ 到 $v$ 的路径上的权值之和。
+1.  修改单个节点的权值；
+2.  查询 $u$ 到 $v$ 的路径上的最大权值；
+3.  查询 $u$ 到 $v$ 的路径上的权值之和。
 
 保证 $1\le n\le 30000$，$0\le q\le 200000$。
 
@@ -224,9 +225,9 @@ int lca(int u, int v) {
 
 根据题面以及以上的性质，你的线段树需要维护三种操作：
 
-1. 单点修改；
-2. 区间查询最大值；
-3. 区间查询和。
+1.  单点修改；
+2.  区间查询最大值；
+3.  区间查询和。
 
 单点修改很容易实现。
 
@@ -264,135 +265,7 @@ int querymax(int x, int y) {
 
 ??? "参考代码"
     ```cpp
-    #include <algorithm>
-    #include <cstdio>
-    #include <cstring>
-    #define lc o << 1
-    #define rc o << 1 | 1
-    const int maxn = 60010;
-    const int inf = 2e9;
-    int n, a, b, w[maxn], q, u, v;
-    int cur, h[maxn], nxt[maxn], p[maxn];
-    int siz[maxn], top[maxn], son[maxn], dep[maxn], fa[maxn], dfn[maxn], rnk[maxn],
-        cnt;
-    char op[10];
-    inline void add_edge(int x, int y) {
-      cur++;
-      nxt[cur] = h[x];
-      h[x] = cur;
-      p[cur] = y;
-    }
-    struct SegTree {
-      int sum[maxn * 4], maxx[maxn * 4];
-      void build(int o, int l, int r) {
-        if (l == r) {
-          sum[o] = maxx[o] = w[rnk[l]];
-          return;
-        }
-        int mid = (l + r) >> 1;
-        build(lc, l, mid);
-        build(rc, mid + 1, r);
-        sum[o] = sum[lc] + sum[rc];
-        maxx[o] = std::max(maxx[lc], maxx[rc]);
-      }
-      int query1(int o, int l, int r, int ql, int qr) {  // max
-        if (l > qr || r < ql) return -inf;
-        if (ql <= l && r <= qr) return maxx[o];
-        int mid = (l + r) >> 1;
-        return std::max(query1(lc, l, mid, ql, qr), query1(rc, mid + 1, r, ql, qr));
-      }
-      int query2(int o, int l, int r, int ql, int qr) {  // sum
-        if (l > qr || r < ql) return 0;
-        if (ql <= l && r <= qr) return sum[o];
-        int mid = (l + r) >> 1;
-        return query2(lc, l, mid, ql, qr) + query2(rc, mid + 1, r, ql, qr);
-      }
-      void update(int o, int l, int r, int x, int t) {
-        if (l == r) {
-          maxx[o] = sum[o] = t;
-          return;
-        }
-        int mid = (l + r) >> 1;
-        if (x <= mid)
-          update(lc, l, mid, x, t);
-        else
-          update(rc, mid + 1, r, x, t);
-        sum[o] = sum[lc] + sum[rc];
-        maxx[o] = std::max(maxx[lc], maxx[rc]);
-      }
-    } st;
-    void dfs1(int o) {
-      son[o] = -1;
-      siz[o] = 1;
-      for (int j = h[o]; j; j = nxt[j])
-        if (!dep[p[j]]) {
-          dep[p[j]] = dep[o] + 1;
-          fa[p[j]] = o;
-          dfs1(p[j]);
-          siz[o] += siz[p[j]];
-          if (son[o] == -1 || siz[p[j]] > siz[son[o]]) son[o] = p[j];
-        }
-    }
-    void dfs2(int o, int t) {
-      top[o] = t;
-      cnt++;
-      dfn[o] = cnt;
-      rnk[cnt] = o;
-      if (son[o] == -1) return;
-      dfs2(son[o], t);
-      for (int j = h[o]; j; j = nxt[j])
-        if (p[j] != son[o] && p[j] != fa[o]) dfs2(p[j], p[j]);
-    }
-    int querymax(int x, int y) {
-      int ret = -inf, fx = top[x], fy = top[y];
-      while (fx != fy) {
-        if (dep[fx] >= dep[fy])
-          ret = std::max(ret, st.query1(1, 1, n, dfn[fx], dfn[x])), x = fa[fx];
-        else
-          ret = std::max(ret, st.query1(1, 1, n, dfn[fy], dfn[y])), y = fa[fy];
-        fx = top[x];
-        fy = top[y];
-      }
-      if (dfn[x] < dfn[y])
-        ret = std::max(ret, st.query1(1, 1, n, dfn[x], dfn[y]));
-      else
-        ret = std::max(ret, st.query1(1, 1, n, dfn[y], dfn[x]));
-      return ret;
-    }
-    int querysum(int x, int y) {
-      int ret = 0, fx = top[x], fy = top[y];
-      while (fx != fy) {
-        if (dep[fx] >= dep[fy])
-          ret += st.query2(1, 1, n, dfn[fx], dfn[x]), x = fa[fx];
-        else
-          ret += st.query2(1, 1, n, dfn[fy], dfn[y]), y = fa[fy];
-        fx = top[x];
-        fy = top[y];
-      }
-      if (dfn[x] < dfn[y])
-        ret += st.query2(1, 1, n, dfn[x], dfn[y]);
-      else
-        ret += st.query2(1, 1, n, dfn[y], dfn[x]);
-      return ret;
-    }
-    int main() {
-      scanf("%d", &n);
-      for (int i = 1; i < n; i++)
-        scanf("%d%d", &a, &b), add_edge(a, b), add_edge(b, a);
-      for (int i = 1; i <= n; i++) scanf("%d", w + i);
-      dep[1] = 1;
-      dfs1(1);
-      dfs2(1, 1);
-      st.build(1, 1, n);
-      scanf("%d", &q);
-      while (q--) {
-        scanf("%s%d%d", op, &u, &v);
-        if (!strcmp(op, "CHANGE")) st.update(1, 1, n, dfn[u], v);
-        if (!strcmp(op, "QMAX")) printf("%d\n", querymax(u, v));
-        if (!strcmp(op, "QSUM")) printf("%d\n", querysum(u, v));
-      }
-      return 0;
-    }
+    --8<-- "docs/graph/code/hld/hld_1.cpp"
     ```
 
 ### [Nauuo and Binary Tree](https://loj.ac/problem/6669)
@@ -568,7 +441,7 @@ $2999+\sum_{i=1}^{2999}T(i)\le 29940$，事实上这个上界是可以通过构�
 
 具体的，我们每个节点的状态直接继承其重儿子的节点状态，同时将轻儿子的 DP 状态暴力合并。
 
-!!! note "[CF 1009F](http://codeforces.com/contest/1009/problem/F)"
+??? note "[CF 1009F](http://codeforces.com/contest/1009/problem/F)"
     我们设 $f_{i,j}$ 表示在子树 i 内，和 i 距离为 j 的点数。
     
     直接暴力转移时间复杂度为 $O(n^2)$
@@ -590,68 +463,7 @@ DP 数组的长度我们可以根据子树最深节点算出。
 例题参考代码：
 
 ```cpp
-#include <bits/stdc++.h>
-using namespace std;
-const int N = 1000005;
-struct edge {
-  int to, next;
-} e[N * 2];
-int head[N], tot, n;
-int d[N], fa[N], mx[N];
-int *f[N], g[N], mxp[N];
-int dfn[N];
-void add(int x, int y) {
-  e[++tot] = (edge){y, head[x]};
-  head[x] = tot;
-}
-void dfs1(int x) {
-  d[x] = 1;
-  for (int i = head[x]; i; i = e[i].next)
-    if (e[i].to != fa[x]) {
-      fa[e[i].to] = x;
-      dfs1(e[i].to);
-      d[x] = max(d[x], d[e[i].to] + 1);
-      if (d[e[i].to] > d[mx[x]]) mx[x] = e[i].to;
-    }
-}
-void dfs2(int x) {
-  dfn[x] = ++*dfn;
-  f[x] = g + dfn[x];
-  if (mx[x]) dfs2(mx[x]);
-  for (int i = head[x]; i; i = e[i].next)
-    if (e[i].to != fa[x] && e[i].to != mx[x]) dfs2(e[i].to);
-}
-void getans(int x) {
-  if (mx[x]) {
-    getans(mx[x]);
-    mxp[x] = mxp[mx[x]] + 1;
-  }
-  f[x][0] = 1;
-  if (f[x][mxp[x]] <= 1) mxp[x] = 0;
-  for (int i = head[x]; i; i = e[i].next)
-    if (e[i].to != fa[x] && e[i].to != mx[x]) {
-      getans(e[i].to);
-      int len = d[e[i].to];
-      For(j, 0, len - 1) {
-        f[x][j + 1] += f[e[i].to][j];
-        if (f[x][j + 1] > f[x][mxp[x]]) mxp[x] = j + 1;
-        if (f[x][j + 1] == f[x][mxp[x]] && j + 1 < mxp[x]) mxp[x] = j + 1;
-      }
-    }
-}
-int main() {
-  scanf("%d", &n);
-  for (int i = 1; i < n; i++) {
-    int x, y;
-    scanf("%d%d", &x, &y);
-    add(x, y);
-    add(y, x);
-  }
-  dfs1(1);
-  dfs2(1);
-  getans(1);
-  for (int i = 1; i <= n; i++) printf("%d\n", mxp[i]);
-}
+--8<-- "docs/graph/code/hld/hld_3.cpp"
 ```
 
 当然长链剖分优化 DP 技巧非常多，包括但是不仅限于打标记等等。这里不再展开。
@@ -664,13 +476,13 @@ int main() {
 
 首先我们假设我们已经预处理了每一个节点的 $2^i$ 级祖先。
 
-现在我们假设我们找到了询问节点的 $2^i$ 级祖先满足 $2^i < k < 2^{i+1}$。
+现在我们假设我们找到了询问节点的 $2^i$ 级祖先满足 $2^i \le k < 2^{i+1}$。
 
 我们考虑求出其所在重链的节点并且按照深度列入表格。假设重链长度为 $d$。
 
 同时我们在预处理的时候找到每条重链的根节点的 $1$ 到 $d$ 级祖先，同样放入表格。
 
-根据长链剖分的性质，$k-2^i < 2^i \leq d$, 也就是说，我们可以 $O(1)$ 在这条长链的表格上求出的这个节点的 $k$ 级祖先。
+根据长链剖分的性质，$k-2^i \le 2^i \leq d$, 也就是说，我们可以 $O(1)$ 在这条重链的表格上求出的这个节点的 $k$ 级祖先。
 
 预处理需要倍增出 $2^i$ 次级祖先，同时需要预处理每条重链对应的表格。
 
@@ -690,8 +502,8 @@ int main() {
 
 [「SDOI2011」染色](https://www.luogu.com.cn/problem/P2486)
 
-[「SDOI2014」旅行](https://www.lydsy.com/JudgeOnline/problem.php?id=3531)
+[「SDOI2014」旅行](https://hydro.ac/d/bzoj/p/3531)
 
-[「POI2014」Hotel 加强版](https://www.lydsy.com/JudgeOnline/problem.php?id=4543)（长链剖分优化 DP)
+[「POI2014」Hotel 加强版](https://hydro.ac/d/bzoj/p/4543)（长链剖分优化 DP）
 
-[攻略](https://www.lydsy.com/JudgeOnline/problem.php?id=3252)（长链剖分优化贪心）
+[攻略](https://hydro.ac/d/bzoj/p/3252)（长链剖分优化贪心）

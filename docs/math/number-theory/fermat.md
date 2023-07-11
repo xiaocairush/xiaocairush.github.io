@@ -1,6 +1,8 @@
-author: PeterlitsZo
+author: PeterlitsZo, Tiphereth-A
 
 ## 费马小定理
+
+### 定义
 
 若 $p$ 为素数，$\gcd(a, p) = 1$，则 $a^{p - 1} \equiv 1 \pmod{p}$。
 
@@ -24,12 +26,15 @@ $$
 
 又因为每一个 $A_i\times a \pmod p$ 都是独一无二的，且 $A_i\times a \pmod p < p$
 
-得证（每一个 $A_i\times a$ 都对应了一个 $A_i$)
+得证（每一个 $A_i\times a$ 都对应了一个 $A_i$）
 
 设 $f=(p-1)!$, 则 $f\equiv a\times A_1\times a\times A_2\times a \times A_3 \dots \times  A_{p-1} \pmod p$
 
 $$
-a^{p-1}\times f \equiv f \pmod p \\ 	a^{p-1} \equiv 1 \pmod p
+\begin{aligned}
+a^{p-1}\times f &\equiv f \pmod p \\
+a^{p-1} &\equiv 1 \pmod p
+\end{aligned}
 $$
 
 证毕。
@@ -48,6 +53,8 @@ $$
 
 在了解欧拉定理（Euler's theorem）之前，请先了解 [欧拉函数](./euler.md)。定理内容如下：
 
+### 定义
+
 若 $\gcd(a, m) = 1$，则 $a^{\varphi(m)} \equiv 1 \pmod{m}$。
 
 ### 证明
@@ -60,6 +67,8 @@ $$
 
 ## 扩展欧拉定理
 
+### 定义
+
 $$
 a^b \equiv \begin{cases}
   a^{b \bmod \varphi(m)},                &\gcd(a,m) =  1,                   \\
@@ -68,13 +77,29 @@ a^b \equiv \begin{cases}
 \end{cases} \pmod m
 $$
 
-（读者可能对第二行是有疑问的。这一行表达的意思是：如果 $b < \varphi(m)$ 的话，那么就不能降幂了。主要是题目中 $m$ 不会太大，而如果 $b < \varphi(m)$，那么自然复杂度是可以接受的。而如果 $b \ge \varphi(m)$ 的话，那么复杂度可能超出预期了，这个时候我们才需要降幂来降低复杂度。）
+### 解释
+
+读者可能对第二行产生疑问，这一行表达的意思是：如果 $b < \varphi(m)$ 的话，就不能降幂了。
+
+主要是因为题目中 $m$ 不会太大，而如果 $b < \varphi(m)$，自然复杂度是可以接受的。而如果 $b \ge \varphi(m)$ 的话，复杂度可能就超出预期了，这个时候我们才需要降幂来降低复杂度。
 
 ### 证明
 
+#### 直观理解
+
+![fermat1](./images/fermat.svg)
+
+需要知道的是，在 $\pmod m$ 的条件下，$a^b \bmod m$ 的取值范围一定在 $[0, m)$，而 $a^i \bmod m = (a^{i-1} \bmod m) \times a \bmod m$，那么对于任意一个数 $a$，那么很容易就能知道它的 **后继**，在有限的空间内这一定会形成一个循环。
+
+在扩展欧拉定理中，循环分为纯循环和混循环。其中纯循环中不存在节点有两个前驱，而混循环则反之。而 $a^i \mod n$ 形成的序列可以是一个混循环，那么只需要知道循环节的长度，和前面那一小段未进入循环节的长度，就可以根据这个性质来进行降幂了。
+
+值得注意的是，无论是费马小定理，还是（扩展）欧拉定理，一个很重要的应用就是降幂，从而将不可能的表达式化为可能。
+
+#### 形式证明
+
 证明转载自 [synapse7](http://blog.csdn.net/synapse7/article/details/19610361)，并进行了一些整理。
 
-1.  **命题**：$a$ 的从 $0$ 次，$1$ 次到 $b$ 次幂模 $m$ 构成的序列中，存在 $r$ 和 $s$，使得前 $r$ 个数（即从 $a^0 \bmod m$ 到 $a^{r-1} \bmod m$) 互不相同，从第 $r$ 个数开始，每 $s$ 个数就循环一次。
+1.  **命题**：$a$ 的从 $0$ 次，$1$ 次到 $b$ 次幂模 $m$ 构成的序列中，存在 $r$ 和 $s$，使得前 $r$ 个数（即从 $a^0 \bmod m$ 到 $a^{r-1} \bmod m$）互不相同，从第 $r$ 个数开始，每 $s$ 个数就循环一次。
 
     **证明**：
 
@@ -88,13 +113,13 @@ $$
 
     **证明**：
 
-    - **若模 $m$ 不能被 $a$ 整除**，而因为 $a$ 是一个素数，那么 $\gcd(a, m) = 1$ 成立，根据欧拉定理，容易证明该式成立。
+    -   **若模 $m$ 不能被 $a$ 整除**，而因为 $a$ 是一个素数，那么 $\gcd(a, m) = 1$ 成立，根据欧拉定理，容易证明该式成立。
 
     -   **若模 $m$ 能被 $a$ 整除**，那么存在 $r$ 和 $m'$ 使得 $m = a^r m'$，且 $\gcd(a, m')=1$ 成立。所以根据欧拉定理有 $a^{\varphi(m')} \equiv 1 \pmod{m'}$。
 
         又由于 $\gcd(a^r, m')=1$，所以根据欧拉函数的求值规则，容易得到：$\varphi(m) = \varphi(m') \times (a-1)a^{r-1}$，即我们有：$\varphi(m') \mid \varphi(m)$。
 
-        所以 $a^{\varphi(m')} \equiv 1 \pmod {m'}, \varphi(m') \mid \varphi(m) \Rightarrow a^{\varphi(m)} \equiv 1 \pmod {m'}$，即 $a^{\varphi(m)}=km'+1$，两边同时乘以 $a^r$，得 $a^{r+\varphi(m)} = km + a^r$（因为 $m = a^r m'$）
+        所以 $a^{\varphi(m')} \equiv 1 \pmod {m'}, \varphi(m') \mid \varphi(m) \implies a^{\varphi(m)} \equiv 1 \pmod {m'}$，即 $a^{\varphi(m)}=km'+1$，两边同时乘以 $a^r$，得 $a^{r+\varphi(m)} = km + a^r$（因为 $m = a^r m'$）
 
         所以对于 $m$ 中素因子 $a$ 的次数 $r$ 满足：$a^r \equiv a^{r+\varphi(m)} \pmod m$。我们可以简单变换形式，得到 **推论**：
 
@@ -132,7 +157,7 @@ $$
 
         此时有关系：$s' \mid s$ 且 $s \mid \varphi(m)$，且 $r'= \lceil \frac{r}{k}\rceil \le r \le \varphi(m)$，由 $r',s'$ 与 $\varphi(m)$ 的关系，依然可以得到 $a^b\equiv a^{b \bmod \varphi(m)+\varphi(m)}\pmod m$。
 
-4.  **合数**：$a$ 为合数的情况，该式成立。
+4.  **命题**：$a$ 为合数的情况，该式成立。
 
     **证明**：
 
@@ -140,7 +165,7 @@ $$
 
         设 $a=a_1a_2$，其中 $a_i=p_i^{k_i}$，而 $a_i$ 的循环长度为 $s_i$；
 
-        则 $s \mid lcm(s_1,s_2)$，由于 $s_1 \mid \varphi(m),s_2 \mid \varphi(m)$，那么 $lcm(s_1,s_2) \mid \varphi(m)$，所以 $s \mid \varphi(m)$，$r=\max(\lceil \frac{r_i}{k_i} \rceil) \le \max(r_i) \le \varphi(m)$；
+        则 $s \mid \operatorname{lcm}(s_1,s_2)$，由于 $s_1 \mid \varphi(m),s_2 \mid \varphi(m)$，那么 $\operatorname{lcm}(s_1,s_2) \mid \varphi(m)$，所以 $s \mid \varphi(m)$，$r=\max(\lceil \frac{r_i}{k_i} \rceil) \le \max(r_i) \le \varphi(m)$；
 
         由 $r,s$ 与 $\varphi(m)$ 的关系，依然可以得到 $a^b \equiv a^{b \bmod \varphi(m)+\varphi(m)}\pmod m$。
 
@@ -148,8 +173,8 @@ $$
 
 ## 习题
 
-1. [SPOJ #4141 "Euler Totient Function"\[Difficulty: CakeWalk\]](http://www.spoj.com/problems/ETF/)
-2. [UVA #10179 "Irreducible Basic Fractions"\[Difficulty: Easy\]](http://uva.onlinejudge.org/index.php?option=onlinejudge&page=show_problem&problem=1120)
-3. [UVA #10299 "Relatives"\[Difficulty: Easy\]](http://uva.onlinejudge.org/index.php?option=onlinejudge&page=show_problem&problem=1240)
-4. [UVA #11327 "Enumerating Rational Numbers"\[Difficulty: Medium\]](http://uva.onlinejudge.org/index.php?option=com_onlinejudge&Itemid=8&page=show_problem&problem=2302)
-5. [TIMUS #1673 "Admission to Exam"\[Difficulty: High\]](http://acm.timus.ru/problem.aspx?space=1&num=1673)
+1.  [SPOJ #4141 "Euler Totient Function"\[Difficulty: CakeWalk\]](http://www.spoj.com/problems/ETF/)
+2.  [UVA #10179 "Irreducible Basic Fractions"\[Difficulty: Easy\]](http://uva.onlinejudge.org/index.php?option=onlinejudge&page=show_problem&problem=1120)
+3.  [UVA #10299 "Relatives"\[Difficulty: Easy\]](http://uva.onlinejudge.org/index.php?option=onlinejudge&page=show_problem&problem=1240)
+4.  [UVA #11327 "Enumerating Rational Numbers"\[Difficulty: Medium\]](http://uva.onlinejudge.org/index.php?option=com_onlinejudge&Itemid=8&page=show_problem&problem=2302)
+5.  [TIMUS #1673 "Admission to Exam"\[Difficulty: High\]](http://acm.timus.ru/problem.aspx?space=1&num=1673)

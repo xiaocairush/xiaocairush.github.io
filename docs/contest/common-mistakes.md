@@ -1,4 +1,4 @@
-author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit
+author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit, shuzhouliu
 
 本页面主要列举一些竞赛中很多人经常会出现的错误。
 
@@ -8,11 +8,11 @@ author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit
 
 例：
 
-- `int main()` 写为 `int mian()` 之类的拼写错误。
+-   `int main()` 写为 `int mian()` 之类的拼写错误。
 
-- 写完 `struct` 或 `class` 忘记写分号。
+-   写完 `struct` 或 `class` 忘记写分号。
 
-- 数组开太大，（在 OJ 上）使用了不合法的函数（例如多线程），或者函数声明但未定义，会引起链接错误。
+-   数组开太大，（在 OJ 上）使用了不合法的函数（例如多线程），或者函数声明但未定义，会引起链接错误。
 
 -   函数参数类型不匹配。
 
@@ -25,7 +25,7 @@ author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit
         //错误    没有与参数列表匹配的 重载函数 "std::max" 实例
         ```
 
-- 使用 `goto` 和 `switch-case` 的时候跳过了一些局部变量的初始化。
+-   使用 `goto` 和 `switch-case` 的时候跳过了一些局部变量的初始化。
 
 ## 不会引起 CE 但会引起 Warning 的错误
 
@@ -44,10 +44,10 @@ author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit
           printf("No");
 
         // 无论 n 的随机所得值为多少，输出肯定是 Yes
-        // 警告    运算符不正确: 在 Boolean 上下文中执行了常量赋值。应考虑改用“==”。
+        // 警告    运算符不正确: 在 Boolean 上下文中执行了常量赋值。应考虑改用「==」。
         ```
 
-    - 如果确实想在原应使用 `==` 的语句里使用 `=`（比如 `while (foo = bar)`），又不想收到 Warning，可以使用 **双括号**：`while ((foo = bar))`。
+    -   如果确实想在原应使用 `==` 的语句里使用 `=`（比如 `while (foo = bar)`），又不想收到 Warning，可以使用 **双括号**：`while ((foo = bar))`。
 
 -   由于运算符优先级产生的错误。
 
@@ -59,25 +59,50 @@ author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit
         // 正确
         std::cout << ((1 << 1) + 1);
 
-        // 警告    “<<”: 检查运算符优先级是否有可能的错误；使用括号阐明优先级
+        // 警告    「<<」: 检查运算符优先级是否有可能的错误；使用括号阐明优先级
         ```
 
-- 不正确地使用 `static` 修饰符。
+-   不正确地使用 `static` 修饰符。
 
-- 使用 `scanf` 读入的时候没加取地址符 `&`。
+-   使用 `scanf` 读入的时候没加取地址符 `&`。
 
-- 使用 `scanf` 或 `printf` 的时候参数类型与格式指定符不符。
+-   使用 `scanf` 或 `printf` 的时候参数类型与格式指定符不符。
 
 -   同时使用位运算和逻辑运算符 `==` 并且未加括号。
-    - 示例：`(x >> j) & 3 == 2`
+    -   示例：`(x >> j) & 3 == 2`
 
 -   `int` 字面量溢出。
 
-    - 示例：`long long x = 0x7f7f7f7f7f7f7f7f`，`1<<62`。
+    -   示例：`long long x = 0x7f7f7f7f7f7f7f7f`，`1<<62`。
 
-- 未初始化局部变量，导致局部变量被赋予垃圾初值。
+-   未初始化局部变量。
 
-- 局部变量与全局变量重名，导致全局变量被意外覆盖。（开 `-Wshadow` 就可检查此类错误。）
+    ???+ note "未初始化变量会发生什么"
+        原文：<https://loj.ac/d/3679> by @hly1204
+        
+        例如我们在 C++ 中声明一个 `int a;` 但不初始化，可能有时候会认为 `a` 是一个「随机」（其实可能不是真的随机）的值，但是可能将其认为是一个固定的值，但实际上并非如此。
+        
+        我们在简单的测试代码中
+        
+        <https://wandbox.org/permlink/T2uiVe4n9Hg4EyWT>
+        
+        代码是：
+        
+        ```cpp
+        #include <iostream>
+        
+        int main() {
+          int a;
+          std::cout << std::boolalpha << (a < 0 || a == 0 || a > 0);
+          return 0;
+        }
+        ```
+        
+        在一些编译器和环境上开启优化后，其输出为 false。
+        
+        有兴趣的话可以看 <https://www.ralfj.de/blog/2019/07/14/uninit.html>，尽管其是用 Rust 做的实验，但是本质是一样的。
+
+-   局部变量与全局变量重名，导致全局变量被意外覆盖。（开 `-Wshadow` 就可检查此类错误。）
 
 -   运算符重载后引发的输出错误。
     -   示例：
@@ -94,16 +119,16 @@ author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit
 
 ### 会导致 WA 的错误
 
-- 上一组数据处理完毕，读入下一组数据前，未清空数组。
+-   上一组数据处理完毕，读入下一组数据前，未清空数组。
 
-- 读入优化未判断负数。
+-   读入优化未判断负数。
 
 -   所用数据类型位宽不足，导致溢出。
-    - 如习语“三年 OI 一场空，不开 `long long` 见祖宗”所描述的场景。选手因为没有在正确的地方开 `long long`（将整数定义为 `long long` 类型），导致得出错误的答案而失分。
+    -   如习语「三年 OI 一场空，不开 `long long` 见祖宗」所描述的场景。选手因为没有在正确的地方开 `long long`（将整数定义为 `long long` 类型），导致得出错误的答案而失分。
 
-- 存图时，节点编号 0 开始，而题目给的边中两个端点的编号从 1 开始，读入的时候忘记 -1。
+-   存图时，节点编号 0 开始，而题目给的边中两个端点的编号从 1 开始，读入的时候忘记 -1。
 
-- 大/小于号打错或打反。
+-   大/小于号打错或打反。
 
 -   在执行 `ios::sync_with_stdio(false);` 后混用 `scanf/printf` 和 `std::cin/std::cout` 两种 IO，导致输入/输出错乱。
 
@@ -114,6 +139,7 @@ author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit
         // 建议单步运行来观察效果
         #include <cstdio>
         #include <iostream>
+
         int main() {
           // 关闭同步后，cin/cout 将使用独立缓冲区，而不是将输出同步至 scanf/printf
           // 的缓冲区，从而减少 IO 耗时
@@ -123,12 +149,12 @@ author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit
           // printf 的 '\n' 会刷新 printf 的缓冲区，导致输出错位
           printf("b\n");
           std::cout << "c\n";
-          //程序结束时，cout 的缓冲区才会被输出
+          // 程序结束时，cout 的缓冲区才会被输出
           return 0;
         }
         ```
 
-    - 特别的，也不能在执行 `ios::sync_with_stdio(false);` 后使用 `freopen`。
+    -   特别的，也不能在执行 `ios::sync_with_stdio(false);` 后使用 `freopen`。
 
 -   由于宏的展开，且未加括号导致的错误。
 
@@ -140,9 +166,9 @@ author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit
         ```
 
 -   哈希的时候没有使用 `unsigned` 导致的运算错误。
-    - 对负数的右移运算会在最高位补 1。参见：[位运算](../math/bit.md)
+    -   对负数的右移运算会在最高位补 1。参见：[位运算](../math/bit.md)
 
-- 没有删除或注释掉调试输出语句。
+-   没有删除或注释掉调试输出语句。
 
 -   误加了 `;`。
 
@@ -154,11 +180,11 @@ author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit
             printf("OI Wiki!\n");
         ```
 
-- 哨兵值设置错误。例如，平衡树的 `0` 节点。
+-   哨兵值设置错误。例如，平衡树的 `0` 节点。
 
 -   在类或结构体的构造函数中使用 `:` 初始化变量时，变量声明顺序不符合初始化时候的依赖关系。
 
-    - 成员变量的初始化顺序与它们在类中声明的顺序有关，而与初始化列表中的顺序无关。参见：[构造函数与成员初始化器列表](https://zh.cppreference.com/w/cpp/language/constructor) 的“初始化顺序”
+    -   成员变量的初始化顺序与它们在类中声明的顺序有关，而与初始化列表中的顺序无关。参见：[构造函数与成员初始化器列表](https://zh.cppreference.com/w/cpp/language/constructor) 的「初始化顺序」
     -   示例：
 
         ```cpp
@@ -167,6 +193,7 @@ author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit
         class Foo {
          public:
           int a, b;
+
           // a 将在 b 前初始化，其值不确定
           Foo(int x) : b(x), a(b + 1) {}
         };
@@ -193,34 +220,129 @@ author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit
 ???+ warning
     在正式比赛中会尽量保证选手答题的环境和最终测试的环境相同。
     
-    本节内容仅适用于模拟赛等情况，而我们也建议出题人尽量让数据符合 [数据格式](../problemsetting/#_29)。
+    本节内容仅适用于模拟赛等情况，而我们也建议出题人尽量让数据符合 [数据格式](../problemsetting/#数据的格式)。
 
 不同的操作系统使用不同的符号来标记换行，以下为几种常用系统的换行符：
 
-- LF（用 `\n` 表示）：`Unix` 或 `Unix` 兼容系统
+-   LF（用 `\n` 表示）：`Unix` 或 `Unix` 兼容系统
 
-- CR+LF（用 `\r\n` 表示）：`Windows`
+-   CR+LF（用 `\r\n` 表示）：`Windows`
 
-- CR（用 `\r` 表示）：`Mac OS` 至版本 9
+-   CR（用 `\r` 表示）：`Mac OS` 至版本 9
 
 而 C/C++ 利用转义序列 `\n` 来换行，这可能会导致我们认为输入中的换行符也一定是由 `\n` 来表示，而只读入了一个字符来代表换行符，这就会导致我们没有完全读入输入文件。
 
 以下为解决方案：
 
-- 多次 `getchar()`，直到读到想要的字符为止。
+-   多次 `getchar()`，直到读到想要的字符为止。
 
-- 使用 `cin` 读入，**这可能会增大代码常数**。
+-   使用 `cin` 读入，**这可能会增大代码常数**。
 
-- 使用 `scanf("%s",str)` 读入一个字符串，然后取 `str[0]` 作为读入的字符。
+-   使用 `scanf("%s",str)` 读入一个字符串，然后取 `str[0]` 作为读入的字符。
 
-- 使用 `scanf(" %c",&c)` 过滤掉所有空白字符。
+-   使用 `scanf(" %c",&c)` 过滤掉所有空白字符。
+
+### 会导致未知的结果
+
+未定义行为会导致未知的结果，可能是 WA，RE 等。编译器通常会假定你的程序不会出现未定义行为，因此出现开 O2 与不开 O2 代码行为不一致的情况。
+
+-   除以 0（求 0 的逆元）
+
+    ???+ warning "示例"
+        ```cpp
+        cout << x / 0 << endl;
+        ```
+
+-   数组（下标）越界
+
+    例如：
+
+    -   未正确设置循环的初值导致访问了下标为 -1 的值。
+
+    -   无向图边表未开 2 倍。
+
+    -   线段树未开 4 倍空间。
+
+    -   看错数据范围，少打一个零。
+
+    -   错误预估了算法的空间复杂度。
+
+    -   写线段树的时候，`pushup` 或 `pushdown` 叶节点。
+
+        正确的做法：不要越界，记得检查自己的代码，使得下标访问数 `x`，在定义的下标中。
+
+-   除 main 外有返回值函数执行至结尾未执行任何 return 语句
+
+    即使有一个分支有返回值，但是其他分支却没有，结果也是未定义的。
+
+    可以向编译选项中追加 `-Wall`，检查编译器是否给出有关于函数未 return 的警告。
+
+-   尝试修改字符串字面量
+
+    ???+ warning "示例"
+        ```cpp
+        char *p = "OI-wiki";
+        p[0] = 'o';
+        p[1] = 'i';
+        ```
+
+    这样试图修改字符串字面量会导致 **未定义行为**，应当使用其他 **合适** 的数据类型，例如 `std::string` 和 `char[]`。
+
+-   多次释放/非法解引用一片内存
+
+    例如：
+
+    -   未初始化就解引用指针。
+
+    -   指针指向的内存区域已经释放。
+
+        使用 `erase` 或 `delete` 或 `free` 操作应注意不要对同一地址/对象多次使用。
+
+-   解引用空指针/野指针
+
+    对于空指针：先应该判断空指针，可以用 `p == nullptr` 或 `!p`。
+
+    对于野指针：可以释放指针的时候将其置为 `nullptr` 以规避。
+
+-   有符号数溢出
+
+    例如我们有一个表达式 `x+1 > x`。
+
+    正常输出应当是 `true`，但是在 `INT_MAX` 作为 `x` 时输出 `false`，这时称为 `signed integer overflow`。
+
+    可以使用更大的数据类型（例如 `long long` 或 `__int128`），或判断溢出。若保证无负数，亦可使用无符号整型。
+
+    有符号整数溢出可能影响编译优化，例如代码：
+
+    ```cpp
+    int foo(int x) {
+      if (x > x + 1) return 1;
+      return 0;
+    }
+    ```
+
+    可能被编译器直接优化为：
+
+    ```cpp
+    int foo(int x) { return 0; }
+    ```
+
+    因为编译器可以假定有符号整数永远不会溢出，因此 `x > x + 1` 恒成立。
+
+-   使用未初始化的变量
+
+    ???+ warning "示例"
+        ```cpp
+        int foo(int a) {
+          int t; /* 没有初始化 */
+          if (/* 使用 */ t > 3) return a;
+          return 0;
+        }
+        ```
 
 ### 会导致 RE
 
--   对整数除以 $0$。
-    - 对 $0$ 求逆元。
-
-- 没删文件操作（某些 OJ）。
+-   没删文件操作（某些 OJ）。
 
 -   排序时比较函数的错误 `std::sort` 要求比较函数是严格弱序：`a<a` 为 `false`；若 `a<b` 为 `true`，则 `b<a` 为 `false`；若 `a<b` 为 `true` 且 `b<c` 为 `true`，则 `a<c` 为 `true`。其中要特别注意第二点。
     如果不满足上述要求，排序时很可能会 RE。
@@ -247,19 +369,17 @@ author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit
     }
     ```
 
-- 解引用空指针。
-
 ### 会导致 TLE
 
-- 分治未判边界导致死递归。
+-   分治未判边界导致死递归。
 
 -   死循环。
 
-    - 循环变量重名。
+    -   循环变量重名。
 
-    - 循环方向反了。
+    -   循环方向反了。
 
-- BFS 时不标记某个状态是否已访问过。
+-   BFS 时不标记某个状态是否已访问过。
 
 -   使用宏展开编写 min/max
 
@@ -289,43 +409,22 @@ author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit
       if (mid >= qr) return query(lt(t), l, mid, ql, qr);
       if (mid < ql) return query(rt(t), mid + 1, r, ql, qr);
       return max(query(lt(t), l, mid, ql, qr), query(rt(t), mid + 1, r, ql, qr));
+    }
     ```
 
-- 没删文件操作（某些 OJ）。
+-   没删文件操作（某些 OJ）。
 
-- 在 `for/while` 循环中重复执行复杂度非 $O(1)$ 的函数。严格来说，这可能会引起时间复杂度的改变。
+-   在 `for/while` 循环中重复执行复杂度非 $O(1)$ 的函数。严格来说，这可能会引起时间复杂度的改变。
 
 ### 会导致 MLE
 
-- 数组过大。
+-   数组过大。
 
 -   STL 容器中插入了过多的元素。
 
-    - 经常是在一个会向 STL 插入元素的循环中死循环了。
+    -   经常是在一个会向 STL 插入元素的循环中死循环了。
 
-    - 也有可能被卡了。
-
-### [未定义行为](https://zh.cppreference.com/w/cpp/language/ub)
-
--   数组越界。多数会引发 RE。
-
-    - 未正确设置循环的初值导致访问了下标为 -1 的值。
-
-    - 无向图边表未开 2 倍。
-
-    - 线段树未开 4 倍空间。
-
-    - 看错数据范围，少打一个零。
-
-    - 错误预估了算法的空间复杂度。
-
-    - 写线段树的时候，`pushup` 或 `pushdown` 叶节点。
-
--   解引用野指针。
-
-    - 未初始化就解引用指针。
-
-    - 指针指向的内存区域已经释放。
+    -   也有可能被卡了。
 
 ### 会导致常数过大
 
@@ -335,19 +434,19 @@ author: H-J-Granger, orzAtalod, ksyx, Ir1d, Chrogeek, Enter-tainer, yiyangit
 
         ```cpp
         // int mod = 998244353;      // 错误
-        const int mod = 998244353  // 正确，方便编译器按常量处理
+        const int mod = 998244353;  // 正确，方便编译器按常量处理
         ```
 
-- 使用了不必要的递归（尾递归不在此列）。
+-   使用了不必要的递归（尾递归不在此列）。
 
-- 将递归转化成迭代的时候，引入了大量额外运算。
+-   将递归转化成迭代的时候，引入了大量额外运算。
 
 ### 只在程序在本地运行的时候造成影响的错误
 
 -   文件操作有可能会发生的错误：
 
-    - 对拍时未关闭文件指针 `fclose(fp)` 就又令 `fp = fopen()`。这会使得进程出现大量的文件野指针。
+    -   对拍时未关闭文件指针 `fclose(fp)` 就又令 `fp = fopen()`。这会使得进程出现大量的文件野指针。
 
-    - `freopen()` 中的文件名未加 `.in`/`.out`。
+    -   `freopen()` 中的文件名未加 `.in`/`.out`。
 
-- 使用堆空间后忘记 `delete` 或 `free`。
+-   使用堆空间后忘记 `delete` 或 `free`。

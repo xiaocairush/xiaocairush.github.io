@@ -8,7 +8,7 @@ author: Marcythm, partychicken, Xeonacid
 
 ## 例 1
 
-???+note "题面"
+???+ note "题面"
     给定两个长度分别为 $n,m$ 且仅由小写字母构成的字符串 $A,B$, 求 $A,B$ 的最长公共子序列。$(n\le 10^6,m\le 10^3)$
 
 ### 朴素的解法
@@ -41,7 +41,7 @@ $$
 
 ## 例 2
 
-???+note "题面"
+???+ note "题面"
     给定一个 $n$ 个点的无权有向图，判断该图是否存在哈密顿回路。$(2\le n\le 20)$
 
 ### 朴素的解法
@@ -51,7 +51,7 @@ $$
 设 $f_{s,i}$ 表示从点 $1$ 出发，仅经过点集 $s$ 中的点能否到达点 $i$。记 $g$ 为原图的邻接矩阵。则有
 
 $$
-f_{s, i} = \bigcap_{j\in s, j\neq i}f_{s - \left\{i\right\}, j}\cap g_{j, i} \left(i\in s\right)
+f_{s, i} = \bigvee_{j\in s, j\neq i}f_{s \setminus \{i\}, j}\wedge g_{j, i} \left(i\in s\right)
 $$
 
 时间复杂度 $O(n^2 \times 2^n)$，写得好看或许能过，但是并不优美。
@@ -62,4 +62,4 @@ $$
 
 我们可以考虑对于每个状态 $s$ 将 $f_{s,1},f_{s,2},\dots,f_{s,n}$ 压成一个 `int`，发现我们可以将邻接矩阵同样压缩后进行 $O(1)$ 转移。
 
-时间复杂度 $O(n\times 2^n)$, 可以通过这道题。
+时间复杂度 $O(n^2/w\times 2^n)$, 可以通过这道题，其中 $w$ 为 `int` 的位数。

@@ -2,7 +2,7 @@ author: ouuan, Ir1d, Marcythm, Xeonacid
 
 ## 树分块的方式
 
-可以参考 [真 - 树上莫队](../misc/mo-algo.md#_14)。
+可以参考 [真 - 树上莫队](../misc/mo-algo-on-tree.md)。
 
 也可以参考 [ouuan 的博客/莫队、带修莫队、树上莫队详解/树上莫队](https://ouuan.github.io/莫队、带修莫队、树上莫队详解/#树上莫队)。
 
@@ -12,7 +12,7 @@ author: ouuan, Ir1d, Marcythm, Xeonacid
 
 树分块除了应用于莫队，还可以灵活地运用到某些树上问题中。但可以用树分块解决的题目往往都有更优秀的做法，所以相关的题目较少。
 
-顺带提一句，“gty 的妹子树”的树分块做法可以被菊花图卡掉。
+顺带提一句，「gty 的妹子树」的树分块做法可以被菊花图卡掉。
 
 ### [BZOJ4763 雪辉](https://www.luogu.com.cn/problem/P3603)
 

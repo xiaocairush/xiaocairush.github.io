@@ -1,4 +1,4 @@
-author: Xeonacid
+author: Xeonacid, nocriz
 
 （本文转载自 [桃酱的算法笔记](https://zhuanlan.zhihu.com/c_1005817911142838272)，原文戳 [链接](https://zhuanlan.zhihu.com/p/41867199)，已获得作者授权）
 
@@ -38,7 +38,7 @@ author: Xeonacid
 
 我们按照定义，显然可以构造 $FWT[A] = A' = \sum_{i=i|j}A_{j}$，来表示 $j$ 满足二进制中 $1$ 为 $i$ 的子集。
 
-那么显然会有 $C_{i} = \sum_{i=j|k}A_{j}*B_{k} \Rightarrow FWT[C] = FWT[A] * FWT[B]$
+那么显然会有 $C_{i} = \sum_{i=j|k}A_{j}*B_{k} \implies FWT[C] = FWT[A] * FWT[B]$
 
 那么我们接下来看 $FWT[A]$ 怎么求。
 
@@ -111,3 +111,11 @@ $$
 $$
 UFWT[A'] = merge(\frac{UFWT[A_1'] - UFWT[A_0']}{2}, \frac{UFWT[A_1'] + UFWT[A_0']}{2})
 $$
+
+## 例题
+
+???+ note "[【CF103329F】【XXII Opencup, Grand Prix of XiAn】The Struggle](https://codeforces.com/gym/103329/problem/F)"
+    给出一个椭圆 $E$，其中所有整点的坐标均在 $[1,4 \cdot 10^6]$ 之间。求 $\sum_{(x,y) \in E} (x \oplus y)^{33}x^{-2}y^{-1} \mod 10^9+7$ 的值。
+    
+    ??? note "题解"
+        这是一道比较不裸的题，出题人提供了详细的英文题解，具体请见 [此链接](https://codeforces.com/blog/entry/96518)。

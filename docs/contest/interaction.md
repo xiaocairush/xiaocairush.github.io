@@ -1,14 +1,14 @@
 author: countercurrent-time, StudyingFather
 
-上个世纪的 IOI 就已涉及交互题。虽然交互题近年来没有在省选以下的比赛中出现，不过 2019 年里 NOI 系列比赛中连续出现《P5208[WC2019]I 君的商店》、《P5473[NOI2019]I 君的探险》两道交互题，这可能代表着交互题重新回到 NOI 系列比赛中。
+上个世纪的 IOI 就已涉及交互题。虽然交互题近年来没有在省选以下的比赛中出现，不过 2019 年里 NOI 系列比赛中连续出现《P5208\[WC2019]I 君的商店》、《P5473\[NOI2019]I 君的探险》两道交互题，这可能代表着交互题重新回到 NOI 系列比赛中。
 
-交互题没有很高的前置算法要求，一般也没有严格的时间限制，程序的优秀程度往往仅取决于交互次数限制。所以学习交互题时，建议按照难度循序渐进。要是有意锻炼算法思维而不只是单纯地学习算法，那么完成交互题是很不错的方法。虽然交互题对选手已掌握算法的要求通常较低，但仍建议掌握一定提高和省选算法后再尝试做交互题，因为此时自己的算法思维水平和知识面已经达到了一定水平。基础的交互题介绍可以参考 OI wiki 的 [题型介绍 - 交互题](./problems.md#interaction)。
+交互题没有很高的前置算法要求，一般也没有严格的时间限制，程序的优秀程度往往仅取决于交互次数限制。所以学习交互题时，建议按照难度循序渐进。要是有意锻炼算法思维而不只是单纯地学习算法，那么完成交互题是很不错的方法。虽然交互题对选手已掌握算法的要求通常较低，但仍建议掌握一定提高和省选算法后再尝试做交互题，因为此时自己的算法思维水平和知识面已经达到了一定水平。基础的交互题介绍可以参考 **OI Wiki** 的 [题型介绍 - 交互题](./problems.md#交互题)。
 
 交互题的特殊错误：
 
-- 选手每一次输出后都需要刷新缓冲区，否则会引起 Idleness limit exceeded 错误。另外，如果题目含多组数据并且程序可以在未读入所有数据前就知道答案，也仍然要读入所有数据，否则同样会因为读入混乱引起 ILE（可以一次提出多次询问，一次接收所有询问的回答）。同时尽量不要使用快读。
-- 如果程序查询次数过多，则在 Codeforces 上会给出 Wrong Answer 的评测结果（不过评测系统会说明 Wrong Answer 的原因），而 UVA 会给出 Protocol Limit Exceeded (PLE) 的评测结果。
-- 如果程序交互格式错误，UVa 会给出 Protocol Violation (PV) 的评测结果。
+-   选手每一次输出后都需要刷新缓冲区，否则会引起 Idleness limit exceeded 错误。另外，如果题目含多组数据并且程序可以在未读入所有数据前就知道答案，也仍然要读入所有数据，否则同样会因为读入混乱引起 ILE（可以一次提出多次询问，一次接收所有询问的回答）。同时尽量不要使用快读。
+-   如果程序查询次数过多，则在 Codeforces 上会给出 Wrong Answer 的评测结果（不过评测系统会说明 Wrong Answer 的原因），而 UVA 会给出 Protocol Limit Exceeded (PLE) 的评测结果。
+-   如果程序交互格式错误，UVa 会给出 Protocol Violation (PV) 的评测结果。
 
 由于交互题输入输出较为繁琐，所以建议分别封装输入和输出函数。
 
@@ -16,11 +16,11 @@ author: countercurrent-time, StudyingFather
 
 例题：
 
-- [CF679A Bear and Prime 100](https://www.luogu.com.cn/problem/CF679A)
-- [CF843B Interactive LowerBound](https://www.luogu.com.cn/problem/CF843B)
-- [UOJ206\[APIO2016\]Gap](http://uoj.ac/problem/206)
-- [CF750F New Year and Finding Roots](https://www.luogu.com.cn/problem/CF750F)
-- [UVA12731 太空站之谜 Mysterious Space Station](https://www.luogu.com.cn/problem/UVA12731)
+-   [CF679A Bear and Prime 100](https://www.luogu.com.cn/problem/CF679A)
+-   [CF843B Interactive LowerBound](https://www.luogu.com.cn/problem/CF843B)
+-   [UOJ206\[APIO2016\]Gap](http://uoj.ac/problem/206)
+-   [CF750F New Year and Finding Roots](https://www.luogu.com.cn/problem/CF750F)
+-   [UVA12731 太空站之谜 Mysterious Space Station](https://www.luogu.com.cn/problem/UVA12731)
 
 ## CF679A Bear and Prime 100
 
@@ -35,6 +35,7 @@ author: countercurrent-time, StudyingFather
                          23, 25, 29, 31, 37, 41, 43, 47, 49};
     int cnt = 0;
     char res[5];
+    
     int main() {
       for (int i : prime) {
         printf("%d\n", i);
@@ -65,6 +66,7 @@ author: countercurrent-time, StudyingFather
     const int N = 50005;
     int n, start, x;
     int a[N];
+    
     int main() {
       scanf("%d%d%d", &n, &start, &x);
       if (n < 2000) {
@@ -102,7 +104,7 @@ author: countercurrent-time, StudyingFather
     }
     ```
 
-## UOJ206[APIO2016]Gap
+## UOJ206\[APIO2016]Gap
 
 分两个子任务讨论：
 
@@ -195,6 +197,7 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
     int T, h, chance;
     bool ok;
     vector<int> to[N], path;
+    
     bool read(int x) {
       if (to[x].empty()) {
         printf("? %d\n", x), fflush(stdout);
@@ -213,6 +216,7 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
       }
       return false;
     }
+    
     bool dfs(int x) {
       if (to[x].empty()) path.push_back(x);
       if (read(x)) return true;
@@ -220,6 +224,7 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
         if (to[i].empty()) return dfs(i);
       return false;
     }
+    
     void bfs(int s, int k) {
       queue<int> q;
       for (int i : to[s])
@@ -238,6 +243,7 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
       }
       printf("! %d\n", q.front()), fflush(stdout);
     }
+    
     int main() {
       for (scanf("%d", &T); T--;) {
         ok = false;
@@ -276,10 +282,10 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
 
 由于唯一的反馈是移动时是否撞墙，所以我们应该考虑在机器人不走丢的情况下，尽量接近墙边走路，这样有几个好处：
 
-- 靠近墙边走路时，很容易知道自己会不会撞墙，获取到尽量多的信息。
-- 墙边都是不会出现传送门的格子，可以避免机器人走丢。
+-   靠近墙边走路时，很容易知道自己会不会撞墙，获取到尽量多的信息。
+-   墙边都是不会出现传送门的格子，可以避免机器人走丢。
 
-所以，我们如果已知机器人可能在墙边的某个位置，要确定机器人是不是真的在这个位置，就可以通过 [“单手扶墙法”](https://en.wikipedia.org/wiki/Maze_solving_algorithm) 确定自己是不是真的在这个位置。根据拓扑学原理，在两边都是墙的迷宫中，如果从入口进入，并且总是用一只手扶着同一边墙，就可以保证找到出口。由于本题中的墙是闭合的，所以只需要沿着墙边的道路走，就可以保证可以回到原点而不会撞墙。另外，由于墙边的道路是地图上的最大闭合回路，所以实际代码中并不需要特意撞墙以保证机器人在墙边，可以使用标记在地图中标明墙边道路。而且一旦撞了墙，就需要赶快沿着原路返回，可以在避免机器人走丢的同时减少步数。
+所以，我们如果已知机器人可能在墙边的某个位置，要确定机器人是不是真的在这个位置，就可以通过 [「单手扶墙法」](https://en.wikipedia.org/wiki/Maze_solving_algorithm) 确定自己是不是真的在这个位置。根据拓扑学原理，在两边都是墙的迷宫中，如果从入口进入，并且总是用一只手扶着同一边墙，就可以保证找到出口。由于本题中的墙是闭合的，所以只需要沿着墙边的道路走，就可以保证可以回到原点而不会撞墙。另外，由于墙边的道路是地图上的最大闭合回路，所以实际代码中并不需要特意撞墙以保证机器人在墙边，可以使用标记在地图中标明墙边道路。而且一旦撞了墙，就需要赶快沿着原路返回，可以在避免机器人走丢的同时减少步数。
 
 由上，可以推断出确定机器人是否在特定格子的试错法：将机器人在不走到未知格子或已知传送门的情况下走到墙边的道路上，然后绕着墙边道路走一圈。这个过程中如果没有撞墙，就可以确定机器人确实是在特定格子。
 
@@ -315,11 +321,17 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
     
     struct point {
       int x, y;
+    
       point(int x = 0, int y = 0) : x(x), y(y) {}
+    
       bool operator==(const point& tmp) const { return x == tmp.x && y == tmp.y; }
+    
       bool operator!=(const point& tmp) const { return !(*this == tmp); }
+    
       point side(int d) const { return point(x + dir[d][0], y + dir[d][1]); }
+    
       int check(int d) { return a[x + dir[d][0]][y + dir[d][1]]; }
+    
       int id() { return ::id[x][y]; }
     } start;
     
@@ -334,6 +346,7 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
       scanf("%d", &ret);
       return ret;
     }
+    
     bool walk(int d, std::stack<int>& st) {
       if (walk(d)) {
         st.push(d);
@@ -341,6 +354,7 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
       }
       return false;
     }
+    
     bool read() {
       if (scanf("%d%d%d", &n, &m, &k) != 3) return false;
       if (n == 0) return false;
@@ -357,11 +371,13 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
         }
       return true;
     }
+    
     void answer() {
       for (int i = 0; i < k; i++)
         printf("Answer %d %d\n", ans[i].first.id(), ans[i].second.id());
       fflush(stdout);
     }
+    
     // 单手扶墙法，因为靠墙的 Path 是极大闭合环，所以只需要在沿着 Path
     // 走的过程中没有碰到障碍就可以了
     void wall_follower_init(point x, int last, int wallside, point s) {
@@ -381,6 +397,7 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
         wall_follower_init(x.side(last), last, wallside, s);
       }
     }
+    
     void init() {
       int cnt = 1;
       for (int i = 0; i < n; i++)
@@ -409,9 +426,11 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
         }
       wall_follower_init(start, last, wallside, start);
     }
+    
     void undo(std::stack<int>& st) {
       while (!st.empty()) walk(st.top() ^ 2), st.pop();
     }
+    
     bool wall_follower(point x) {
       std::stack<int> st;
       bool ok = true;
@@ -432,8 +451,9 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
       if (ok == false) undo(st);
       return ok;
     }
+    
     // 确定自己当前在
-    // x，使用“摸着石头过河”的方法，只需要沿着可以避开障碍、未知格子和传送门的方向走到
+    // x，使用「摸着石头过河」的方法，只需要沿着可以避开障碍、未知格子和传送门的方向走到
     // Path 就行。 在找传送门和配对传送门时使用
     void bfs(point s, point t, std::vector<int>& v) {
       static int map[N][N] = {};
@@ -458,6 +478,7 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
       }
       std::reverse(v.begin(), v.end());
     }
+    
     bool move(point s, point t, std::stack<int>& st) {  // 在靠近传送门时使用
       static std::vector<int> v;
       v.clear();
@@ -466,6 +487,7 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
         if (walk(i, st) == false) return false;
       return true;
     }
+    
     // 尽可能快地向墙边移动
     bool make_sure(point x, int last) {
       if (a[x.x][x.y] == Path) return wall_follower(x);
@@ -478,6 +500,7 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
         }
       return false;
     }
+    
     void find_gate() {
       int cnt = 0;
       std::stack<int> st;
@@ -507,6 +530,7 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
             undo(st);
           }
     }
+    
     void make_gate_pair() {
       int cnt = 0;
       std::stack<int> st;
@@ -528,6 +552,7 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
               undo(st);
             }
     }
+    
     int main() {
       while (read()) {
         init();
@@ -541,10 +566,10 @@ $h \le 4$ 时可以直接暴力枚举。然而 $h > 4$ 时需要很高效的遍�
 
 ## 习题
 
-- [刘汝佳的交互题专场比赛 Rujia Liu's Present 7 质量非常高，推荐一做。](https://onlinejudge.org/contests/328-9976a2e2/)
-- [P5473\[NOI2019\]I 君的探险](https://www.luogu.com.cn/problem/P5473)
-- [P5208\[WC2019\]I 君的商店](https://www.luogu.com.cn/problem/P5208)
+-   [刘汝佳的交互题专场比赛 Rujia Liu's Present 7 质量非常高，推荐一做。](https://onlinejudge.org/contests/328-9976a2e2/)
+-   [P5473\[NOI2019\]I 君的探险](https://www.luogu.com.cn/problem/P5473)
+-   [P5208\[WC2019\]I 君的商店](https://www.luogu.com.cn/problem/P5208)
 
 ## 参考资料与拓展阅读
 
-- [用 Linux 管道实现 online judge 的交互题功能](https://www.cnblogs.com/tsreaper/p/pipe-interactive.html)
+-   [用 Linux 管道实现 online judge 的交互题功能](https://www.cnblogs.com/tsreaper/p/pipe-interactive.html)

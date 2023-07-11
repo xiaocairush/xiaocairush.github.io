@@ -22,11 +22,11 @@ std::stack<TypeName> s2(s1);        // 将 s1 复制一份用于构造 s2
 
 #### 以下所有函数均为常数复杂度
 
-- `top()` 访问栈顶元素（如果栈为空，此处会出错）
-- `push(x)` 向栈中插入元素 x
-- `pop()` 删除栈顶元素
-- `size()` 查询容器中的元素数量
-- `empty()` 询问容器是否为空
+-   `top()` 访问栈顶元素（如果栈为空，此处会出错）
+-   `push(x)` 向栈中插入元素 x
+-   `pop()` 删除栈顶元素
+-   `size()` 查询容器中的元素数量
+-   `empty()` 询问容器是否为空
 
 ### 简单示例
 
@@ -36,10 +36,10 @@ s1.push(2);
 s1.push(1);
 std::stack<int> s2(s1);
 s1.pop();
-std::cout << s1.size() << " " << s2.size() << endl;  // 1 2
-std::cout << s1.top() << " " << s2.top() << endl;    // 2 1
+std::cout << s1.size() << " " << s2.size() << std::endl;  // 1 2
+std::cout << s1.top() << " " << s2.top() << std::endl;    // 2 1
 s1.pop();
-std::cout << s1.empty() << " " << s2.empty() << endl;  // 1 0
+std::cout << s1.empty() << " " << s2.empty() << std::endl;  // 1 0
 ```
 
 ## 队列
@@ -65,11 +65,11 @@ std::queue<TypeName> q2(q1);  // 将 s1 复制一份用于构造 q2
 
 #### 以下所有函数均为常数复杂度
 
-- `front()` 访问队首元素（如果队列为空，此处会出错）
-- `push(x)` 向队列中插入元素 x
-- `pop()` 删除队首元素
-- `size()` 查询容器中的元素数量
-- `empty()` 询问容器是否为空
+-   `front()` 访问队首元素（如果队列为空，此处会出错）
+-   `push(x)` 向队列中插入元素 x
+-   `pop()` 删除队首元素
+-   `size()` 查询容器中的元素数量
+-   `empty()` 询问容器是否为空
 
 ### 简单示例
 
@@ -79,10 +79,10 @@ q1.push(2);
 q1.push(1);
 std::queue<int> q2(q1);
 q1.pop();
-std::cout << q1.size() << " " << q2.size() << endl;    // 1 2
-std::cout << q1.front() << " " << q2.front() << endl;  // 1 2
+std::cout << q1.size() << " " << q2.size() << std::endl;    // 1 2
+std::cout << q1.front() << " " << q2.front() << std::endl;  // 1 2
 q1.pop();
-std::cout << q1.empty() << " " << q2.empty() << endl;  // 1 0
+std::cout << q1.empty() << " " << q2.empty() << std::endl;  // 1 0
 ```
 
 ## 优先队列
@@ -120,14 +120,14 @@ std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int> >,
 
 #### 以下所有函数均为常数复杂度
 
-- `top()` 访问堆顶元素（此时优先队列不能为空）
-- `empty()` 询问容器是否为空
-- `size()` 查询容器中的元素数量
+-   `top()` 访问堆顶元素（此时优先队列不能为空）
+-   `empty()` 询问容器是否为空
+-   `size()` 查询容器中的元素数量
 
 #### 以下所有函数均为对数复杂度
 
-- `push(x)` 插入元素，并对底层容器排序
-- `pop()` 删除堆顶元素（此时优先队列不能为空）
+-   `push(x)` 插入元素，并对底层容器排序
+-   `pop()` 删除堆顶元素（此时优先队列不能为空）
 
 ### 简单示例
 

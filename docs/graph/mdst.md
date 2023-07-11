@@ -1,5 +1,7 @@
 在学习最小直径生成树（Minimum Diameter Spanning Tree）前建议先阅读 [树的直径](./tree-diameter.md) 的内容。
 
+## 定义
+
 在无向图的所有生成树中，直径最小的那一棵生成树就是最小直径生成树。
 
 ## 图的绝对中心
@@ -32,17 +34,17 @@ $\textit{rk}(i,j)$ 记录点 $i$ 到其他所有结点中第 $j$ 小的那个结
 
 图的绝对中心可能在某个结点上，用距离预选结点最远的那个结点来更新，即 $\textit{ans}\leftarrow \min(\textit{ans},d(i,\textit{rk}(i,n))\times 2)$。
 
-### 算法流程
+### 过程
 
-1. 使用多源最短路算法（[Floyd](./shortest-path.md#floyd)，[Johnson](./shortest-path.md#johnson) 等），求出 $d$ 数组；
+1.  使用多源最短路算法（[Floyd](./shortest-path.md#floyd-算法)，[Johnson](./shortest-path.md#johnson-全源最短路径算法) 等），求出 $d$ 数组；
 
-2. 求出 $\textit{rk}(i,j)$，并将其升序排序；
+2.  求出 $\textit{rk}(i,j)$，并将其升序排序；
 
-3. 图的绝对中心可能在某个结点上，用距离预选结点最远的那个结点来更新，遍历所有结点并用 $\textit{ans}\leftarrow \min(\textit{ans},d(i,\textit{rk}(i,n)) \times 2)$ 更新最小值。
+3.  图的绝对中心可能在某个结点上，用距离预选结点最远的那个结点来更新，遍历所有结点并用 $\textit{ans}\leftarrow \min(\textit{ans},d(i,\textit{rk}(i,n)) \times 2)$ 更新最小值。
 
-4. 图的绝对中心可能在某条边上，枚举所有的边。对于一条边 $w(u,v)$ 从距离 $u$ 最远的结点开始更新。当出现 $d(v,\textit{rk}(u,i)) > \max_{j=i+1}^n d(v,\textit{rk}(u,j))$ 的情况时，用 $\textit{ans}\leftarrow  \min(\textit{ans}, d(u,\textit{rk}(u,i))+\max_{j=i+1}^n d(v,\textit{rk}(u,j))+w(u,v))$ 来更新。因为这种情况会使图的绝对中心改变。
+4.  图的绝对中心可能在某条边上，枚举所有的边。对于一条边 $w(u,v)$ 从距离 $u$ 最远的结点开始更新。当出现 $d(v,\textit{rk}(u,i)) > \max_{j=i+1}^n d(v,\textit{rk}(u,j))$ 的情况时，用 $\textit{ans}\leftarrow  \min(\textit{ans}, d(u,\textit{rk}(u,i))+\max_{j=i+1}^n d(v,\textit{rk}(u,j))+w(u,v))$ 来更新。因为这种情况会使图的绝对中心改变。
 
-??? note "参考实现"
+??? note "实现"
     ```cpp
     bool cmp(int a, int b) { return val[a] < val[b]; }
     
@@ -79,7 +81,7 @@ $\textit{rk}(i,j)$ 记录点 $i$ 到其他所有结点中第 $j$ 小的那个结
 
 ### 例题
 
-- [CodeForce 266D BerDonalds](https://codeforces.ml/contest/266/problem/D)
+-   [CodeForce 266D BerDonalds](https://codeforces.ml/contest/266/problem/D)
 
 ## 最小直径生成树
 
@@ -87,7 +89,7 @@ $\textit{rk}(i,j)$ 记录点 $i$ 到其他所有结点中第 $j$ 小的那个结
 
 求解最小直径生成树首先需要找到图的绝对中心。以图的绝对中心为起点，生成一个最短路径树，那么就可以得到最小直径生成树了。
 
-??? note "参考实现"
+??? note "实现"
     ```cpp
     #include <bits/stdc++.h>
     using namespace std;
@@ -97,17 +99,21 @@ $\textit{rk}(i,j)$ 记录点 $i$ 到其他所有结点中第 $j$ 小的那个结
     ll d[MAXN][MAXN], dd[MAXN][MAXN], rk[MAXN][MAXN], val[MAXN];
     const ll INF = 1e17;
     int n, m;
+    
     bool cmp(int a, int b) { return val[a] < val[b]; }
+    
     void floyd() {
       for (int k = 1; k <= n; k++)
         for (int i = 1; i <= n; i++)
           for (int j = 1; j <= n; j++) d[i][j] = min(d[i][j], d[i][k] + d[k][j]);
     }
+    
     struct node {
       ll u, v, w;
     } a[MAXN * (MAXN - 1) / 2];
+    
     void solve() {
-      //求图的绝对中心
+      // 求图的绝对中心
       floyd();
       for (int i = 1; i <= n; i++) {
         for (int j = 1; j <= n; j++) {
@@ -117,14 +123,14 @@ $\textit{rk}(i,j)$ 记录点 $i$ 到其他所有结点中第 $j$ 小的那个结
         sort(rk[i] + 1, rk[i] + 1 + n, cmp);
       }
       ll P = 0, ansP = INF;
-      //在点上
+      // 在点上
       for (int i = 1; i <= n; i++) {
         if (d[i][rk[i][n]] * 2 < ansP) {
           ansP = d[i][rk[i][n]] * 2;
           P = i;
         }
       }
-      //在边上
+      // 在边上
       int f1 = 0, f2 = 0;
       ll disu = INT_MIN, disv = INT_MIN, ansL = INF;
       for (int i = 1; i <= m; i++) {
@@ -142,7 +148,7 @@ $\textit{rk}(i,j)$ 记录点 $i$ 到其他所有结点中第 $j$ 小的那个结
         }
       }
       cout << min(ansP, ansL) / 2 << '\n';
-      //最小路径生成树
+      // 最小路径生成树
       vector<pii> pp;
       for (int i = 1; i <= 501; ++i)
         for (int j = 1; j <= 501; ++j) dd[i][j] = INF;
@@ -193,11 +199,13 @@ $\textit{rk}(i,j)$ 记录点 $i$ 到其他所有结点中第 $j$ 小的那个结
           if (x != n && y != n) cout << x << ' ' << y << '\n';
       }
     }
+    
     void init() {
       for (int i = 1; i <= 501; ++i)
         for (int j = 1; j <= 501; ++j) d[i][j] = INF;
       for (int i = 1; i <= 501; ++i) d[i][i] = 0;
     }
+    
     int main() {
       init();
       cin >> n >> m;

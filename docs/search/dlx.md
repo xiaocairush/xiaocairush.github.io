@@ -1,16 +1,18 @@
-author: LeverImmy
+author: LeverImmy, 383494
 
-本页面将介绍精确覆盖问题，解决这个问题的算法 X 算法，以及用来优化 X 算法的双向十字链表 Dancing Link。本页也将介绍如何在建模的配合下使用 DLX 解决一些搜索题。
+本页面将介绍精确覆盖问题、重复覆盖问题，解决这两个问题的算法「X 算法」，以及用来优化 X 算法的双向十字链表 Dancing Link。本页也将介绍如何在建模的配合下使用 DLX 解决一些搜索题。
 
 ## 精确覆盖问题
 
-### 问题定义
+### 定义
 
-精确覆盖问题（英文：Exact Cover Problem) 是指给定许多集合 $S_i (1 \le i \le n)$ 以及一个集合 $X$，求满足以下条件的无序多元组 $(T_1, T_2, \cdots , T_m)$：
+精确覆盖问题（英文：Exact Cover Problem）是指给定许多集合 $S_i (1 \le i \le n)$ 以及一个集合 $X$，求满足以下条件的无序多元组 $(T_1, T_2, \cdots , T_m)$：
 
-1. $\forall i, j \in [1, m],T_i\bigcap T_j = \varnothing (i \neq j)$
-2. $X = \bigcup\limits_{i = 1}^{m}T_i$
-3. $\forall i \in[1, m], T_i \in \{S_1, S_2, \cdots, S_n\}$
+1.  $\forall i, j \in [1, m],T_i\bigcap T_j = \varnothing (i \neq j)$
+2.  $X = \bigcup\limits_{i = 1}^{m}T_i$
+3.  $\forall i \in[1, m], T_i \in \{S_1, S_2, \cdots, S_n\}$
+
+### 解释
 
 例如，若给出
 
@@ -32,7 +34,7 @@ $$
 
 将 $\bigcup\limits_{i = 1}^{n}S_i$ 中的所有数离散化，可以得到这么一个模型：
 
-> 给定一个 01 矩阵，你可以选择一些行，使得最终每列都恰好有一个 1。
+> 给定一个 01 矩阵，你可以选择一些行（row），使得最终每列（column）[^note1]都恰好有一个 1。
 > 举个例子，我们对上文中的例子进行建模，可以得到这么一个矩阵：
 
 $$
@@ -48,7 +50,9 @@ $$
 
 > 其中第 $i$ 行表示着 $S_i$，而这一行的每个数依次表示 $[1 \in S_i],[3 \in S_i],[5 \in S_i],\cdots,[119 \in S_i]$。
 
-### 暴力 1
+### 实现
+
+#### 暴力 1
 
 一种方法是枚举选择哪些行，最后检查这个方案是否合法。
 
@@ -56,7 +60,7 @@ $$
 
 而每次检查都需要 $O(nm)$ 的时间复杂度。所以总的复杂度是 $O(nm\cdot2^n)$。
 
-??? note "代码实现"
+??? note "实现"
     ```cpp
     int ok = 0;
     for (int state = 0; state < 1 << n; ++state) {  // 枚举每行是否被选
@@ -85,7 +89,7 @@ $$
     if (!ok) puts("No solution.");
     ```
 
-### 暴力 2
+#### 暴力 2
 
 考虑到 01 矩阵的特殊性质，每一行都可以看做一个 $m$ 位二进制数。
 
@@ -97,7 +101,7 @@ $$
 
 而每次计算 `tmp` 都需要 $O(n)$ 的时间复杂度。所以总的复杂度为 $O(n\cdot2^n)$。
 
-??? note "代码实现"
+??? note "实现"
     ```cpp
     int ok = 0;
     for (int i = 1; i <= n; ++i)
@@ -119,9 +123,15 @@ $$
     if (!ok) puts("No solution.");
     ```
 
+## 重复覆盖问题
+
+重复覆盖问题与精确覆盖问题类似，但没有对元素相似性的限制。下文介绍的 [X 算法](#x-算法) 原本针对精确覆盖问题，但经过一些修改和优化（已标注在其中）同样可以高效地解决重复覆盖问题。
+
 ## X 算法
 
 Donald E. Knuth 提出了 X 算法 (Algorithm X)，其思想与刚才的暴力差不多，但是方便优化。
+
+### 过程
 
 继续以上文中中提到的例子为载体，得到一个这样的 01 矩阵：
 
@@ -149,7 +159,7 @@ $$
       \end{pmatrix}
     $$
 
-2.  选择所有被标记的列，将它们删除，并将这些列中含 $1$ 的行打上标记；
+2.  选择所有被标记的列，将它们删除，并将这些列中含 $1$ 的行打上标记（重复覆盖问题无需打标记）；
 
     $$
     \begin{pmatrix}
@@ -277,21 +287,23 @@ $$
 
 通过上述步骤，可将 X 算法的流程概括如下：
 
-1. 对于现在的矩阵 $M$，选择并标记一列 $r$，将 $r$ 添加至 $S$ 中；
-2. 如果尝试了所有的 $r$ 却无解，则算法结束，输出无解；
-3. 标记与 $r$ 相关的行 $r_i$ 和 $c_i$；
-4. 删除所有标记的行和列，得到新矩阵 $M'$；
+1.  对于现在的矩阵 $M$，选择并标记一行 $r$，将 $r$ 添加至 $S$ 中；
+2.  如果尝试了所有的 $r$ 却无解，则算法结束，输出无解；
+3.  标记与 $r$ 相关的行 $r_i$ 和 $c_i$（相关的行和列与 [X 算法](#过程) 中第 2 步定义相同，下同）；
+4.  删除所有标记的行和列，得到新矩阵 $M'$；
 5.  如果 $M'$ 为空，且 $r$ 为全 $1$，则算法结束，输出被删除的行组成的集合 $S$；
 
     如果 $M'$ 为空，且 $r$ 不全为 $1$，则恢复与 $r$ 相关的行 $r_i$ 以及列 $c_i$，跳转至步骤 1；
 
     如果 $M'$ 不为空，则跳转至步骤 1。
 
-不难看出，X 算法需要大量的“删除行”、“删除列”和“恢复行”、“恢复列”的操作。
+不难看出，X 算法需要大量的「删除行」、「删除列」和「恢复行」、「恢复列」的操作。
+
+一个朴素的想法是，使用一个二维数组存放矩阵，再用四个数组分别存放每一行与之相邻的行编号，每次删除和恢复仅需更新四个数组中的元素。但由于一般问题的矩阵中 0 的数量远多于 1 的数量，这样做的空间复杂度难以接受。
 
 Donald E. Knuth 想到了用双向十字链表来维护这些操作。
 
-而在双向十字链表上不断跳跃的过程被形象地比喻成“跳跃”，因此被用来优化 X 算法的双向十字链表也被称为“Dancing Links”。
+而在双向十字链表上不断跳跃的过程被形象地比喻成「跳跃」，因此被用来优化 X 算法的双向十字链表也被称为「Dancing Links」。
 
 ## Dancing Links 优化的 X 算法
 
@@ -320,20 +332,22 @@ Donald E. Knuth 想到了用双向十字链表来维护这些操作。
 特殊地，$0$ 号结点无右结点等价于这个 Dancing Links 为空。
 
 ```cpp
-static const int MS = 1e5 + 5;
+constexpr int MS = 1e5 + 5;
 int n, m, idx, first[MS], siz[MS];
 int L[MS], R[MS], U[MS], D[MS];
 int col[MS], row[MS];
 ```
 
-### remove 操作
+### 过程
+
+#### remove 操作
 
 `remove(c)` 表示在 Dancing Links 中删除第 $c$ 列以及与其相关的行和列。
 
 先将 $c$ 删除，此时：
 
-- $c$ 左侧的结点的右结点应为 $c$ 的右结点。
-- $c$ 右侧的结点的左结点应为 $c$ 的左结点。
+-   $c$ 左侧的结点的右结点应为 $c$ 的右结点。
+-   $c$ 右侧的结点的左结点应为 $c$ 的左结点。
 
 即 `L[R[c]] = L[c], R[L[c]] = R[c];`。
 
@@ -343,8 +357,8 @@ int col[MS], row[MS];
 
 如何删掉每一行呢？枚举当前行的指针 $j$，此时：
 
-- $j$ 上方的结点的下结点应为 $j$ 的下结点。
-- $j$ 下方的结点的上结点应为 $j$ 的上结点。
+-   $j$ 上方的结点的下结点应为 $j$ 的下结点。
+-   $j$ 下方的结点的上结点应为 $j$ 的上结点。
 
 注意要修改每一列的元素个数。
 
@@ -354,19 +368,20 @@ int col[MS], row[MS];
 
 `remove` 函数的代码实现如下：
 
-```cpp
-void remove(const int &c) {
-  int i, j;
-  L[R[c]] = L[c], R[L[c]] = R[c];
-  //顺着这一列从上往下遍历
-  for (i = D[c]; i != c; i = D[i])
-    //顺着这一行从左往右遍历
-    for (j = R[i]; j != i; j = R[j])
+???+ note "实现"
+    ```cpp
+    void remove(const int &c) {
+      int i, j;
+      L[R[c]] = L[c], R[L[c]] = R[c];
+      // 顺着这一列从上往下遍历
+      IT(i, D, c)
+      // 顺着这一行从左往右遍历
+      IT(j, R, i)
       U[D[j]] = U[j], D[U[j]] = D[j], --siz[col[j]];
-}
-```
+    }
+    ```
 
-### recover 操作
+#### recover 操作
 
 `recover(c)` 表示在 Dancing Links 中还原第 $c$ 列以及与其相关的行和列。
 
@@ -376,15 +391,16 @@ void remove(const int &c) {
 
 `recover(c)` 的代码实现如下：
 
-```cpp
-void recover(const int &c) {
-  int i, j;
-  IT(i, U, c) IT(j, L, i) U[D[j]] = D[U[j]] = j, ++siz[col[j]];
-  L[R[c]] = R[L[c]] = c;
-}
-```
+???+ note "实现"
+    ```cpp
+    void recover(const int &c) {
+      int i, j;
+      IT(i, U, c) IT(j, L, i) U[D[j]] = D[U[j]] = j, ++siz[col[j]];
+      L[R[c]] = R[L[c]] = c;
+    }
+    ```
 
-### build 操作
+#### build 操作
 
 `build(r, c)` 表示新建一个大小为 $r \times c$，即有 $r$ 行，$c$ 列的 Dancing Links。
 
@@ -400,20 +416,21 @@ void recover(const int &c) {
 
 `build(r, c)` 的代码实现如下：
 
-```cpp
-void build(const int &r, const int &c) {
-  n = r, m = c;
-  for (int i = 0; i <= c; ++i) {
-    L[i] = i - 1, R[i] = i + 1;
-    U[i] = D[i] = i;
-  }
-  L[0] = c, R[c] = 0, idx = c;
-  memset(first, 0, sizeof(first));
-  memset(siz, 0, sizeof(siz));
-}
-```
+???+ note "实现"
+    ```cpp
+    void build(const int &r, const int &c) {
+      n = r, m = c;
+      for (int i = 0; i <= c; ++i) {
+        L[i] = i - 1, R[i] = i + 1;
+        U[i] = D[i] = i;
+      }
+      L[0] = c, R[c] = 0, idx = c;
+      memset(first, 0, sizeof(first));
+      memset(siz, 0, sizeof(siz));
+    }
+    ```
 
-### insert 操作
+#### insert 操作
 
 `insert(r, c)` 表示在第 $r$ 行，第 $c$ 列插入一个结点。
 
@@ -429,10 +446,10 @@ void build(const int &r, const int &c) {
 
     -   把 $idx$ 插入到 $c$ 的正下方，此时：
 
-        - $idx$ 下方的结点为原来 $c$ 的下结点；
-        - $idx$ 下方的结点（即原来 $c$ 的下结点）的上结点为 $idx$;
-        - $idx$ 的上结点为 $c$；
-        - $c$ 的下结点为 $idx$。
+        -   $idx$ 下方的结点为原来 $c$ 的下结点；
+        -   $idx$ 下方的结点（即原来 $c$ 的下结点）的上结点为 $idx$;
+        -   $idx$ 的上结点为 $c$；
+        -   $c$ 的下结点为 $idx$。
 
         注意记录 $idx$ 的所在列和所在行，以及更新这一列的元素个数。
 
@@ -445,17 +462,17 @@ void build(const int &r, const int &c) {
 
     -   把 $idx$ 插入到 $first(r)$ 的正右方，此时：
 
-        1. $idx$ 右侧的结点为原来 $first(r)$ 的右结点；
-        2. 原来 $first(r)$ 右侧的结点的左结点为 $idx$；
-        3. $idx$ 的左结点为 $first(r)$；
-        4.  $first(r)$ 的右结点为 $idx$。
+        -   $idx$ 右侧的结点为原来 $first(r)$ 的右结点；
+        -   原来 $first(r)$ 右侧的结点的左结点为 $idx$；
+        -   $idx$ 的左结点为 $first(r)$；
+        -   $first(r)$ 的右结点为 $idx$。
 
-            ```cpp
-            L[idx] = first[r], R[idx] = R[first[r]];
-            R[first[r]] = idx, L[R[first[r]]] = idx;
-            ```
+        ```cpp
+        L[idx] = first[r], R[idx] = R[first[r]];
+        L[R[first[r]]] = idx, R[first[r]] = idx;
+        ```
 
-            **强烈建议读者完全掌握这几步的顺序后再继续阅读本文。**
+        **强烈建议读者完全掌握这几步的顺序后再继续阅读本文。**
 
 `insert(r, c)` 这个操作可以通过图片来辅助理解：
 
@@ -465,54 +482,58 @@ void build(const int &r, const int &c) {
 
 `insert(r, c)` 的代码实现如下：
 
-```cpp
-void insert(const int &r, const int &c) {
-  row[++idx] = r, col[idx] = c, ++siz[c];
-  U[idx] = c, D[idx] = D[c], U[D[c]] = idx, D[c] = idx;
-  if (!first[r])
-    first[r] = L[idx] = R[idx] = idx;
-  else {
-    L[idx] = first[r], R[idx] = R[first[r]];
-    L[R[first[r]]] = idx, R[first[r]] = idx;
-  }
-}
-```
+???+ note "实现"
+    ```cpp
+    void insert(const int &r, const int &c) {
+      row[++idx] = r, col[idx] = c, ++siz[c];
+      U[idx] = c, D[idx] = D[c], U[D[c]] = idx, D[c] = idx;
+      if (!first[r])
+        first[r] = L[idx] = R[idx] = idx;
+      else {
+        L[idx] = first[r], R[idx] = R[first[r]];
+        L[R[first[r]]] = idx, R[first[r]] = idx;
+      }
+    }
+    ```
 
-### dance 操作
+#### dance 操作
 
 `dance()` 即为递归地删除以及还原各个行列的过程。
 
-1. 如果 $0$ 号结点没有右结点，那么矩阵为空，记录答案并返回；
-2. 选择列元素个数最少的一列，并删掉这一列；
-3. 遍历这一列所有有 $1$ 的行，枚举它是否被选择；
-4. 递归调用 `dance()`，如果可行，则返回；如果不可行，则恢复被选择的行；
-5. 如果无解，则返回。
+1.  如果 $0$ 号结点没有右结点，那么矩阵为空，记录答案并返回；
+2.  选择列元素个数最少的一列，并删掉这一列；
+3.  遍历这一列所有有 $1$ 的行，枚举它是否被选择；
+4.  递归调用 `dance()`，如果可行，则返回；如果不可行，则恢复被选择的行；
+5.  如果无解，则返回。
 
 `dance()` 的代码实现如下：
 
-```cpp
-bool dance(int dep) {
-  int i, j, c = R[0];
-  if (!R[0]) {
-    ans = dep;
-    return 1;
-  }
-  IT(i, R, 0) if (siz[i] < siz[c]) c = i;
-  remove(c);
-  IT(i, D, c) {
-    stk[dep] = row[i];
-    IT(j, R, i) remove(col[j]);
-    if (dance(dep + 1)) return 1;
-    IT(j, L, i) recover(col[j]);
-  }
-  recover(c);
-  return 0;
-}
-```
+???+ note "实现"
+    ```cpp
+    bool dance(int dep) {
+      int i, j, c = R[0];
+      if (!R[0]) {
+        ans = dep;
+        return 1;
+      }
+      IT(i, R, 0) if (siz[i] < siz[c]) c = i;
+      remove(c);
+      IT(i, D, c) {
+        stk[dep] = row[i];
+        IT(j, R, i) remove(col[j]);
+        if (dance(dep + 1)) return 1;
+        IT(j, L, i) recover(col[j]);
+      }
+      recover(c);
+      return 0;
+    }
+    ```
 
 其中 `stk[]` 用来记录答案。
 
 注意我们每次优先选择列元素个数最少的一列进行删除，这样能保证程序具有一定的启发性，使搜索树分支最少。
+
+对于重复覆盖问题，在搜索时可以用估价函数（与 [A\*](astar.md) 中类似）进行剪枝：若当前最好情况下所选行数超过目前最优解，则可以直接返回。
 
 ## 模板
 
@@ -521,7 +542,7 @@ bool dance(int dep) {
     --8<-- "docs/search/code/dlx/dlx_1.cpp"
     ```
 
-## 时间复杂度
+## 性质
 
 DLX 递归及回溯的次数与矩阵中 $1$ 的个数有关，与矩阵的 $r, c$ 等参数无关。因此，它的时间复杂度是 **指数级** 的，理论复杂度大概在 $O(c^n)$ 左右，其中 $c$ 为某个非常接近于 $1$ 的常数，$n$ 为矩阵中 $1$ 的个数。
 
@@ -535,9 +556,9 @@ DLX 的难点，不全在于链表的建立，而在于建模。
 
 我们每拿到一个题，应该考虑行和列所表示的意义：
 
-- 行表示*决策*，因为每行对应着一个集合，也就对应着选/不选；
+-   行表示*决策*，因为每行对应着一个集合，也就对应着选/不选；
 
-- 列表示*状态*，因为第 $i$ 列对应着某个条件 $P_i$。
+-   列表示*状态*，因为第 $i$ 列对应着某个条件 $P_i$。
 
 对于某一行而言，由于不同的列的值不尽相同，我们 **由不同的状态，定义了一个决策**。
 
@@ -548,7 +569,7 @@ DLX 的难点，不全在于链表的建立，而在于建模。
     
     在这一题中，每一个决策可以用形如 $(r, c, w)$ 的有序三元组表示。
     
-    注意到“宫”并不是决策的参数，因为它 **可以被每个确定的 $(r, c)$ 表示**。
+    注意到「宫」并不是决策的参数，因为它 **可以被每个确定的 $(r, c)$ 表示**。
     
     因此有 $9 \times 9 \times 9 = 729$ 行。
     
@@ -556,10 +577,10 @@ DLX 的难点，不全在于链表的建立，而在于建模。
     
     我们思考一下 $(r, c, w)$ 这个决将会造成什么影响。记 $(r, c)$ 所在的宫为 $b$。
     
-    1. 第 $r$ 行用了一个 $w$（用 $9 \times 9 = 81$ 列表示）；
-    2. 第 $c$ 列用了一个 $w$（用 $9 \times 9 = 81$ 列表示）；
-    3. 第 $b$ 宫用了一个 $w$（用 $9 \times 9 = 81$ 列表示）；
-    4. $(r, c)$ 中填入了一个数（用 $9 \times 9 = 81$ 列表示）。
+    1.  第 $r$ 行用了一个 $w$（用 $9 \times 9 = 81$ 列表示）；
+    2.  第 $c$ 列用了一个 $w$（用 $9 \times 9 = 81$ 列表示）；
+    3.  第 $b$ 宫用了一个 $w$（用 $9 \times 9 = 81$ 列表示）；
+    4.  $(r, c)$ 中填入了一个数（用 $9 \times 9 = 81$ 列表示）。
     
     因此有 $81 \times 4 = 324$ 列，共 $729 \times 4 = 2916$ 个 $1$。
     
@@ -571,17 +592,6 @@ DLX 的难点，不全在于链表的建立，而在于建模。
     ```
 
 ### 例题 2 [靶形数独](https://www.luogu.com.cn/problem/P1074)
-
-    $$
-    \begin{pmatrix}
-      \color{Blue}0 & \color{Blue}0 & \color{Blue}1 & \color{Blue}0 & \color{Blue}1 & \color{Blue}1 & \color{Blue}0 \\
-      1 & 0 & \color{Red}0 & 1 & \color{Red}0 & \color{Red}0 & 1 \\
-      0 & 1 & \color{Red}1 & 0 & \color{Red}0 & \color{Red}1 & 0 \\
-      1 & 0 & \color{Red}0 & 1 & \color{Red}0 & \color{Red}0 & 0 \\
-      0 & 1 & \color{Red}0 & 0 & \color{Red}0 & \color{Red}0 & 1 \\
-      0 & 0 & \color{Red}0 & 1 & \color{Red}1 & \color{Red}0 & 1
-      \end{pmatrix}
-    $$
 
 ??? note "解题思路"
     这一题与 [数独](https://www.luogu.com.cn/problem/P1784) 的模型构建 **一模一样**，主要区别在于答案的更新。
@@ -622,9 +632,8 @@ DLX 的难点，不全在于链表的建立，而在于建模。
     
     我们思考一下，$(v, d, f, i)$ 这个决策会造成什么影响。
     
-    1. 某些格子被占了（用 $55$ 列表示）；
-    
-    2. 第 $i$ 个智慧珠被用了（用 $12$ 列表示）。
+    1.  某些格子被占了（用 $55$ 列表示）；
+    2.  第 $i$ 个智慧珠被用了（用 $12$ 列表示）。
     
     因此有 $55 + 12 = 67$ 列，共 $5280 \times (5 + 1) = 31680$ 个 $1$。
     
@@ -637,13 +646,17 @@ DLX 的难点，不全在于链表的建立，而在于建模。
 
 ## 习题
 
-- [SUDOKU - Sudoku](https://www.spoj.com/problems/SUDOKU/)
-- [「kuangbin 带你飞」专题三 Dancing Links](https://vjudge.net/contest/65998#overview)
+-   [SUDOKU - Sudoku](https://www.spoj.com/problems/SUDOKU/)
+-   [「kuangbin 带你飞」专题三 Dancing Links](https://vjudge.net/contest/65998#overview)
 
 ## 外部链接
 
-- [夜深人静写算法（九）- Dancing Links X（跳舞链）\_WhereIsHeroFrom 的博客》](https://blog.csdn.net/whereisherofrom/article/details/79220897)
-- [跳跃的舞者，舞蹈链（Dancing Links）算法——求解精确覆盖问题 - 万仓一黍](https://www.cnblogs.com/grenet/p/3145800.html)
-- [DLX 算法一览 - zhangjianjunab](https://blog.csdn.net/zhangjianjunab/article/details/83688681)
-- [搜索：DLX 算法 - 静听风吟。](https://www.cnblogs.com/aininot260/p/9629926.html)
-- [《算法竞赛入门经典 - 训练指南》](https://book.douban.com/subject/35431537/)
+-   [夜深人静写算法（九）- Dancing Links X（跳舞链）\_WhereIsHeroFrom 的博客》](https://blog.csdn.net/whereisherofrom/article/details/79220897)
+-   [跳跃的舞者，舞蹈链（Dancing Links）算法——求解精确覆盖问题 - 万仓一黍](https://www.cnblogs.com/grenet/p/3145800.html)
+-   [DLX 算法一览 - zhangjianjunab](https://blog.csdn.net/zhangjianjunab/article/details/83688681)
+-   [搜索：DLX 算法 - 静听风吟。](https://www.cnblogs.com/aininot260/p/9629926.html)
+-   [《算法竞赛入门经典 - 训练指南》](https://book.douban.com/subject/35431537/)
+
+## 注释
+
+[^note1]: （两岸用语差异）台灣：直行（column）、橫列（row）

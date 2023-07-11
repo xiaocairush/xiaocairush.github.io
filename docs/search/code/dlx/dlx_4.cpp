@@ -32,14 +32,16 @@ const int gety[] = {0, 1, 1, 2,  1,  2,  3,  1, 2,  3,  4,  1, 2, 3, 4,  5,  1,
                     6, 7, 8, 9,  10, 1,  2,  3, 4,  5,  6,  7, 8, 9, 10, 11, 1,
                     2, 3, 4, 5,  6,  7,  8,  9, 10, 11, 12, 1, 2, 3, 4,  5,  6,
                     7, 8, 9, 10, 11, 12, 13, 1, 2,  3,  4,  5, 6, 7, 8,  9};
+
 struct DLX {
   static const int MS = 1e5 + 10;
   int n, m, tot, first[MS], siz[MS];
   int L[MS], R[MS], U[MS], D[MS];
   int col[MS], row[MS];
+
   void build(const int &r, const int &c) {
     n = r, m = c;
-    for (register int i = 0; i <= c; ++i) {
+    for (int i = 0; i <= c; ++i) {
       L[i] = i - 1, R[i] = i + 1;
       U[i] = D[i] = i;
     }
@@ -47,6 +49,7 @@ struct DLX {
     memset(first, 0, sizeof(first));
     memset(siz, 0, sizeof(siz));
   }
+
   void insert(const int &r, const int &c) {  // insert
     col[++tot] = c, row[tot] = r, ++siz[c];
     D[tot] = D[c], U[D[c]] = tot, U[tot] = c, D[c] = tot;
@@ -56,22 +59,25 @@ struct DLX {
       R[tot] = R[first[r]], L[R[first[r]]] = tot, L[tot] = first[r],
       R[first[r]] = tot;  // !
   }
+
   void remove(const int &c) {  // remove
-    register int i, j;
+    int i, j;
     L[R[c]] = L[c], R[L[c]] = R[c];
     for (i = D[c]; i != c; i = D[i])
       for (j = R[i]; j != i; j = R[j])
         U[D[j]] = U[j], D[U[j]] = D[j], --siz[col[j]];
   }
+
   void recover(const int &c) {  // recover
-    register int i, j;
+    int i, j;
     for (i = U[c]; i != c; i = U[i])
       for (j = L[i]; j != i; j = L[j]) U[D[j]] = D[U[j]] = j, ++siz[col[j]];
     L[R[c]] = R[L[c]] = c;
   }
+
   bool dance() {  // dance
     if (!R[0]) return 1;
-    register int i, j, c = R[0];
+    int i, j, c = R[0];
     for (i = R[0]; i != 0; i = R[i])
       if (siz[i] < siz[c]) c = i;
     remove(c);
@@ -88,23 +94,24 @@ struct DLX {
     return 0;
   }
 } solver;
+
 int main() {
-  for (register int i = 1; i <= 10; ++i) scanf("%s", ans[i] + 1);
-  for (register int i = 1; i <= 10; ++i)
-    for (register int j = 1; j <= i; ++j) {
+  for (int i = 1; i <= 10; ++i) scanf("%s", ans[i] + 1);
+  for (int i = 1; i <= 10; ++i)
+    for (int j = 1; j <= i; ++j) {
       if (ans[i][j] != '.') vis[ans[i][j] - 'A'] = 1;
       num[i][j] = ++numcol;
     }
   solver.build(2730, numcol + 12);
   /*******build*******/
-  for (register int id = 0, op; id < 12; ++id) {  // every block
+  for (int id = 0, op; id < 12; ++id) {  // every block
     for (++numcol, op = 0; op <= 1; ++op) {
-      for (register int dx = 0; dx <= 1; ++dx) {
-        for (register int dy = 0; dy <= 1; ++dy) {
+      for (int dx = 0; dx <= 1; ++dx) {
+        for (int dy = 0; dy <= 1; ++dy) {
           for (tx[0] = 1; tx[0] <= 10; ++tx[0]) {
             for (tx[1] = 1; tx[1] <= tx[0]; ++tx[1]) {
               bool flag = 1;
-              for (register int k = 0; k < len[id]; ++k) {
+              for (int k = 0; k < len[id]; ++k) {
                 nxt[op] = tx[op] + f[dx] * table[id][k][0];
                 nxt[op ^ 1] = tx[op ^ 1] + f[dy] * table[id][k][1];
                 if (vis[id]) {
@@ -120,7 +127,7 @@ int main() {
               if (!flag) continue;
               dfn[++numrow] = id;
               solver.insert(numrow, numcol);
-              for (register int k = 0; k < len[id]; ++k) {
+              for (int k = 0; k < len[id]; ++k) {
                 nxt[op] = tx[op] + f[dx] * table[id][k][0];
                 nxt[op ^ 1] = tx[op ^ 1] + f[dy] * table[id][k][1];
                 solver.insert(numrow, num[nxt[0]][nxt[1]]);
@@ -135,7 +142,7 @@ int main() {
   if (!solver.dance())
     puts("No solution");
   else
-    for (register int i = 1; i <= 10; ++i, puts(""))
-      for (register int j = 1; j <= i; ++j) putchar(ans[i][j]);
+    for (int i = 1; i <= 10; ++i, puts(""))
+      for (int j = 1; j <= i; ++j) putchar(ans[i][j]);
   return 0;
 }

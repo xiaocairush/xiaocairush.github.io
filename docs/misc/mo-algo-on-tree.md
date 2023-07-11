@@ -1,4 +1,4 @@
-author: StudyingFather, Backl1ght, countercurrent-time, Ir1d, greyqz, MicDZ, ouuan
+author: StudyingFather, Backl1ght, countercurrent-time, Ir1d, greyqz, MicDZ, ouuan, Linky
 
 ## 括号序树上莫队
 
@@ -8,21 +8,27 @@ author: StudyingFather, Backl1ght, countercurrent-time, Ir1d, greyqz, MicDZ, ouu
 
 具体怎么做呢？
 
+### 过程
+
 dfs 一棵树，然后如果 dfs 到 x 点，就 `push_back(x)`，dfs 完 x 点，就直接 `push_back(-x)`，然后我们在挪动指针的时候，
 
-- 新加入的值是 x  --->`add(x)`
-- 新加入的值是 - x --->`del(x)`
-- 新删除的值是 x  --->`del(x)`
-- 新删除的值是 - x --->`add(x)`
+-   新加入的值是 x  --->`add(x)`
+-   新加入的值是 - x --->`del(x)`
+-   新删除的值是 x  --->`del(x)`
+-   新删除的值是 - x --->`add(x)`
 
 这样的话，我们就把一棵树处理成了序列。
 
-???+note "例题[「WC2013」糖果公园](https://uoj.ac/problem/58)"
-    题意：给你一棵树，每个点有颜色，每次询问
+### 例题
+
+???+ note " 例题 [「WC2013」糖果公园](https://uoj.ac/problem/58)"
+    题意：给你一棵树，树上第 $i$ 个点颜色为 $c_i$，每次询问一条路径 $u_i$,$v_i$, 求这条路径上的
     
     $\sum_{c}val_c\sum_{i=1}^{cnt_c}w_i$
     
     其中：$val$ 表示该颜色的价值，$cnt$ 表示颜色出现的次数，$w$ 表示该颜色出现 $i$ 次后的价值
+
+#### 过程
 
 先把树变成序列，然后每次添加/删除一个点，这个点的对答案的的贡献是可以在 $O(1)$ 时间内获得的，即 $val_c\times w_{cnt_{c+1}}$
 
@@ -39,6 +45,8 @@ dfs 一棵树，然后如果 dfs 到 x 点，就 `push_back(x)`，dfs 完 x 点�
 修改的话，加上一维时间维即可，变成带修改树上莫队。
 
 然后因为所包含的区间内可能没有 LCA，对于没有的情况要将多余的贡献删除，然后就完事了。
+
+#### 实现
 
 ??? 参考代码
     ```cpp
@@ -59,17 +67,19 @@ dfs 一棵树，然后如果 dfs 到 x 点，就 `push_back(x)`，dfs 完 x 点�
     struct edge {
       int to, nxt;
     } e[maxn];
+    
     int cnt1 = 0, cnt2 = 0;  // 时间戳
     
     struct query {
       int l, r, t, id;
+    
       bool operator<(const query &b) const {
         return (pos[l] < pos[b.l]) || (pos[l] == pos[b.l] && pos[r] < pos[b.r]) ||
                (pos[l] == pos[b.l] && pos[r] == pos[b.r] && t < b.t);
       }
     } a[maxn], b[maxn];
     
-    inline void addedge(int x, int y) {
+    void addedge(int x, int y) {
       e[++cnt] = (edge){y, head[x]};
       head[x] = cnt;
     }
@@ -86,7 +96,7 @@ dfs 一棵树，然后如果 dfs 到 x 点，就 `push_back(x)`，dfs 完 x 点�
       id[g[x] = ++index] = x;  // 括号序
     }
     
-    inline int lca(int x, int y) {
+    int lca(int x, int y) {
       if (dep[x] < dep[y]) swap(x, y);
       if (dep[x] != dep[y]) {
         int dis = dep[x] - dep[y];
@@ -100,7 +110,7 @@ dfs 一棵树，然后如果 dfs 到 x 点，就 `push_back(x)`，dfs 完 x 点�
       return fa[x][0];
     }
     
-    inline void add(int x) {
+    void add(int x) {
       if (vis[x])
         cur -= (long long)v[col[x]] * w[app[col[x]]--];
       else
@@ -108,7 +118,7 @@ dfs 一棵树，然后如果 dfs 到 x 点，就 `push_back(x)`，dfs 完 x 点�
       vis[x] ^= 1;
     }
     
-    inline void modify(int x, int t) {
+    void modify(int x, int t) {
       if (vis[x]) {
         add(x);
         col[x] = t;
@@ -208,16 +218,16 @@ dfs 一棵树，然后如果 dfs 到 x 点，就 `push_back(x)`，dfs 完 x 点�
 
 条件：
 
-- 属于同一块的节点之间的距离不超过给定块的大小
-- 每个块中的节点不能太多也不能太少
-- 每个节点都要属于一个块
-- 编号相邻的块之间的距离不能太大
+-   属于同一块的节点之间的距离不超过给定块的大小
+-   每个块中的节点不能太多也不能太少
+-   每个节点都要属于一个块
+-   编号相邻的块之间的距离不能太大
 
 了解了这些条件后，我们看到这样一道题 [「SCOI2005」王室联邦](https://loj.ac/problem/2152)。
 
 在这道题的基础上我们只要保证最后一个条件就可以解决分块的问题了。
 
-!!! 思路
+??? 思路
     令 lim 为希望块的大小，首先，对于整个树 dfs，当子树的大小大于 lim 时，就将它们分在一块，容易想到：对于根，可能会剩下一些点，于是将这些点分在最后一个块里。
 
 做法：用栈维护当前节点作为父节点访问它的子节点，当从栈顶到父节点的距离大于希望块的大小时，弹出这部分元素分为一块，最后剩余的一块单独作为一块。
@@ -225,6 +235,8 @@ dfs 一棵树，然后如果 dfs 到 x 点，就 `push_back(x)`，dfs 完 x 点�
 最后的排序方法：若第一维时间戳大于第二维，交换它们，按第一维所属块为第一关键字，第二维时间戳为第二关键字排序。
 
 ### 指针的移动
+
+#### 过程
 
 容易想到，我们可以标记被计入答案的点，让指针直接向目标移动，同时取反路径上的点。
 
@@ -236,8 +248,10 @@ dfs 一棵树，然后如果 dfs 到 x 点，就 `push_back(x)`，dfs 完 x 点�
 
 所以我们每次不标记 LCA，到需要询问答案时再将 LCA 标记，然后再撤销。
 
+#### 实现
+
 ```cpp
-//取反路径上除LCA以外的所有节点
+// 取反路径上除LCA以外的所有节点
 void move(int x, int y) {
   if (dp[x] < dp[y]) swap(x, y);
   while (dp[x] > dp[y]) update(x), x = fa[x];
@@ -252,8 +266,9 @@ void move(int x, int y) {
 int bl[100002], bls = 0;  // 属于的块，块的数量
 unsigned step;            // 块大小
 int fa[100002], dp[100002], hs[100002] = {0}, sz[100002] = {0};
-//父节点，深度，重儿子，大小
+// 父节点，深度，重儿子，大小
 stack<int> sta;
+
 void dfs1(int x) {
   sz[x] = 1;
   unsigned ss = sta.size();
@@ -271,6 +286,7 @@ void dfs1(int x) {
     }
   sta.push(x);
 }
+
 // main
 if (!sta.empty()) {
   bls++;  // 这一行可写可不写
@@ -284,8 +300,8 @@ if (!sta.empty()) {
 
 设块的大小为 $unit$：
 
-- 对于 x 指针，由于每个块中节点的距离在 $unit$ 左右，每个块中 x 指针移动 $unit^2$ 次（$unit\times dis_max$），共计 $n\times unit$（$unit^2 \times (n\div unit)$）次；
-- 对于 y 指针，每个块中最多移动 $O(n)$ 次，共计 $n^2\div unit$（$n \times (n \div unit)$）次。
+-   对于 x 指针，由于每个块中节点的距离在 $unit$ 左右，每个块中 x 指针移动 $unit^2$ 次（$unit\times dis_{\max}$），共计 $n\times unit$ 次（$unit^2 \times (\frac{n}{unit})$）；
+-   对于 y 指针，每个块中最多移动 $O(n)$ 次，共计 $\frac{n^2}{unit}$ 次（$n \times (\frac{n}{unit})$）。
 
 加起来大概在根号处取得最小值（由于树上莫队块的大小不固定，所以不一定要严格按照）。
 
@@ -297,8 +313,9 @@ if (!sta.empty()) {
     ```cpp
     #include <bits/stdc++.h>
     using namespace std;
-    inline int gi() {
-      register int x, c, op = 1;
+    
+    int gi() {
+      int x, c, op = 1;
       while (c = getchar(), c < '0' || c > '9')
         if (c == '-') op = -op;
       x = c ^ 48;
@@ -306,16 +323,20 @@ if (!sta.empty()) {
         x = (x << 3) + (x << 1) + (c ^ 48);
       return x * op;
     }
+    
     int head[100002], nxt[200004], ver[200004], tot = 0;
+    
     void add(int x, int y) {
       ver[++tot] = y, nxt[tot] = head[x], head[x] = tot;
       ver[++tot] = x, nxt[tot] = head[y], head[y] = tot;
     }
+    
     int bl[100002], bls = 0;
     unsigned step;
     int fa[100002], dp[100002], hs[100002] = {0}, sz[100002] = {0}, top[100002],
                                 id[100002];
     stack<int> sta;
+    
     void dfs1(int x) {
       sz[x] = 1;
       unsigned ss = sta.size();
@@ -332,7 +353,9 @@ if (!sta.empty()) {
         }
       sta.push(x);
     }
+    
     int cnt = 0;
+    
     void dfs2(int x, int hf) {
       top[x] = hf, id[x] = ++cnt;
       if (!hs[x]) return;
@@ -340,6 +363,7 @@ if (!sta.empty()) {
       for (int i = head[x]; i; i = nxt[i])
         if (ver[i] != fa[x] && ver[i] != hs[x]) dfs2(ver[i], ver[i]);
     }
+    
     int lca(int x, int y) {
       while (top[x] != top[y]) {
         if (dp[top[x]] < dp[top[y]]) swap(x, y);
@@ -347,17 +371,22 @@ if (!sta.empty()) {
       }
       return dp[x] < dp[y] ? x : y;
     }
+    
     struct qu {
       int x, y, t, id;
+    
       bool operator<(const qu a) const {
         return bl[x] == bl[a.x] ? (bl[y] == bl[a.y] ? t < a.t : bl[y] < bl[a.y])
                                 : bl[x] < bl[a.x];
       }
     } q[100001];
+    
     int qs = 0;
+    
     struct ch {
       int x, y, b;
     } upd[100001];
+    
     int ups = 0;
     long long ans[100001];
     int b[100001] = {0};
@@ -366,6 +395,7 @@ if (!sta.empty()) {
     long long v[100001];
     long long now = 0;
     bool vis[100001] = {0};
+    
     void back(int t) {
       if (vis[upd[t].x]) {
         now -= w[b[upd[t].y]--] * v[upd[t].y];
@@ -373,6 +403,7 @@ if (!sta.empty()) {
       }
       a[upd[t].x] = upd[t].b;
     }
+    
     void change(int t) {
       if (vis[upd[t].x]) {
         now -= w[b[upd[t].b]--] * v[upd[t].b];
@@ -380,6 +411,7 @@ if (!sta.empty()) {
       }
       a[upd[t].x] = upd[t].y;
     }
+    
     void update(int x) {
       if (vis[x])
         now -= w[b[a[x]]--] * v[a[x]];
@@ -387,11 +419,13 @@ if (!sta.empty()) {
         now += w[++b[a[x]]] * v[a[x]];
       vis[x] ^= 1;
     }
+    
     void move(int x, int y) {
       if (dp[x] < dp[y]) swap(x, y);
       while (dp[x] > dp[y]) update(x), x = fa[x];
       while (x != y) update(x), update(y), x = fa[x], y = fa[y];
     }
+    
     int main() {
       int n = gi(), m = gi(), k = gi();
       step = (int)pow(n, 0.6);

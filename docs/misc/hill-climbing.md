@@ -18,7 +18,7 @@
 
 ![](./images/hill-climbing.png)
 
-* * *
+***
 
 ## 具体实现
 
@@ -30,15 +30,15 @@
 
 ### 例 1 [「JSOI2008」球形空间产生器](https://www.luogu.com.cn/problem/P4035)
 
-题意：给出 $n$ 维空间中的 $n$ 个点，已知它们在同一个 $n$ 维球面上，求出球心。$n \leq 10$，坐标绝对值不超过 $10000$。
+题意：给出 $n$ 维空间中的 $n + 1$ 个点，已知它们在同一个 $n$ 维球面上，求出球心。$n \leq 10$，坐标绝对值不超过 $20000$。
 
 很明显的单峰函数，可以使用爬山解决。本题算法流程：
 
-1. 初始化球心为各个给定点的重心（即其各维坐标均为所有给定点对应维度坐标的平均值），以减少枚举量。
-2. 对于当前的球心，求出每个已知点到这个球心欧氏距离的平均值。
-3. 遍历所有已知点。记录一个改变值 $\textit{cans}$（分开每一维度记录）对于每一个点的欧氏距离，如果大于平均值，就把改变值加上差值，否则减去。实际上并不用判断这个大小问题，只要不考虑绝对值，直接用坐标计算即可。这个过程可以形象地转化成一个新的球心，在空间里推来推去，碰到太远的点就往点的方向拉一点，碰到太近的点就往点的反方向推一点。
-4. 将我们记录的 $\textit{cans}$ 乘上温度，更新球心，回到步骤 2
-5. 在温度小于某个给定阈值的时候结束。
+1.  初始化球心为各个给定点的重心（即其各维坐标均为所有给定点对应维度坐标的平均值），以减少枚举量。
+2.  对于当前的球心，求出每个已知点到这个球心欧氏距离的平均值。
+3.  遍历所有已知点。记录一个改变值 $\textit{cans}$（分开每一维度记录）对于每一个点的欧氏距离，如果大于平均值，就把改变值加上差值，否则减去。实际上并不用判断这个大小问题，只要不考虑绝对值，直接用坐标计算即可。这个过程可以形象地转化成一个新的球心，在空间里推来推去，碰到太远的点就往点的方向拉一点，碰到太近的点就往点的反方向推一点。
+4.  将我们记录的 $\textit{cans}$ 乘上温度，更新球心，回到步骤 2
+5.  在温度小于某个给定阈值的时候结束。
 
 因此，我们在更新球心的时候，不能直接加上改变值，而是要加上改变值与温度的乘积。
 
@@ -46,43 +46,10 @@
 
 ???+ 例题参考代码
     ```cpp
-    #include <bits/stdc++.h>
-    using namespace std;
-    double ans[10001], cans[100001], dis[10001], tot, f[1001][1001];
-    int n;
-    double check() {
-      tot = 0;
-      for (int i = 1; i <= n + 1; i++) {
-        dis[i] = 0;
-        cans[i] = 0;
-        for (int j = 1; j <= n; j++)
-          dis[i] += (f[i][j] - ans[j]) * (f[i][j] - ans[j]);
-        dis[i] = sqrt(dis[i]);  // 欧氏距离
-        tot += dis[i];
-      }
-      tot /= (n + 1);  // 平均
-      for (int i = 1; i <= n + 1; i++)
-        for (int j = 1; j <= n; j++)
-          cans[j] += (dis[i] - tot) * (f[i][j] - ans[j]) /
-                     tot;  // 对于每个维度把修改值更新掉，欧氏距离差*差值贡献
-    }
-    int main() {
-      cin >> n;
-      for (int i = 1; i <= n + 1; i++)
-        for (int j = 1; j <= n; j++) {
-          cin >> f[i][j];
-          ans[j] += f[i][j];
-        }
-      for (int i = 1; i <= n; i++) ans[i] /= (n + 1);      // 初始化
-      for (double t = 10001; t >= 0.0001; t *= 0.99995) {  // 不断降温
-        check();
-        for (int i = 1; i <= n; i++) ans[i] += cans[i] * t;  // 修改
-      }
-      for (int i = 1; i <= n; i++) printf("%.3f ", ans[i]);
-    }
+    --8<-- "docs/misc/code/hill-climbing/hill-climbing_1.cpp"
     ```
 
-* * *
+***
 
 ### 例 2 [「BZOJ 3680」吊打 XXX](https://www.luogu.com.cn/problem/P1337)
 
@@ -92,42 +59,10 @@
 
 ???+ 参考代码
     ```cpp
-    #include <cmath>
-    #include <cstdio>
-    const int N = 10005;
-    int n, x[N], y[N], w[N];
-    double ansx, ansy;
-    void hillclimb() {
-      double t = 1000;
-      while (t > 1e-8) {
-        double nowx = 0, nowy = 0;
-        for (int i = 1; i <= n; ++i) {
-          double dx = x[i] - ansx, dy = y[i] - ansy;
-          double dis = sqrt(dx * dx + dy * dy);
-          nowx += (x[i] - ansx) * w[i] / dis;
-          nowy += (y[i] - ansy) * w[i] / dis;
-        }
-        ansx += nowx * t, ansy += nowy * t;
-        if (t > 0.5)
-          t *= 0.5;
-        else
-          t *= 0.97;
-      }
-    }
-    int main() {
-      scanf("%d", &n);
-      for (int i = 1; i <= n; ++i) {
-        scanf("%d%d%d", &x[i], &y[i], &w[i]);
-        ansx += x[i], ansy += y[i];
-      }
-      ansx /= n, ansy /= n;
-      hillclimb();
-      printf("%.3lf %.3lf\n", ansx, ansy);
-      return 0;
-    }
+    --8<-- "docs/misc/code/hill-climbing/hill-climbing_2.cpp"
     ```
 
-* * *
+***
 
 ## 优化
 

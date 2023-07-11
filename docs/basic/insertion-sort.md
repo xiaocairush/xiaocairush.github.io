@@ -1,12 +1,12 @@
 本页面将简要介绍插入排序。
 
-## 简介
+## 定义
 
-插入排序（英语：Insertion sort）是一种简单直观的排序算法。它的工作原理为将待排列元素划分为“已排序”和“未排序”两部分，每次从“未排序的”元素中选择一个插入到“已排序的”元素中的正确位置。
+插入排序（英语：Insertion sort）是一种简单直观的排序算法。它的工作原理为将待排列元素划分为「已排序」和「未排序」两部分，每次从「未排序的」元素中选择一个插入到「已排序的」元素中的正确位置。
 
 一个与插入排序相同的操作是打扑克牌时，从牌桌上抓一张牌，按牌面大小插到手牌后，再抓下一张牌。
 
-![insertion-sort-1-animate-example](images/insertion-sort-1-animate-example.svg)
+![insertion sort animate example](images/insertion-sort-1-animate-example.svg)
 
 ## 性质
 
@@ -39,34 +39,56 @@ $$
 \end{array}
 $$
 
-### C++
+=== "C++"
 
-```cpp
-// C++ Version
-void insertion_sort(int* a, int n) {
-  // 对 a[1],a[2],...,a[n] 进行插入排序
-  for (int i = 2; i <= n; ++i) {
-    int key = a[i];
-    int j = i - 1;
-    while (j > 0 && a[j] > key) {
-      a[j + 1] = a[j];
-      --j;
+    ```cpp 
+    void insertion_sort(int arr[], int len) {
+        for (int i = 1; i < len; ++i) {
+            int key = arr[i];
+            int j = i - 1;
+            while (j >= 0 && arr[j] > key) {
+                arr[j + 1] = arr[j];
+                j--;
+            }
+            arr[j + 1] = key;
+        }
     }
-    a[j + 1] = key;
-  }
-}
-```
+    ```
 
-### Python
+=== "Python"
 
-```python
-# Python Version
-def insertion_sort(a, n):
-    for i in range(2, n + 1):
-        key = a[i]
-        j = i - 1
-        while j > 0 and a[j] > key:
-            a[j + 1] = a[j]
-            j = j - 1
-        a[j + 1] = key
-```
+    ```python
+    def insertion_sort(arr, n):
+        for i in range(1, n):
+            key = arr[i]
+            j = i - 1
+            while j >= 0 and arr[j] > key:
+                arr[j + 1] = arr[j]
+                j = j - 1
+            arr[j + 1] = key
+    ```
+
+## 折半插入排序
+
+插入排序还可以通过二分算法优化性能，在排序元素数量较多时优化的效果比较明显。
+
+### 时间复杂度
+
+折半插入排序与直接插入排序的基本思想是一致的，折半插入排序仅对插入排序时间复杂度中的常数进行了优化，所以优化后的时间复杂度仍然不变。
+
+### 代码实现
+
+=== "C++"
+
+    ```cpp
+    void insertion_sort(int arr[], int len) {
+        if (len < 2) return;
+        for (int i = 1; i != len; ++i) {
+            int key = arr[i];
+            auto index = upper_bound(arr, arr + i, key) - arr;
+            // 使用 memmove 移动元素，比使用 for 循环速度更快，时间复杂度仍为 O(n)
+            memmove(arr + index + 1, arr + index, (i - index) * sizeof(int));
+            arr[i] = key;
+        }
+    }
+    ```

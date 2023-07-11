@@ -11,7 +11,7 @@ int a, b, maxd;
 long long gcd(long long a, long long b) { return b == 0 ? a : gcd(b, a % b); }
 
 // 返回满足 1/c <= a/b 的最小 c 值
-inline int get_first(long long a, long long b) { return b / a + 1; }
+int get_first(long long a, long long b) { return b / a + 1; }
 
 const int maxn = 100 + 5;
 
@@ -54,9 +54,9 @@ int main() {
   int kase = 0;
   while (cin >> a >> b) {
     int ok = 0;
-    for (maxd = 1; maxd <= 100; maxd++) {  //枚举深度上限
+    for (maxd = 1; maxd <= 100; maxd++) {  // 枚举深度上限
       memset(ans, -1, sizeof(ans));
-      if (dfs(0, get_first(a, b), a, b)) {  //开始进行搜索
+      if (dfs(0, get_first(a, b), a, b)) {  // 开始进行搜索
         ok = 1;
         break;
       }

@@ -1,10 +1,10 @@
-author: hydingsy, hyp1231, ranwen
+author: hydingsy, hyp1231, ranwen, 383494
 
-## 莫比乌斯反演
+## 引入
 
 莫比乌斯反演是数论中的重要内容。对于一些函数 $f(n)$，如果很难直接求出它的值，而容易求出其倍数和或约数和 $g(n)$，那么可以通过莫比乌斯反演简化运算，求得 $f(n)$ 的值。
 
-开始学习莫比乌斯反演前，需要先学习一些前置知识：[数论分块](./sqrt-decomposition.md)、狄利克雷卷积。
+开始学习莫比乌斯反演前，需要先学习一些前置知识：[数论分块](./sqrt-decomposition.md)、[狄利克雷卷积](../poly/dgf.md#dirichlet-%E5%8D%B7%E7%A7%AF)。
 
 ### 莫比乌斯函数
 
@@ -25,10 +25,10 @@ $$
 
 令 $n=\prod_{i=1}^kp_i^{c_i}$，其中 $p_i$ 为质因子，$c_i\ge 1$。上述定义表示：
 
-1. $n=1$ 时，$\mu(n)=1$；
+1.  $n=1$ 时，$\mu(n)=1$；
 2.  对于 $n\not= 1$ 时：
-    1. 当存在 $i\in [1,k]$，使得 $c_i > 1$ 时，$\mu(n)=0$，也就是说只要某个质因子出现的次数超过一次，$\mu(n)$ 就等于 $0$；
-    2. 当任意 $i\in[1,k]$，都有 $c_i=1$ 时，$\mu(n)=(-1)^k$，也就是说每个质因子都仅仅只出现过一次时，即 $n=\prod_{i=1}^kp_i$，$\{p_i\}_{i=1}^k$ 中个元素唯一时，$\mu(n)$ 等于 $-1$ 的 $k$ 次幂，此处 $k$ 指的便是仅仅只出现过一次的质因子的总个数。
+    1.  当存在 $i\in [1,k]$，使得 $c_i > 1$ 时，$\mu(n)=0$，也就是说只要某个质因子出现的次数超过一次，$\mu(n)$ 就等于 $0$；
+    2.  当任意 $i\in[1,k]$，都有 $c_i=1$ 时，$\mu(n)=(-1)^k$，也就是说每个质因子都仅仅只出现过一次时，即 $n=\prod_{i=1}^kp_i$，$\{p_i\}_{i=1}^k$ 中个元素唯一时，$\mu(n)$ 等于 $-1$ 的 $k$ 次幂，此处 $k$ 指的便是仅仅只出现过一次的质因子的总个数。
 
 ### 性质
 
@@ -52,7 +52,7 @@ $$
 
 根据二项式定理，易知该式子的值在 $k=0$ 即 $n=1$ 时值为 $1$ 否则为 $0$，这也同时证明了 $\displaystyle\sum_{d\mid n}\mu(d)=[n=1]=\varepsilon(n)$ 以及 $\mu\ast 1=\varepsilon$
 
-???+note "注"
+???+ note "注"
     这个性质意味着，莫比乌斯函数在狄利克雷生成函数中，等价于黎曼函数 $\zeta$ 的倒数。所以在狄利克雷卷积中，莫比乌斯函数是常数函数 $1$ 的逆元。
 
 ### 补充结论
@@ -68,40 +68,42 @@ $$
 由于 $\mu$ 函数为积性函数，因此可以线性筛莫比乌斯函数（线性筛基本可以求所有的积性函数，尽管方法不尽相同）。
 
 ???+ note "线性筛实现"
-    ```cpp
-    // C++ Version
-    void getMu() {
-      mu[1] = 1;
-      for (int i = 2; i <= n; ++i) {
-        if (!flg[i]) p[++tot] = i, mu[i] = -1;
-        for (int j = 1; j <= tot && i * p[j] <= n; ++j) {
-          flg[i * p[j]] = 1;
-          if (i % p[j] == 0) {
-            mu[i * p[j]] = 0;
-            break;
-          }
-          mu[i * p[j]] = -mu[i];
-        }
-      }
-    }
-    ```
+    === "C++"
     
-    ```python
-    # Python Version
-    def getMu():
-    mu[1] = 1
-    for i in range(2, n + 1):
-        if flg[i] != 0:
-            p[tot] = i; tot = tot + 1; mu[i] = -1
-        j = 1
-        while j <= tot and i * p[j] <= n:
-            flg[i * p[j]] = 1
-            if i % p[j] == 0:
-                mu[i * p[j]] = 0
-                break
-            mu[i * p[j]] = mu[i * p[j]] - mu[i]
-            j = j + 1
-    ```
+        ```cpp
+        void getMu() {
+          mu[1] = 1;
+          for (int i = 2; i <= n; ++i) {
+            if (!flg[i]) p[++tot] = i, mu[i] = -1;
+            for (int j = 1; j <= tot && i * p[j] <= n; ++j) {
+              flg[i * p[j]] = 1;
+              if (i % p[j] == 0) {
+                mu[i * p[j]] = 0;
+                break;
+              }
+              mu[i * p[j]] = -mu[i];
+            }
+          }
+        }
+        ```
+    
+    === "Python"
+    
+        ```python
+        def getMu():
+        mu[1] = 1
+        for i in range(2, n + 1):
+            if flg[i] != 0:
+                p[tot] = i; tot = tot + 1; mu[i] = -1
+            j = 1
+            while j <= tot and i * p[j] <= n:
+                flg[i * p[j]] = 1
+                if i % p[j] == 0:
+                    mu[i * p[j]] = 0
+                    break
+                mu[i * p[j]] = mu[i * p[j]] - mu[i]
+                j = j + 1
+        ```
 
 ### 拓展
 
@@ -131,7 +133,7 @@ $$
 
 该式子两侧同时卷 $\mu$ 可得 $\displaystyle\varphi(n)=\sum_{d\mid n}d\cdot\mu(\frac{n}{d})$
 
-* * *
+***
 
 ### 莫比乌斯变换
 
@@ -143,7 +145,7 @@ $$
 
 容易看出，数论函数 $g(n)$ 的莫比乌斯变换，就是将数论函数 $g(n)$ 与常数函数 $1$ 进行狄利克雷卷积。
 
-???+note "注"
+???+ note "注"
     根据狄利克雷卷积与狄利克雷生成函数的对应关系，数论函数 $g(n)$ 的莫比乌斯变换对应的狄利克雷生成函数，就是数论函数 $g(n)$ 的狄利克雷生成函数与黎曼函数 $\zeta$ 的乘积。
 
 形式二：如果有 $f(n)=\sum_{n|d}g(d)$，那么有 $g(n)=\sum_{n|d}\mu(\frac{d}{n})f(d)$。
@@ -183,7 +185,7 @@ $$
 
 发现枚举 $k$ 再枚举 $kn$ 的倍数可以转换为直接枚举 $n$ 的倍数再求出 $k$，发现后面那一块其实就是 $\epsilon$, 整个式子只有在 $d=n$ 的时候才能取到值。
 
-* * *
+***
 
 ## 问题形式
 
@@ -431,12 +433,10 @@ $$
 多组数据，求
 
 $$
-\sum_{i=1}^n\sum_{j=1}^md(i\cdot j)\\
-\left(d(n)=\sum_{i \mid n}1\right)
-n,m,T\leq5\times10^4
+\sum_{i=1}^n\sum_{j=1}^md(i\cdot j) \qquad \left(n,m,T\leq5\times10^4\right)
 $$
 
-其中 $d(n)$ 表示 $n$ 的约数个数
+其中 $d(n)=\sum_{i \mid n}1$，$d(n)$ 表示 $n$ 的约数个数
 
 要推这道题首先要了解 $d$ 函数的一个特殊性质
 
@@ -530,8 +530,11 @@ $\sum_{T=1}^{n}F^2\left(\left\lfloor\frac{n}{T}\right\rfloor\right) T^2\varphi(T
 对于数论函数 $f,g$ 和完全积性函数 $t$ 且 $t(1)=1$：
 
 $$
+\begin{gathered}
 f(n)=\sum_{i=1}^nt(i)g\left(\left\lfloor\frac{n}{i}\right\rfloor\right)\\
-\iff g(n)=\sum_{i=1}^n\mu(i)t(i)f\left(\left\lfloor\frac{n}{i}\right\rfloor\right)
+\iff\\
+g(n)=\sum_{i=1}^n\mu(i)t(i)f\left(\left\lfloor\frac{n}{i}\right\rfloor\right)
+\end{gathered}
 $$
 
 我们证明一下

@@ -1,8 +1,12 @@
-author: accelsao, thallium, Chrogeek, Enter-tainer, ksyx, StudyingFather, H-J-Granger, Henry-ZHR, countercurrent-time, william-song-shy
+author: accelsao, thallium, Chrogeek, Enter-tainer, ksyx, StudyingFather, H-J-Granger, Henry-ZHR, countercurrent-time, william-song-shy, 5ab-juruo, XiaoQuQuSD
 
 为了描述方便将两个集合分成左和右两个部分，所有匹配边都是横跨左右两个集合，可以假想成男女配对。
 
 假设图有 $n$ 个顶点，$m$ 条边。
+
+## 题目描述
+
+给定一个二分图 $G$，即分左右两部分，各部分之间的点没有边连接，要求选出一些边，使得这些边没有公共顶点，且边的数量最大。
 
 ## 增广路算法 Augmenting Path Algorithm
 
@@ -12,9 +16,11 @@ author: accelsao, thallium, Chrogeek, Enter-tainer, ksyx, StudyingFather, H-J-Gr
 那么只要从起始点开始 DFS 遍历直到找到某个未匹配点，$O(m)$。
 未找到增广路时，我们拓展的路也称为 **交错树**。
 
+### 性质
+
 因为要枚举 $n$ 个点，总复杂度为 $O(nm)$。
 
-### 代码
+### 实现
 
 ```cpp
 struct augment_path {
@@ -85,7 +91,7 @@ struct augment_path {
 
 将源点连上左边所有点，右边所有点连上汇点，容量皆为 $1$。原来的每条边从左往右连边，容量也皆为 $1$，最大流即最大匹配。
 
-如果使用 [Dinic 算法](../../graph/flow/max-flow.md#dinic) 求该网络的最大流，可在 $O(\sqrt{n}m)$ 求出。
+如果使用 [Dinic 算法](../flow/max-flow.md#dinic-算法) 求该网络的最大流，可在 $O(\sqrt{n}m)$ 求出。
 
 Dinic 算法分成两部分，第一部分用 $O(m)$ 时间 BFS 建立网络流，第二步是 $O(nm)$ 时间 DFS 进行增广。
 
@@ -93,25 +99,36 @@ Dinic 算法分成两部分，第一部分用 $O(m)$ 时间 BFS 建立网络流�
 
 接下来前 $O(\sqrt{n})$ 轮，复杂度为 $O(\sqrt{n}m)$。$O(\sqrt{n})$ 轮以后，每条增广路径长度至少 $\sqrt{n}$，而这样的路径不超过 $\sqrt{n}$，所以此时最多只需要跑 $\sqrt{n}$ 轮，整体复杂度为 $O(\sqrt{n}m)$。
 
-代码可以参考 [Dinic 算法](../../graph/flow/max-flow.md#dinic) 的参考实现，这里不再给出。
+代码可以参考 [Dinic 算法](../flow/max-flow.md#dinic-算法) 的参考实现，这里不再给出。
 
 ## 补充
 
+### 二分图最小点覆盖（König 定理）
+
+最小点覆盖：选最少的点，满足每条边至少有一个端点被选。
+
+二分图中，最小点覆盖 $=$ 最大匹配。
+
+???+ note "证明"
+    将二分图点集分成左右两个集合，使得所有边的两个端点都不在一个集合。
+    
+    考虑如下构造：从左侧未匹配的节点出发，按照匈牙利算法中增广路的方式走，即先走一条未匹配边，再走一条匹配边。由于已经求出了最大匹配，所以这样的增广路一定以匹配边结束。在所有经过这样「增广路」的节点上打标记。则最后构造的集合是：所有左侧未打标记的节点和所有右侧打了标记的节点。
+    
+    首先，易证这个集合的大小等于最大匹配。打了标记的节点一定都是匹配边上的点，一条匹配的边两侧一定都有标记（在增广路上）或都没有标记，所以两个节点中必然有一个被选中。
+    
+    其次，这个集合是一个点覆盖。一条匹配边一定有一个点被选中，而一条未匹配的边一定是增广路的一部分，而右侧端点也一定被选中。
+    
+    同时，不存在更小的点覆盖。为了覆盖最大匹配的所有边，至少要有最大匹配边数的点数。
+
 ### 二分图最大独立集
 
-选最多的点，满足两两之间没有边相连。
+最大独立集：选最多的点，满足两两之间没有边相连。
 
-二分图中，最大独立集 =$n$- 最大匹配。
-
-### 二分图最小点覆盖
-
-选最少的点，满足每条边至少有一个端点被选，不难发现补集是独立集。
-
-二分图中，最小点覆盖 =$n$- 最大独立集。
+因为在最小点覆盖中，任意一条边都被至少选了一个顶点，所以对于其点集的补集，任意一条边都被至多选了一个顶点，所以不存在边连接两个点集中的点，且该点集最大。因此二分图中，最大独立集 $=n-$ 最小点覆盖。
 
 ## 习题
 
-??? note "[UOJ #78. 二分图最大匹配](https://uoj.ac/problem/78) "
+??? note "[UOJ #78. 二分图最大匹配](https://uoj.ac/problem/78)"
     模板题
     
     ```cpp
@@ -197,8 +214,12 @@ Dinic 算法分成两部分，第一部分用 $O(m)$ 时间 BFS 建立网络流�
     }
     ```
 
-??? note "[P1640 [SCOI2010]连续攻击游戏](https://www.luogu.com.cn/problem/P1640) "
+??? note "[P1640 \[SCOI2010\] 连续攻击游戏](https://www.luogu.com.cn/problem/P1640)"
     None
 
-??? note "[Codeforces 1139E - Maximize Mex](https://codeforces.com/problemset/problem/1139/E) "
+??? note "[Codeforces 1139E - Maximize Mex](https://codeforces.com/problemset/problem/1139/E)"
     None
+
+## 参考资料
+
+1.  <http://www.matrix67.com/blog/archives/116>

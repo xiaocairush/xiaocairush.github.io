@@ -4,8 +4,8 @@ author: Chrogeek, Enter-tainer, HeRaNO, Ir1d, Marcythm, ShadowsEpic, StudyingFat
 
 在阅读下列内容之前，请务必阅读 [图论相关概念](./concept.md) 与 [树基础](./tree-basic.md) 部分，并了解以下定义：
 
-1. 生成子图
-2. 生成树
+1.  生成子图
+2.  生成树
 
 我们定义无向连通图的 **最小生成树**（Minimum Spanning Tree，MST）为边权和最小的生成树。
 
@@ -173,14 +173,14 @@ $$
 
 为了描述该算法，我们需要引入一些定义：
 
-1. 定义 $E'$ 为我们当前找到的最小生成森林的边。在算法执行过程中，我们逐步向 $E'$ 加边，定义 **连通块** 表示一个点集 $V'\subseteq V$，且这个点集中的任意两个点 $u$，$v$ 在 $E'$ 中的边构成的子图上是连通的（互相可达）。
-2. 定义一个连通块的 **最小边** 为它连向其它连通块的边中权值最小的那一条。
+1.  定义 $E'$ 为我们当前找到的最小生成森林的边。在算法执行过程中，我们逐步向 $E'$ 加边，定义 **连通块** 表示一个点集 $V'\subseteq V$，且这个点集中的任意两个点 $u$，$v$ 在 $E'$ 中的边构成的子图上是连通的（互相可达）。
+2.  定义一个连通块的 **最小边** 为它连向其它连通块的边中权值最小的那一条。
 
 初始时，$E'=\varnothing$，每个点各自是一个连通块：
 
-1. 计算每个点分别属于哪个连通块。将每个连通块都设为“没有最小边”。
-2. 遍历每条边 $(u, v)$，如果 $u$ 和 $v$ 不在同一个连通块，就用这条边的边权分别更新 $u$ 和 $v$ 所在连通块的最小边。
-3. 如果所有连通块都没有最小边，退出程序，此时的 $E'$ 就是原图最小生成森林的边集。否则，将每个有最小边的连通块的最小边加入 $E'$，返回第一步。
+1.  计算每个点分别属于哪个连通块。将每个连通块都设为「没有最小边」。
+2.  遍历每条边 $(u, v)$，如果 $u$ 和 $v$ 不在同一个连通块，就用这条边的边权分别更新 $u$ 和 $v$ 所在连通块的最小边。
+3.  如果所有连通块都没有最小边，退出程序，此时的 $E'$ 就是原图最小生成森林的边集。否则，将每个有最小边的连通块的最小边加入 $E'$，返回第一步。
 
 下面通过一张动态图来举一个例子（图源自 [维基百科](https://en.wikipedia.org/wiki/Bor%C5%AFvka%27s_algorithm)）：
 
@@ -212,8 +212,8 @@ $$
 
 ## 习题
 
-- [「HAOI2006」聪明的猴子](https://www.luogu.com.cn/problem/P2504)
-- [「SCOI2005」繁忙的都市](https://loj.ac/problem/2149)
+-   [「HAOI2006」聪明的猴子](https://www.luogu.com.cn/problem/P2504)
+-   [「SCOI2005」繁忙的都市](https://loj.ac/problem/2149)
 
 ## 最小生成树的唯一性
 
@@ -225,60 +225,7 @@ $$
 
 ??? note " 例题：[POJ 1679](http://poj.org/problem?id=1679)"
     ```cpp
-    #include <algorithm>
-    #include <cstdio>
-    
-    struct Edge {
-      int x, y, z;
-    };
-    int f[100001];
-    Edge a[100001];
-    int cmp(const Edge& a, const Edge& b) { return a.z < b.z; }
-    int find(int x) { return f[x] == x ? x : f[x] = find(f[x]); }
-    int main() {
-      int t;
-      scanf("%d", &t);
-      while (t--) {
-        int n, m;
-        scanf("%d%d", &n, &m);
-        for (int i = 1; i <= n; i++) f[i] = i;
-        for (int i = 1; i <= m; i++) scanf("%d%d%d", &a[i].x, &a[i].y, &a[i].z);
-        sort(a + 1, a + m + 1, cmp);
-        int num = 0, ans = 0, tail = 0, sum1 = 0, sum2 = 0;
-        bool flag = 1;
-        for (int i = 1; i <= m + 1; i++) {
-          if (i > tail) {
-            if (sum1 != sum2) {
-              flag = 0;
-              break;
-            }
-            sum1 = 0;
-            for (int j = i; j <= m + 1; j++) {
-              if (a[j].z != a[i].z) {
-                tail = j - 1;
-                break;
-              }
-              if (find(a[j].x) != find(a[j].y)) ++sum1;
-            }
-            sum2 = 0;
-          }
-          if (i > m) break;
-          int x = find(a[i].x);
-          int y = find(a[i].y);
-          if (x != y && num != n - 1) {
-            sum2++;
-            num++;
-            f[x] = f[y];
-            ans += a[i].z;
-          }
-        }
-        if (flag)
-          printf("%d\n", ans);
-        else
-          printf("Not Unique!\n");
-      }
-      return 0;
-    }
+    --8<-- "docs/graph/code/mst/mst_1.cpp"
     ```
 
 ## 次小生成树
@@ -291,9 +238,9 @@ $$
 
 #### 求解方法
 
-- 求出无向图的最小生成树 $T$，设其权值和为 $M$
-- 遍历每条未被选中的边 $e = (u,v,w)$，找到 $T$ 中 $u$ 到 $v$ 路径上边权最大的一条边 $e' = (s,t,w')$，则在 $T$ 中以 $e$ 替换 $e'$，可得一棵权值和为 $M' = M + w - w'$ 的生成树 $T'$.
-- 对所有替换得到的答案 $M'$ 取最小值即可
+-   求出无向图的最小生成树 $T$，设其权值和为 $M$
+-   遍历每条未被选中的边 $e = (u,v,w)$，找到 $T$ 中 $u$ 到 $v$ 路径上边权最大的一条边 $e' = (s,t,w')$，则在 $T$ 中以 $e$ 替换 $e'$，可得一棵权值和为 $M' = M + w - w'$ 的生成树 $T'$.
+-   对所有替换得到的答案 $M'$ 取最小值即可
 
 如何求 $u,v$ 路径上的边权最大值呢？
 
@@ -326,6 +273,7 @@ const long long INF64 = 0x3fffffffffffffffLL;
 
 struct Edge {
   int u, v, val;
+
   bool operator<(const Edge &other) const { return val < other.val; }
 };
 
@@ -340,6 +288,7 @@ class Tr {
   struct Edge {
     int to, nxt, val;
   } e[600010];
+
   int cnt, head[100010];
 
   int pnt[100010][22];
@@ -418,6 +367,7 @@ class Tr {
 } tr;
 
 int fa[100010];
+
 int find(int x) { return fa[x] == x ? x : fa[x] = find(fa[x]); }
 
 void Kruskal() {
@@ -486,7 +436,7 @@ int main() {
 
 ### 例题
 
-???+note "POJ 2395 Out of Hay"
+???+ note "POJ 2395 Out of Hay"
     给出 n 个农场和 m 条边，农场按 1 到 n 编号，现在有一人要从编号为 1 的农场出发到其他的农场去，求在这途中他最多需要携带的水的重量，注意他每到达一个农场，可以对水进行补给，且要使总共的路径长度最小。
     题目要求的就是瓶颈树的最大边，可以通过求最小生成树来解决。
 
@@ -542,147 +492,15 @@ int main() {
 
 不难发现，原图中两个点之间的所有简单路径上最大边权的最小值 = 最小生成树上两个点之间的简单路径上的最大值 = Kruskal 重构树上两点之间的 LCA 的权值。
 
-也就是说，到点 $x$ 的简单路径上最小边权最大值 $\leq val$ 的所有点 $y$ 均在 Kruskal 重构树上的某一棵子树内，且恰好为该子树的所有叶子节点。
+也就是说，到点 $x$ 的简单路径上最大边权的最小值 $\leq val$ 的所有点 $y$ 均在 Kruskal 重构树上的某一棵子树内，且恰好为该子树的所有叶子节点。
 
 我们在 Kruskal 重构树上找到 $x$ 到根的路径上权值 $\leq val$ 的最浅的节点。显然这就是所有满足条件的节点所在的子树的根节点。
 
-如果需要求原图中两个点之间的所有简单路径上最大边权的最小值，则在跑 Kruskal 的过程中按边权大到小的顺序加边。
+如果需要求原图中两个点之间的所有简单路径上最小边权的最大值，则在跑 Kruskal 的过程中按边权大到小的顺序加边。
 
 ??? note "[「LOJ 137」最小瓶颈路 加强版](https://loj.ac/problem/137)"
     ```cpp
-    #include <bits/stdc++.h>
-    
-    using namespace std;
-    
-    const int MAX_VAL_RANGE = 280010;
-    
-    int n, m, log2Values[MAX_VAL_RANGE + 1];
-    
-    namespace TR {
-    struct Edge {
-      int to, nxt, val;
-    } e[400010];
-    int cnt, head[140010];
-    
-    void addedge(int u, int v, int val = 0) {
-      e[++cnt] = (Edge){v, head[u], val};
-      head[u] = cnt;
-    }
-    
-    int val[140010];
-    namespace LCA {
-    int sec[280010], cnt;
-    int pos[140010];
-    int dpth[140010];
-    
-    void dfs(int now, int fa) {
-      dpth[now] = dpth[fa] + 1;
-      sec[++cnt] = now;
-      pos[now] = cnt;
-    
-      for (int i = head[now]; i; i = e[i].nxt) {
-        if (fa != e[i].to) {
-          dfs(e[i].to, now);
-          sec[++cnt] = now;
-        }
-      }
-    }
-    
-    int dp[280010][20];
-    void init() {
-      dfs(2 * n - 1, 0);
-      for (int i = 1; i <= 4 * n; i++) {
-        dp[i][0] = sec[i];
-      }
-      for (int j = 1; j <= 19; j++) {
-        for (int i = 1; i + (1 << j) - 1 <= 4 * n; i++) {
-          dp[i][j] = dpth[dp[i][j - 1]] < dpth[dp[i + (1 << (j - 1))][j - 1]]
-                         ? dp[i][j - 1]
-                         : dp[i + (1 << (j - 1))][j - 1];
-        }
-      }
-    }
-    
-    int lca(int x, int y) {
-      int l = pos[x], r = pos[y];
-      if (l > r) {
-        swap(l, r);
-      }
-      int k = log2Values[r - l + 1];
-      return dpth[dp[l][k]] < dpth[dp[r - (1 << k) + 1][k]]
-                 ? dp[l][k]
-                 : dp[r - (1 << k) + 1][k];
-    }
-    }  // namespace LCA
-    }  // namespace TR
-    
-    using TR::addedge;
-    
-    namespace GR {
-    struct Edge {
-      int u, v, val;
-    
-      bool operator<(const Edge &other) const { return val < other.val; }
-    } e[100010];
-    
-    int fa[140010];
-    
-    int find(int x) { return fa[x] == 0 ? x : fa[x] = find(fa[x]); }
-    
-    void kruskal() {
-      int tot = 0, cnt = n;
-      sort(e + 1, e + m + 1);
-      for (int i = 1; i <= m; i++) {
-        int fau = find(e[i].u), fav = find(e[i].v);
-        if (fau != fav) {
-          cnt++;
-          fa[fau] = fa[fav] = cnt;
-          addedge(fau, cnt);
-          addedge(cnt, fau);
-          addedge(fav, cnt);
-          addedge(cnt, fav);
-          TR::val[cnt] = e[i].val;
-          tot++;
-        }
-        if (tot == n - 1) {
-          break;
-        }
-      }
-    }
-    }  // namespace GR
-    
-    int ans;
-    int A, B, C, P;
-    inline int rnd() { return A = (A * B + C) % P; }
-    
-    void initLog2() {
-      for (int i = 2; i <= MAX_VAL_RANGE; i++) {
-        log2Values[i] = log2Values[i >> 1] + 1;
-      }
-    }
-    
-    int main() {
-      initLog2();
-      cin >> n >> m;
-      for (int i = 1; i <= m; i++) {
-        int u, v, val;
-        cin >> u >> v >> val;
-        GR::e[i] = (GR::Edge){u, v, val};
-      }
-      GR::kruskal();
-      TR::LCA::init();
-      int Q;
-      cin >> Q;
-      cin >> A >> B >> C >> P;
-    
-      while (Q--) {
-        int u = rnd() % n + 1, v = rnd() % n + 1;
-        ans += TR::val[TR::LCA::lca(u, v)];
-        ans %= 1000000007;
-      }
-      cout << ans;
-      return 0;
-    }
+    --8<-- "docs/graph/code/mst/mst_2.cpp"
     ```
 
 ??? note "[NOI 2018 归程](https://uoj.ac/problem/393)"
@@ -696,4 +514,4 @@ int main() {
     
     询问的根节点可以使用 Kruskal 重构树上倍增的方式求出。
     
-    时间复杂度 $O((n+m+Q) \log n)$
+    时间复杂度 $O((n+m+Q) \log n)$。
