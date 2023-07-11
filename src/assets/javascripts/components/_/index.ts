@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-import { getElementOrThrow, getElements } from "~/browser"
+import { getElement, getElements } from "~/browser"
 
 /* ----------------------------------------------------------------------------
  * Types
@@ -32,12 +32,14 @@ import { getElementOrThrow, getElements } from "~/browser"
 export type ComponentType =
   | "announce"                         /* Announcement bar */
   | "container"                        /* Container */
+  | "consent"                          /* Consent */
   | "content"                          /* Content */
   | "dialog"                           /* Dialog */
   | "header"                           /* Header */
   | "header-title"                     /* Header title */
   | "header-topic"                     /* Header topic */
   | "main"                             /* Main area */
+  | "outdated"                         /* Version warning */
   | "palette"                          /* Color palette */
   | "search"                           /* Search */
   | "search-query"                     /* Search input */
@@ -75,12 +77,14 @@ export type Component<
 interface ComponentTypeMap {
   "announce": HTMLElement              /* Announcement bar */
   "container": HTMLElement             /* Container */
+  "consent": HTMLElement               /* Consent */
   "content": HTMLElement               /* Content */
   "dialog": HTMLElement                /* Dialog */
   "header": HTMLElement                /* Header */
   "header-title": HTMLElement          /* Header title */
   "header-topic": HTMLElement          /* Header topic */
   "main": HTMLElement                  /* Main area */
+  "outdated": HTMLElement              /* Version warning */
   "palette": HTMLElement               /* Color palette */
   "search": HTMLElement                /* Search */
   "search-query": HTMLInputElement     /* Search input */
@@ -112,7 +116,7 @@ interface ComponentTypeMap {
 export function getComponentElement<T extends ComponentType>(
   type: T, node: ParentNode = document
 ): ComponentTypeMap[T] {
-  return getElementOrThrow(`[data-md-component=${type}]`, node)
+  return getElement(`[data-md-component=${type}]`, node)
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,15 +20,17 @@
  * IN THE SOFTWARE.
  */
 
-import { Observable, fromEvent } from "rxjs"
 import {
+  Observable,
   filter,
+  fromEvent,
   map,
+  merge,
   shareReplay,
   startWith
-} from "rxjs/operators"
+} from "rxjs"
 
-import { getElement } from "~/browser"
+import { getOptionalElement } from "~/browser"
 import { h } from "~/utilities"
 
 /* ----------------------------------------------------------------------------
@@ -65,10 +67,17 @@ export function setLocationHash(hash: string): void {
 /**
  * Watch location hash
  *
+ * @param location$ - Location observable
+ *
  * @returns Location hash observable
  */
-export function watchLocationHash(): Observable<string> {
-  return fromEvent<HashChangeEvent>(window, "hashchange")
+export function watchLocationHash(
+  location$: Observable<URL>
+): Observable<string> {
+  return merge(
+    fromEvent<HashChangeEvent>(window, "hashchange"),
+    location$
+  )
     .pipe(
       map(getLocationHash),
       startWith(getLocationHash()),
@@ -80,12 +89,16 @@ export function watchLocationHash(): Observable<string> {
 /**
  * Watch location target
  *
+ * @param location$ - Location observable
+ *
  * @returns Location target observable
  */
-export function watchLocationTarget(): Observable<HTMLElement> {
-  return watchLocationHash()
+export function watchLocationTarget(
+  location$: Observable<URL>
+): Observable<HTMLElement> {
+  return watchLocationHash(location$)
     .pipe(
-      map(id => getElement(`[id="${id}"]`)!),
+      map(id => getOptionalElement(`[id="${id}"]`)!),
       filter(el => typeof el !== "undefined")
     )
 }

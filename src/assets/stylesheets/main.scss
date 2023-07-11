@@ -1,5 +1,5 @@
 ////
-/// Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+/// Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a
 /// copy of this software and associated documentation files (the "Software"),
@@ -36,27 +36,31 @@
 
 @import "config";
 
-@import "main/reset";
+@import "main/resets";
 @import "main/colors";
 @import "main/icons";
 @import "main/typeset";
 
-@import "main/layout/base";
-@import "main/layout/announce";
-@import "main/layout/clipboard";
-@import "main/layout/content";
-@import "main/layout/dialog";
-@import "main/layout/form";
-@import "main/layout/header";
-@import "main/layout/footer";
-@import "main/layout/nav";
-@import "main/layout/search";
-@import "main/layout/select";
-@import "main/layout/sidebar";
-@import "main/layout/source";
-@import "main/layout/tabs";
-@import "main/layout/top";
-@import "main/layout/version";
+@import "main/components/banner";
+@import "main/components/base";
+@import "main/components/clipboard";
+@import "main/components/consent";
+@import "main/components/content";
+@import "main/components/dialog";
+@import "main/components/feedback";
+@import "main/components/footer";
+@import "main/components/form";
+@import "main/components/header";
+@import "main/components/nav";
+@import "main/components/search";
+@import "main/components/select";
+@import "main/components/sidebar";
+@import "main/components/source";
+@import "main/components/tabs";
+@import "main/components/tag";
+@import "main/components/tooltip";
+@import "main/components/top";
+@import "main/components/version";
 
 @import "main/extensions/markdown/admonition";
 @import "main/extensions/markdown/footnotes";
@@ -71,5 +75,6 @@
 @import "main/extensions/pymdownx/tabbed";
 @import "main/extensions/pymdownx/tasklist";
 
+@import "main/integrations/mermaid";
+
 @import "main/modifiers";
-@import "main/shame";

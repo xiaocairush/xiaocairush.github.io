@@ -1,5 +1,5 @@
 <!--
-  Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+  Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to
@@ -23,11 +23,12 @@
 <!-- Translations: Estonian -->
 {% macro t(key) %}{{ {
   "language": "et",
+  "action.edit": "Muuda seda lehte",
+  "action.skip": "Keri sisuni",
   "clipboard.copy": "Kopeeri lõikelauale",
   "clipboard.copied": "Kopeeritud",
-  "edit.link.title": "Muuda seda lehte",
-  "footer.previous": "Eelmine",
   "footer.next": "Järgmine",
+  "footer.previous": "Eelmine",
   "meta.comments": "Kommentaarid",
   "meta.source": "Lähtekood",
   "search.placeholder": "Otsi",
@@ -35,10 +36,8 @@
   "search.result.none": "Otsingule ei leitud ühtegi vastet",
   "search.result.one": "Leiti üks tulemus",
   "search.result.other": "Leiti # tulemust",
-  "skip.link.title": "Keri sisuni",
-  "source.link.title": "Ava repositooriumis",
-  "source.revision.date": "Viimane uuendus",
-  "source.file.date.updated": "Viimane uuendus",
+  "source": "Ava repositooriumis",
   "source.file.date.created": "Loodud",
-  "toc.title": "Sisukord"
+  "source.file.date.updated": "Viimane uuendus",
+  "toc": "Sisukord"
 }[key] }}{% endmacro %}

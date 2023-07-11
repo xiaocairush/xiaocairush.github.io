@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,72 +20,23 @@
  * IN THE SOFTWARE.
  */
 
-import { ObservableInput, Subject, from } from "rxjs"
-import { map, share } from "rxjs/operators"
-
-import { configuration, feature, translation } from "~/_"
-import { WorkerHandler, watchWorker } from "~/browser"
-
-import { SearchIndex } from "../../_"
 import {
-  SearchOptions,
-  SearchPipeline
-} from "../../options"
+  ObservableInput,
+  Subject,
+  first,
+  merge,
+  of,
+  switchMap
+} from "rxjs"
+
+import { feature } from "~/_"
+import { watchToggle, watchWorker } from "~/browser"
+
+import { SearchIndex } from "../../config"
 import {
   SearchMessage,
-  SearchMessageType,
-  SearchSetupMessage,
-  isSearchResultMessage
+  SearchMessageType
 } from "../message"
-
-/* ----------------------------------------------------------------------------
- * Types
- * ------------------------------------------------------------------------- */
-
-/**
- * Search worker
- */
-export type SearchWorker = WorkerHandler<SearchMessage>
-
-/* ----------------------------------------------------------------------------
- * Helper functions
- * ------------------------------------------------------------------------- */
-
-/**
- * Set up search index
- *
- * @param data - Search index
- *
- * @returns Search index
- */
-function setupSearchIndex(
-  { config, docs, index }: SearchIndex
-): SearchIndex {
-
-  /* Override default language with value from translation */
-  if (config.lang.length === 1 && config.lang[0] === "en")
-    config.lang = [
-      translation("search.config.lang")
-    ]
-
-  /* Override default separator with value from translation */
-  if (config.separator === "[\\s\\-]+")
-    config.separator = translation("search.config.separator")
-
-  /* Set pipeline from translation */
-  const pipeline = translation("search.config.pipeline")
-    .split(/\s*,\s*/)
-    .filter(Boolean) as SearchPipeline
-
-  /* Determine search options */
-  const options: SearchOptions = {
-    pipeline,
-    suggestions: feature("search.suggest")
-  }
-
-  /* Return search index after defaulting */
-  return { config, docs, index, options }
-}
 
 /* ----------------------------------------------------------------------------
  * Functions
@@ -94,46 +45,51 @@ function setupSearchIndex(
 /**
  * Set up search worker
  *
- * This function creates a web worker to set up and query the search index,
- * which is done using Lunr.js. The index must be passed as an observable to
- * enable hacks like _localsearch_ via search index embedding as JSON.
+ * This function creates and initializes a web worker that is used for search,
+ * so that the user interface doesn't freeze. In general, the application does
+ * not care how search is implemented, as long as the web worker conforms to
+ * the format expected by the application as defined in `SearchMessage`. This
+ * allows the author to implement custom search functionality, by providing a
+ * custom web worker via configuration.
+ *
+ * Material for MkDocs' built-in search implementation makes use of Lunr.js, an
+ * efficient and fast implementation for client-side search. Leveraging a tiny
+ * iframe-based web worker shim, search is even supported for the `file://`
+ * protocol, enabling search for local non-hosted builds.
+ *
+ * If the protocol is `file://`, search initialization is deferred to mitigate
+ * freezing, as it's now synchronous by design - see https://bit.ly/3C521EO
+ *
+ * @see https://bit.ly/3igvtQv - How to implement custom search
  *
  * @param url - Worker URL
- * @param index - Search index observable input
+ * @param index$ - Search index observable input
  *
  * @returns Search worker
  */
 export function setupSearchWorker(
-  url: string, index: ObservableInput<SearchIndex>
-): SearchWorker {
-  const config = configuration()
-  const worker = new Worker(url)
-
-  /* Create communication channels and resolve relative links */
-  const tx$ = new Subject<SearchMessage>()
-  const rx$ = watchWorker(worker, { tx$ })
+  url: string, index$: ObservableInput<SearchIndex>
+): Subject<SearchMessage> {
+  const worker$ = watchWorker<SearchMessage>(url)
+  merge(
+    of(location.protocol !== "file:"),
+    watchToggle("search")
+  )
     .pipe(
-      map(message => {
-        if (isSearchResultMessage(message)) {
-          for (const result of message.data.items)
-            for (const document of result)
-              document.location = `${new URL(document.location, config.base)}`
-        }
-        return message
-      }),
-      share()
+      first(active => active),
+      switchMap(() => index$)
     )
-
-  /* Set up search index */
-  from(index)
-    .pipe(
-      map<SearchIndex, SearchSetupMessage>(data => ({
+      .subscribe(({ config, docs }) => worker$.next({
         type: SearchMessageType.SETUP,
-        data: setupSearchIndex(data)
+        data: {
+          config,
+          docs,
+          options: {
+            suggest: feature("search.suggest")
+          }
+        }
       }))
-    )
-      .subscribe(tx$.next.bind(tx$))
 
   /* Return search worker */
-  return { tx$, rx$ }
+  return worker$
 }

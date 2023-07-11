@@ -31,56 +31,52 @@ repo_url: https://github.com/xiaocairush/xiaocairush.github.io
 edit_uri: ""
 
 # Copyright
-copyright: Copyright &copy; 2016 - 2021 xiaocairush
+copyright: Copyright &copy; 2016 - 2023 xiaocairush
 
 extra_javascript:
-  - javascripts/config.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
 # Configuration
 theme:
-  name: null
-  custom_dir: !ENV [THEME_DIR, "material"]
-
-  # Static files
-  static_templates:
-    - 404.html
-
-  # Don't include MkDocs' JavaScript
-  include_search_page: false
-  search_index_only: true
-
-  # Default values, taken from mkdocs_theme.yml
-  language: zh
+  name: material
+  custom_dir: material/.overrides
   features:
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
     - content.code.annotate
-    - content.tabs.link
+    - content.code.copy
+    # - content.tabs.link
+    - content.tooltips
     # - header.autohide
     # - navigation.expand
+    - navigation.footer
     - navigation.indexes
-    - navigation.instant
+    # - navigation.instant
+    # - navigation.prune
     - navigation.sections
     - navigation.tabs
-    - navigation.tabs.sticky
+    # - navigation.tabs.sticky
     - navigation.top
     - navigation.tracking
     - search.highlight
     - search.share
     - search.suggest
+    - toc.follow
     # - toc.integrate
   palette:
     - scheme: default
-      primary: white
+      primary: indigo
       accent: indigo
       toggle:
-        icon: material/toggle-switch-off-outline
+        icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
-      primary: red
-      accent: red
+      primary: indigo
+      accent: indigo
       toggle:
-        icon: material/toggle-switch
+        icon: material/brightness-4
         name: Switch to light mode
   font:
     text: Roboto
@@ -89,33 +85,29 @@ theme:
   icon:
     logo: logo
 
+
+
 # Plugins
 plugins:
-  - search
-  - redirects:
-      redirect_maps:
-        changelog/insiders.md: insiders/changelog.md
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
   - minify:
       minify_html: true
 
+# Hooks
+hooks:
+  - material/.overrides/hooks/translations.py
+
 # Customization
 extra:
+  annotate:
+    json: [.s2]
   analytics:
     provider: google
     property: !ENV GOOGLE_ANALYTICS_KEY
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/squidfunk
-    - icon: fontawesome/brands/gitter
-      link: https://gitter.im/squidfunk/mkdocs-material
-    - icon: fontawesome/brands/docker
-      link: https://hub.docker.com/r/squidfunk/mkdocs-material/
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/squidfunk
-    - icon: fontawesome/brands/linkedin
-      link: https://linkedin.com/in/squidfunk/
-    - icon: fontawesome/brands/instagram
-      link: https://instagram.com/squidfunk
+      link: https://github.com/xiaocairush
 
 # Extensions
 markdown_extensions:
@@ -142,7 +134,7 @@ markdown_extensions:
   - pymdownx.keys
   - pymdownx.magiclink:
       repo_url_shorthand: true
-      user: squidfunk
+      user: xiaocairush
       repo: mkdocs-material
   - pymdownx.mark
   - pymdownx.smartsymbols
@@ -162,20 +154,22 @@ markdown_extensions:
 
 # Page tree
 nav:
-  - Home: index.md
-  - java后端:
-    - ZooKeeper: java后端/ZooKeeper-overview.markdown
-    - Spark: java后端/Spark-Overview.markdown
-    - Resources: java后端/Resources.markdown
-    - 同步工具类: java后端/同步工具类.markdown
-    - java-SE8-in-practice: java后端/java-SE8-in-practice.markdown
-    - vim: java后端/vim-learning-notes.markdown
-    - 理解REST: java后端/understanding-REST.markdown
-    - spring: java后端/spring-callstack.markdown
-    - BlockingQueue源码剖析: java后端/BlockingQueue源码剖析.markdown
-    - ConcurrentHashMap: java后端/ConcurrentHashMap(1.8版本)源码剖析.markdown
-    - java.util.concurrent.locks源码剖析: java后端/java.util.concurrent.locks源码剖析.markdown
-    - Redis: java后端/Redis-CheatSheet.markdown
+  - 博客运维: index.md
+  - JDK:
+    - JDK源码剖析系列之Stream: jdk/JDK源码剖析系列之Stream.markdown
+    - 同步工具类: jdk/同步工具类.markdown
+  - java:
+    - ZooKeeper: java/ZooKeeper-overview.markdown
+    - Spark: java/Spark-Overview.markdown
+    - Resources: java/Resources.markdown
+    - java-SE8-in-practice: java/java-SE8-in-practice.markdown
+    - vim: java/vim-learning-notes.markdown
+    - 理解REST: java/understanding-REST.markdown
+    - spring: java/spring-callstack.markdown
+    - BlockingQueue源码剖析: java/BlockingQueue源码剖析.markdown
+    - ConcurrentHashMap: java/ConcurrentHashMap(1.8版本)源码剖析.markdown
+    - java.util.concurrent.locks源码剖析: java/java.util.concurrent.locks源码剖析.markdown
+    - Redis: java/Redis-CheatSheet.markdown
   - 比赛相关:
     - 比赛相关简介: contest/index.md
     - 赛事:

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -23,26 +23,24 @@
 import {
   Observable,
   Subject,
-  animationFrameScheduler,
-  combineLatest,
-  defer,
-  of
-} from "rxjs"
-import {
   bufferCount,
+  combineLatest,
   combineLatestWith,
+  defer,
   distinctUntilChanged,
   distinctUntilKeyChanged,
+  endWith,
   filter,
+  ignoreElements,
   map,
-  observeOn,
+  of,
   shareReplay,
   startWith,
-  switchMap
-} from "rxjs/operators"
+  switchMap,
+  takeUntil
+} from "rxjs"
 
 import { feature } from "~/_"
-import { resetHeaderState, setHeaderState } from "~/actions"
 import {
   Viewport,
   watchElementSize,
@@ -61,8 +59,7 @@ import { Main } from "../../main"
  */
 export interface Header {
   height: number                       /* Header visible height */
-  sticky: boolean                      /* Header stickyness */
-  hidden: boolean                      /* User scrolled past threshold */
+  hidden: boolean                      /* Header is hidden */
 }
 
 /* ----------------------------------------------------------------------------
@@ -146,22 +143,16 @@ function isHidden({ viewport$ }: WatchOptions): Observable<boolean> {
 export function watchHeader(
   el: HTMLElement, options: WatchOptions
 ): Observable<Header> {
-  return defer(() => {
-    const styles = getComputedStyle(el)
-    return of(
-      styles.position === "sticky" ||
-      styles.position === "-webkit-sticky"
-    )
-  })
+  return defer(() => combineLatest([
+    watchElementSize(el),
+    isHidden(options)
+  ]))
     .pipe(
-      combineLatestWith(watchElementSize(el), isHidden(options)),
-      map(([sticky, { height }, hidden]) => ({
-        height: sticky ? height : 0,
-        sticky,
+      map(([{ height }, hidden]) => ({
+        height,
         hidden
       })),
       distinctUntilChanged((a, b) => (
-        a.sticky === b.sticky &&
         a.height === b.height &&
         a.hidden === b.hidden
       )),
@@ -183,24 +174,27 @@ export function watchHeader(
 export function mountHeader(
   el: HTMLElement, { header$, main$ }: MountOptions
 ): Observable<Component<Header>> {
-  const internal$ = new Subject<Main>()
-  internal$
-    .pipe(
-      distinctUntilKeyChanged("active"),
-      combineLatestWith(header$),
-      observeOn(animationFrameScheduler)
-    )
-      .subscribe(([{ active }, { hidden }]) => {
-        if (active)
-          setHeaderState(el, hidden ? "hidden" : "shadow")
-        else
-          resetHeaderState(el)
-      })
+  return defer(() => {
+    const push$ = new Subject<Main>()
+    const done$ = push$.pipe(ignoreElements(), endWith(true))
+    push$
+      .pipe(
+        distinctUntilKeyChanged("active"),
+        combineLatestWith(header$)
+      )
+        .subscribe(([{ active }, { hidden }]) => {
+          el.classList.toggle("md-header--shadow", active && !hidden)
+          el.hidden = hidden
+        })
 
-  /* Connect to long-living subject and return component */
-  main$.subscribe(main => internal$.next(main))
-  return header$
-    .pipe(
-      map(state => ({ ref: el, ...state }))
-    )
+    /* Link to main area */
+    main$.subscribe(push$)
+
+    /* Create and return component */
+    return header$
+      .pipe(
+        takeUntil(done$),
+        map(state => ({ ref: el, ...state }))
+      )
+  })
 }

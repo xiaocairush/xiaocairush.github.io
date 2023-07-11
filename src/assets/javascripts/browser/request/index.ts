@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,13 +20,17 @@
  * IN THE SOFTWARE.
  */
 
-import { Observable, from } from "rxjs"
 import {
-  filter,
+  EMPTY,
+  Observable,
+  catchError,
+  from,
   map,
+  of,
   shareReplay,
-  switchMap
-} from "rxjs/operators"
+  switchMap,
+  throwError
+} from "rxjs"
 
 /* ----------------------------------------------------------------------------
  * Functions
@@ -34,6 +38,9 @@ import {
 
 /**
  * Fetch the given URL
+ *
+ * If the request fails (e.g. when dispatched from `file://` locations), the
+ * observable will complete without emitting a value.
  *
  * @param url - Request URL
  * @param options - Options
@@ -45,9 +52,15 @@ export function request(
 ): Observable<Response> {
   return from(fetch(`${url}`, options))
     .pipe(
-      filter(res => res.status === 200),
+      catchError(() => EMPTY),
+      switchMap(res => res.status !== 200
+        ? throwError(() => new Error(res.statusText))
+        : of(res)
+      )
     )
 }
+
+/* ------------------------------------------------------------------------- */
 
 /**
  * Fetch JSON from the given URL

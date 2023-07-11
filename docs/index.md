@@ -1,17 +1,16 @@
-# Welcome to MkDocs
+# 博客运维
 
-For full documentation visit [mkdocs.org](https://mkdocs.org).
+本站使用[mkdocs工具](https://mkdocs.org)搭建，模板使用[mkdocs-material](https://github.com/squidfunk/mkdocs-material)
 
-## Commands
+# 环境搭建
+```
+pip install -r requirements.txt
+pip install mkdocs-minify-plugin
+```
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs help` - Print this help message.
 
-## Project layout
+## 添加文档
+1. 在docs文档下添加markdown文件
+2. 在mkdocs.yml中的nav中添加内容
+3. mkdocs serve预览一下是否有问题
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.

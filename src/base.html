@@ -1,5 +1,5 @@
 <!--
-  Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+  Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to
@@ -32,21 +32,14 @@
       <meta name="viewport" content="width=device-width,initial-scale=1" />
 
       <!-- Page description -->
-      {% if page and page.meta and page.meta.description %}
+      {% if page.meta and page.meta.description %}
         <meta name="description" content="{{ page.meta.description }}" />
       {% elif config.site_description %}
         <meta name="description" content="{{ config.site_description }}" />
       {% endif %}
 
-      <!-- Page keywords -->
-      {% if page and page.meta and page.meta.keywords %}
-        <meta name="keywords" content="{{ page.meta.keywords }}" />
-      {% elif config.site_keywords %}
-        <meta name="keywords" content="{{ config.site_keywords }}" />
-      {% endif %}
-
       <!-- Page author -->
-      {% if page and page.meta and page.meta.author %}
+      {% if page.meta and page.meta.author %}
         <meta name="author" content="{{ page.meta.author }}" />
       {% elif config.site_author %}
         <meta name="author" content="{{ config.site_author }}" />
@@ -55,6 +48,16 @@
       <!-- Canonical -->
       {% if page.canonical_url %}
         <link rel="canonical" href="{{ page.canonical_url }}" />
+      {% endif %}
+
+      <!-- Previous page -->
+      {% if page.previous_page %}
+        <link rel="prev" href="{{ page.previous_page.url | url }}" />
+      {% endif %}
+
+      <!-- Next page -->
+      {% if page.next_page %}
+        <link rel="next" href="{{ page.next_page.url | url }}" />
       {% endif %}
 
       <!-- Favicon -->
@@ -69,16 +72,16 @@
 
     <!-- Site title -->
     {% block htmltitle %}
-      {% if page and page.meta and page.meta.title %}
+      {% if page.meta and page.meta.title %}
         <title>{{ page.meta.title }} - {{ config.site_name }}</title>
-      {% elif page and page.title and not page.is_homepage %}
+      {% elif page.title and not page.is_homepage %}
         <title>{{ page.title | striptags }} - {{ config.site_name }}</title>
       {% else %}
         <title>{{ config.site_name }}</title>
       {% endif %}
     {% endblock %}
 
-    <!-- Theme-related stylesheets -->
+    <!-- Theme-related style sheets -->
     {% block styles %}
       <link rel="stylesheet" href="{{ 'assets/stylesheets/main.css' | url }}" />
 
@@ -89,16 +92,10 @@
           rel="stylesheet"
           href="{{ 'assets/stylesheets/palette.css' | url }}"
         />
-
-        <!-- Theme-color meta tag for Android -->
-        {% if palette.primary %}
-          {% import "partials/palette.html" as map %}
-          {% set primary = map.primary(
-            palette.primary | replace(" ", "-") | lower
-          ) %}
-          <meta name="theme-color" content="{{ primary }}" />
-        {% endif %}
       {% endif %}
+
+      <!-- Custom icons -->
+      {% include "partials/icons.html" %}
     {% endblock %}
 
     <!-- JavaScript libraries -->
@@ -109,70 +106,73 @@
 
       <!-- Load fonts from Google -->
       {% if config.theme.font != false %}
-        {% set font = config.theme.font %}
+        {% set text = config.theme.font.text | d("Roboto", true) %}
+        {% set code = config.theme.font.code | d("Roboto Mono", true) %}
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css?family={{
-            font.text | replace(' ', '+') + ':300,400,400i,700%7C' +
-            font.code | replace(' ', '+')
+            text | replace(' ', '+') + ':300,300i,400,400i,700,700i%7C' +
+            code | replace(' ', '+') + ':400,400i,700,700i'
           }}&display=fallback"
         />
         <style>
           :root {
-            --md-text-font-family: "{{ font.text }}";
-            --md-code-font-family: "{{ font.code }}";
+            --md-text-font: "{{ text }}";
+            --md-code-font: "{{ code }}";
           }
         </style>
       {% endif %}
     {% endblock %}
 
-    <!-- Progressive Web App Manifest -->
-    {% if config.extra.manifest %}
-      <link
-        rel="manifest"
-        href="{{ config.extra.manifest | url }}"
-        crossorigin="use-credentials"
-      />
-    {% endif %}
-
-    <!-- Custom stylesheets -->
-    {% for path in config["extra_css"] %}
+    <!-- Custom style sheets -->
+    {% for path in config.extra_css %}
       <link rel="stylesheet" href="{{ path | url }}" />
     {% endfor %}
+
+    <!-- Helper functions for inline scripts -->
+    {% include "partials/javascripts/base.html" %}
 
     <!-- Analytics -->
     {% block analytics %}
       {% include "partials/integrations/analytics.html" %}
     {% endblock %}
 
+    <!-- Meta tags from front matter or plugins -->
+    {% if page.meta and page.meta.meta %}
+      {% for tag in page.meta.meta %}
+        <meta
+          {% for key, value in tag.items() %}
+            {{ key }}="{{value}}"
+          {% endfor %}
+        />
+      {% endfor %}
+    {% endif %}
+
     <!-- Custom front matter -->
     {% block extrahead %}{% endblock %}
   </head>
 
   <!-- Set text direction and color palette, if defined -->
-  {% set direction = config.theme.direction or lang.t('direction') %}
+  {% set direction = config.theme.direction or lang.t("direction") %}
   {% if config.theme.palette %}
     {% set palette = config.theme.palette %}
     {% if not palette is mapping %}
       {% set palette = palette | first %}
     {% endif %}
-    {% set scheme  = palette.scheme  | replace(" ", "-") | lower %}
-    {% set primary = palette.primary | replace(" ", "-") | lower %}
-    {% set accent  = palette.accent  | replace(" ", "-") | lower %}
+    {% set scheme  = palette.scheme  | d("default", true) %}
+    {% set primary = palette.primary | d("indigo", true) %}
+    {% set accent  = palette.accent  | d("indigo", true) %}
     <body
       dir="{{ direction }}"
-      data-md-color-scheme="{{ scheme }}"
-      data-md-color-primary="{{ primary }}"
-      data-md-color-accent="{{ accent }}"
+      data-md-color-scheme="{{ scheme | replace(' ', '-') }}"
+      data-md-color-primary="{{ primary | replace(' ', '-') }}"
+      data-md-color-accent="{{ accent | replace(' ', '-') }}"
     >
   {% else %}
     <body dir="{{ direction }}">
   {% endif %}
-
-    <!-- Retrieve features from configuration -->
     {% set features = config.theme.features or [] %}
-    {% include "partials/javascripts/base.html" %}
 
     <!-- User preference: color palette -->
     {% if not config.theme.palette is mapping %}
@@ -206,7 +206,7 @@
       {% if page.toc | first is defined %}
         {% set skip = page.toc | first %}
         <a href="{{ skip.url | url }}" class="md-skip">
-          {{ lang.t('skip.link.title') }}
+          {{ lang.t("action.skip") }}
         </a>
       {% endif %}
     </div>
@@ -214,13 +214,42 @@
     <!-- Announcement bar -->
     <div data-md-component="announce">
       {% if self.announce() %}
-        <aside class="md-banner md-announce">
-          <div class="md-banner__inner md-announce__inner md-grid md-typeset">
+        <aside class="md-banner">
+          <div class="md-banner__inner md-grid md-typeset">
+
+            <!-- Button to dismiss announcement -->
+            {% if "announce.dismiss" in features %}
+              <button
+                class="md-banner__button md-icon"
+                aria-label="{{ lang.t('announce.dismiss') }}"
+              >
+                {% include ".icons/material/close.svg" %}
+              </button>
+            {% endif %}
+
+            <!-- Announcement bar content -->
             {% block announce %}{% endblock %}
           </div>
+          {% if "announce.dismiss" in features %}
+            {% include "partials/javascripts/announce.html" %}
+          {% endif %}
         </aside>
       {% endif %}
     </div>
+
+    <!-- Version warning -->
+    {% if config.extra.version %}
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        {% if self.outdated() %}
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              {% block outdated %}{% endblock %}
+            </div>
+            {% include "partials/javascripts/outdated.html" %}
+          </aside>
+        {% endif %}
+      </div>
+    {% endif %}
 
     <!-- Header -->
     {% block header %}
@@ -235,7 +264,7 @@
 
       <!-- Navigation tabs (collapsing) -->
       {% block tabs %}
-        {% if not "navigation.tabs.sticky" in features %}
+        {% if "navigation.tabs.sticky" not in features %}
           {% if "navigation.tabs" in features %}
             {% include "partials/tabs.html" %}
           {% endif %}
@@ -246,12 +275,12 @@
       <main class="md-main" data-md-component="main">
         <div class="md-main__inner md-grid">
 
-          <!-- Navigation -->
+          <!-- Sidebars -->
           {% block site_nav %}
 
-            <!-- Main navigation -->
+            <!-- Navigation -->
             {% if nav %}
-              {% if page and page.meta and page.meta.hide %}
+              {% if page.meta and page.meta.hide %}
                 {% set hidden = "hidden" if "navigation" in page.meta.hide %}
               {% endif %}
               <div
@@ -269,8 +298,8 @@
             {% endif %}
 
             <!-- Table of contents -->
-            {% if page.toc and not "toc.integrate" in features %}
-              {% if page and page.meta and page.meta.hide %}
+            {% if "toc.integrate" not in features %}
+              {% if page.meta and page.meta.hide %}
                 {% set hidden = "hidden" if "toc" in page.meta.hide %}
               {% endif %}
               <div
@@ -288,65 +317,32 @@
             {% endif %}
           {% endblock %}
 
-          <!-- Article -->
-          <div class="md-content" data-md-component="content">
-            <article class="md-content__inner md-typeset">
+          <!-- Page content -->
+          {% block container %}
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                {% block content %}
+                  {% include "partials/content.html" %}
+                {% endblock %}
+              </article>
+            </div>
+          {% endblock %}
 
-              <!-- Content -->
-              {% block content %}
-
-                <!-- Edit button -->
-                {% if page.edit_url %}
-                  <a
-                    href="{{ page.edit_url }}"
-                    title="{{ lang.t('edit.link.title') }}"
-                    class="md-content__button md-icon"
-                  >
-                    {% include ".icons/material/pencil.svg" %}
-                  </a>
-                {% endif %}
-
-                <!--
-                  Hack: check whether the content contains a h1 headline. If it
-                  doesn't, the page title (or respectively site name) is used
-                  as the main headline.
-                -->
-                {% if not "\x3ch1" in page.content %}
-                  <h1>{{ page.title | d(config.site_name, true)}}</h1>
-                {% endif %}
-
-                <!-- Markdown content -->
-                {{ page.content }}
-
-                <!-- Last update of source file -->
-                {% if page and page.meta %}
-                  {% if page.meta.git_revision_date_localized or
-                        page.meta.revision_date
-                  %}
-                    {% include "partials/source-file.html" %}
-                  {% endif %}
-                {% endif %}
-              {% endblock %}
-
-              <!-- Disqus integration -->
-              {% block disqus %}
-                {% include "partials/integrations/disqus.html" %}
-              {% endblock %}
-            </article>
-          </div>
+          <!-- User preference: content -->
+          {% include "partials/javascripts/content.html" %}
         </div>
 
         <!-- Back-to-top button -->
         {% if "navigation.top" in features %}
-          <a
-            href="#"
+          <button
+            type="button"
             class="md-top md-icon"
             data-md-component="top"
-            data-md-state="hidden"
+            hidden
           >
             {% include ".icons/material/arrow-up.svg" %}
-            {{ lang.t('top.title') }}
-          </a>
+            {{ lang.t("top") }}
+          </button>
         {% endif %}
       </main>
 
@@ -361,25 +357,45 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
 
+    <!-- Consent -->
+    {% if config.extra.consent %}
+      <div class="md-consent" data-md-component="consent" id="__consent" hidden>
+        <div class="md-consent__overlay"></div>
+        <aside class="md-consent__inner">
+          <form class="md-consent__form md-grid md-typeset" name="consent">
+            {% include "partials/consent.html" %}
+          </form>
+        </aside>
+      </div>
+
+      <!-- User preference: consent -->
+      {% include "partials/javascripts/consent.html" %}
+    {% endif %}
+
     <!-- Theme-related configuration -->
     {% block config %}
       {%- set app = {
         "base": base_url,
         "features": features,
         "translations": {},
-        "search": "assets/javascripts/workers/search.js" | url,
-        "version": config.extra.version or None
+        "search": "assets/javascripts/workers/search.js" | url
       } -%}
+
+      <!-- Versioning -->
+      {%- if config.extra.version -%}
+        {%- set _ = app.update({ "version": config.extra.version }) -%}
+      {%- endif -%}
+
+      <!-- Tags -->
+      {%- if config.extra.tags -%}
+        {%- set _ = app.update({ "tags": config.extra.tags }) -%}
+      {%- endif -%}
 
       <!-- Translations -->
       {%- set translations = app.translations -%}
       {%- for key in [
         "clipboard.copy",
         "clipboard.copied",
-        "search.config.lang",
-        "search.config.pipeline",
-        "search.config.separator",
-        "search.placeholder",
         "search.result.placeholder",
         "search.result.none",
         "search.result.one",
@@ -387,7 +403,7 @@
         "search.result.more.one",
         "search.result.more.other",
         "search.result.term.missing",
-        "select.version.title"
+        "select.version"
       ] -%}
         {%- set _ = translations.update({ key: lang.t(key) }) -%}
       {%- endfor -%}
@@ -403,8 +419,12 @@
       <script src="{{ 'assets/javascripts/bundle.js' | url }}"></script>
 
       <!-- Custom JavaScript -->
-      {% for path in config["extra_javascript"] %}
-        <script src="{{ path | url }}"></script>
+      {% for path in config.extra_javascript %}
+        {% if path.endswith(".mjs") %}
+          <script type="module" src="{{ path | url }}"></script>
+        {% else %}
+          <script src="{{ path | url }}"></script>
+        {% endif %}
       {% endfor %}
     {% endblock %}
   </body>

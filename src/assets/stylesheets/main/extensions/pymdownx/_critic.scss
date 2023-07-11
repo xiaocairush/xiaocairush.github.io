@@ -1,5 +1,5 @@
 ////
-/// Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+/// Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a
 /// copy of this software and associated documentation files (the "Software"),
@@ -27,26 +27,22 @@
 // Scoped in typesetted content to match specificity of regular content
 .md-typeset {
 
-  // Deletion, addition or comment
-  del.critic,
-  ins.critic,
-  .critic.comment {
-    box-decoration-break: clone;
-  }
-
   // Deletion
   del.critic {
     background-color: var(--md-typeset-del-color);
+    box-decoration-break: clone;
   }
 
   // Addition
   ins.critic {
     background-color: var(--md-typeset-ins-color);
+    box-decoration-break: clone;
   }
 
   // Comment
   .critic.comment {
     color: var(--md-code-hl-comment-color);
+    box-decoration-break: clone;
 
     // Comment opening mark
     &::before {
@@ -62,9 +58,8 @@
   // Critic block
   .critic.block {
     display: block;
+    padding-inline: px2rem(16px);
     margin: 1em 0;
-    padding-right: px2rem(16px);
-    padding-left: px2rem(16px);
     overflow: auto;
     box-shadow: none;
 

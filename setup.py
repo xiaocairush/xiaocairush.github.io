@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+# Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -18,53 +18,36 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-import json
-from setuptools import setup, find_packages
+import sys
 
-# Load package.json contents
-with open("package.json") as data:
-    package = json.load(data)
+from setuptools import setup
 
-# Load list of dependencies
-with open("requirements.txt") as data:
+# -----------------------------------------------------------------------------
+# Do not use – only provided for compatibility
+# -----------------------------------------------------------------------------
+
+sys.stderr.write(
+    """
+===============================
+Unsupported installation method
+===============================
+This version of mkdocs-material no longer supports
+installation with `python setup.py install`.
+Please use `python -m pip install .` instead.
+"""
+)
+sys.exit(1)
+
+# The below code will never execute, however GitHub is particularly
+# picky about where it finds Python packaging metadata.
+# See: https://github.com/github/feedback/discussions/6456
+with open("requirements.txt") as f:
     install_requires = [
-        line for line in data.read().split("\n")
-        if line and not line.startswith("#")
+        line for line in f.read().split("\n")
+            if line and not line.startswith("#")
     ]
 
-# Load README contents
-with open("README.md", encoding = "utf-8") as data:
-    long_description = data.read()
-
-# Package description
 setup(
     name = "mkdocs-material",
-    version = package["version"],
-    url = package["homepage"],
-    license = package["license"],
-    description = package["description"],
-    long_description = long_description,
-    long_description_content_type = "text/markdown",
-    author = package["author"]["name"],
-    author_email = package["author"]["email"],
-    keywords = package["keywords"],
-    classifiers = [
-        "Development Status :: 5 - Production/Stable",
-        "Environment :: Web Environment",
-        "License :: OSI Approved :: MIT License",
-        "Programming Language :: JavaScript",
-        "Programming Language :: Python",
-        "Topic :: Documentation",
-        "Topic :: Software Development :: Documentation",
-        "Topic :: Text Processing :: Markup :: HTML"
-    ],
-    packages = find_packages(exclude = ["src"]),
-    include_package_data = True,
     install_requires = install_requires,
-    entry_points = {
-        "mkdocs.themes": [
-            "material = material",
-        ]
-    },
-    zip_safe = False
 )

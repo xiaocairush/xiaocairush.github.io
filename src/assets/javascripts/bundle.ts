@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,22 +20,33 @@
  * IN THE SOFTWARE.
  */
 
+import "array-flat-polyfill"
 import "focus-visible"
-import { NEVER, Subject, defer, merge } from "rxjs"
+import "unfetch/polyfill"
+import "url-polyfill"
+
 import {
+  EMPTY,
+  NEVER,
+  Observable,
+  Subject,
+  defer,
   delay,
   filter,
   map,
+  merge,
   mergeWith,
   shareReplay,
   switchMap
-} from "rxjs/operators"
+} from "rxjs"
 
 import { configuration, feature } from "./_"
 import {
   at,
-  getElement,
+  getActiveElement,
+  getOptionalElement,
   requestJSON,
+  setLocation,
   setToggle,
   watchDocument,
   watchKeyboard,
@@ -43,12 +54,15 @@ import {
   watchLocationTarget,
   watchMedia,
   watchPrint,
+  watchScript,
   watchViewport
 } from "./browser"
 import {
   getComponentElement,
   getComponentElements,
+  mountAnnounce,
   mountBackToTop,
+  mountConsent,
   mountContent,
   mountDialog,
   mountHeader,
@@ -74,6 +88,33 @@ import {
   patchScrollfix,
   patchScrolllock
 } from "./patches"
+import "./polyfills"
+
+/* ----------------------------------------------------------------------------
+ * Functions - @todo refactor
+ * ------------------------------------------------------------------------- */
+
+/**
+ * Fetch search index
+ *
+ * @returns Search index observable
+ */
+function fetchSearchIndex(): Observable<SearchIndex> {
+  if (location.protocol === "file:") {
+    return watchScript(
+      `${new URL("search/search_index.js", config.base)}`
+    )
+      .pipe(
+        // @ts-ignore - @todo fix typings
+        map(() => __index),
+        shareReplay(1)
+      )
+  } else {
+    return requestJSON<SearchIndex>(
+      new URL("search/search_index.json", config.base)
+    )
+  }
+}
 
 /* ----------------------------------------------------------------------------
  * Application
@@ -86,7 +127,7 @@ document.documentElement.classList.add("js")
 /* Set up navigation observables and subjects */
 const document$ = watchDocument()
 const location$ = watchLocation()
-const target$   = watchLocationTarget()
+const target$   = watchLocationTarget(location$)
 const keyboard$ = watchKeyboard()
 
 /* Set up media observables */
@@ -98,9 +139,7 @@ const print$    = watchPrint()
 /* Retrieve search index, if search is enabled */
 const config = configuration()
 const index$ = document.forms.namedItem("search")
-  ? __search?.index || requestJSON<SearchIndex>(
-    new URL("search/search_index.json", config.base)
-  )
+  ? fetchSearchIndex()
   : NEVER
 
 /* Set up Clipboard.js integration */
@@ -109,11 +148,12 @@ setupClipboardJS({ alert$ })
 
 /* Set up instant loading, if enabled */
 if (feature("navigation.instant"))
-  setupInstantLoading({ document$, location$, viewport$ })
+  setupInstantLoading({ location$, viewport$ })
+    .subscribe(document$)
 
 /* Set up version selector */
 if (config.version?.provider === "mike")
-  setupVersionSelector()
+  setupVersionSelector({ document$ })
 
 /* Always close drawer and search on navigation */
 merge(location$, target$)
@@ -136,18 +176,24 @@ keyboard$
         /* Go to previous page */
         case "p":
         case ",":
-          const prev = getElement("[href][rel=prev]")
+          const prev = getOptionalElement<HTMLLinkElement>("link[rel=prev]")
           if (typeof prev !== "undefined")
-            prev.click()
+            setLocation(prev)
           break
 
         /* Go to next page */
         case "n":
         case ".":
-          const next = getElement("[href][rel=next]")
+          const next = getOptionalElement<HTMLLinkElement>("link[rel=next]")
           if (typeof next !== "undefined")
-            next.click()
+            setLocation(next)
           break
+
+        /* Expand navigation, see https://bit.ly/3ZjG5io */
+        case "Enter":
+          const active = getActiveElement()
+          if (active instanceof HTMLLabelElement)
+            active.click()
       }
     })
 
@@ -167,6 +213,10 @@ const main$ = document$
 
 /* Set up control component observables */
 const control$ = merge(
+
+  /* Consent */
+  ...getComponentElements("consent")
+    .map(el => mountConsent(el, { target$ })),
 
   /* Dialog */
   ...getComponentElements("dialog")
@@ -192,15 +242,19 @@ const control$ = merge(
 /* Set up content component observables */
 const content$ = defer(() => merge(
 
+  /* Announcement bar */
+  ...getComponentElements("announce")
+    .map(el => mountAnnounce(el)),
+
   /* Content */
   ...getComponentElements("content")
-    .map(el => mountContent(el, { target$, viewport$, print$ })),
+    .map(el => mountContent(el, { viewport$, target$, print$ })),
 
   /* Search highlighting */
   ...getComponentElements("content")
     .map(el => feature("search.highlight")
       ? mountSearchHiglight(el, { index$, location$ })
-      : NEVER
+      : EMPTY
     ),
 
   /* Header title */
@@ -220,11 +274,13 @@ const content$ = defer(() => merge(
 
   /* Table of contents */
   ...getComponentElements("toc")
-    .map(el => mountTableOfContents(el, { viewport$, header$ })),
+    .map(el => mountTableOfContents(el, {
+      viewport$, header$, main$, target$
+    })),
 
   /* Back-to-top button */
   ...getComponentElements("top")
-    .map(el => mountBackToTop(el, { viewport$, header$, main$ }))
+    .map(el => mountBackToTop(el, { viewport$, header$, main$, target$ }))
 ))
 
 /* Set up component observables */
@@ -247,8 +303,8 @@ window.location$  = location$          /* Location subject */
 window.target$    = target$            /* Location target observable */
 window.keyboard$  = keyboard$          /* Keyboard observable */
 window.viewport$  = viewport$          /* Viewport observable */
-window.tablet$    = tablet$            /* Tablet observable */
-window.screen$    = screen$            /* Screen observable */
-window.print$     = print$             /* Print mode observable */
+window.tablet$    = tablet$            /* Media tablet observable */
+window.screen$    = screen$            /* Media screen observable */
+window.print$     = print$             /* Media print observable */
 window.alert$     = alert$             /* Alert subject */
 window.component$ = component$         /* Component observable */

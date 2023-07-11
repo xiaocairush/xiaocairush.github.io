@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -25,19 +25,18 @@ import * as fs from "fs/promises"
 import {
   EMPTY,
   Observable,
+  concatAll,
+  filter,
   from,
   fromEvent,
   identity,
-  defer,
-  of
-} from "rxjs"
-import {
   catchError,
-  mapTo,
+  defer,
+  map,
   mergeWith,
-  switchMap,
+  of,
   tap
-} from "rxjs/operators"
+} from "rxjs"
 import glob from "tiny-glob"
 
 /* ----------------------------------------------------------------------------
@@ -50,6 +49,7 @@ import glob from "tiny-glob"
 interface ResolveOptions {
   cwd: string                          /* Working directory */
   watch?: boolean                      /* Watch mode */
+  dot?: boolean                        /* Hidden files or directories */
 }
 
 /**
@@ -107,10 +107,17 @@ function now() {
 export function resolve(
   pattern: string, options?: ResolveOptions
 ): Observable<string> {
-  return from(glob(pattern, options))
+  return from(glob(pattern, { dot: true, ...options }))
     .pipe(
       catchError(() => EMPTY),
-      switchMap(files => from(files)),
+      concatAll(),
+
+      /* Build overrides */
+      !process.argv.includes("--all")
+        ? filter(file => !file.startsWith(".overrides/"))
+        : identity,
+
+      /* Start file watcher */
       options?.watch
         ? mergeWith(watch(pattern, options))
         : identity
@@ -146,7 +153,7 @@ export function watch(
 export function mkdir(directory: string): Observable<string> {
   return defer(() => fs.mkdir(directory, { recursive: true }))
     .pipe(
-      mapTo(directory)
+      map(() => directory)
     )
 }
 
@@ -178,7 +185,7 @@ export function write(file: string, data: string): Observable<string> {
     cache.set(file, data)
     return defer(() => fs.writeFile(file, data))
       .pipe(
-        mapTo(file),
+        map(() => file),
         process.argv.includes("--verbose")
           ? tap(file => console.log(`${now()} + ${file}`))
           : identity

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -23,9 +23,11 @@
 import {
   Observable,
   ObservableInput,
-  combineLatest
+  combineLatest,
+  filter,
+  map,
+  startWith
 } from "rxjs"
-import { filter, map, startWith } from "rxjs/operators"
 
 import { getLocation } from "~/browser"
 import {
@@ -79,11 +81,11 @@ export function mountSearchHiglight(
     location$
       .pipe(
         startWith(getLocation()),
-        filter(url => url.searchParams.has("h"))
+        filter(url => !!url.searchParams.get("h"))
       )
   ])
     .pipe(
-      map(([index, url]) => setupSearchHighlighter(index.config, true)(
+      map(([index, url]) => setupSearchHighlighter(index.config)(
         url.searchParams.get("h")!
       )),
       map(fn => {

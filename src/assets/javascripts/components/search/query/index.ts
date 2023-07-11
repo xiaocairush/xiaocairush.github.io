@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -24,37 +24,29 @@ import {
   Observable,
   Subject,
   combineLatest,
-  fromEvent,
-  merge
-} from "rxjs"
-import {
-  delay,
   distinctUntilChanged,
   distinctUntilKeyChanged,
-  filter,
+  endWith,
   finalize,
+  first,
+  fromEvent,
+  ignoreElements,
   map,
-  take,
-  takeLast,
+  merge,
+  shareReplay,
   takeUntil,
   tap
-} from "rxjs/operators"
+} from "rxjs"
 
 import {
-  resetSearchQueryPlaceholder,
-  setSearchQueryPlaceholder
-} from "~/actions"
-import {
   getLocation,
-  setElementFocus,
   setToggle,
-  watchElementFocus
+  watchElementFocus,
+  watchToggle
 } from "~/browser"
 import {
+  SearchMessage,
   SearchMessageType,
-  SearchQueryMessage,
-  SearchWorker,
-  defaultTransform,
   isSearchReadyMessage
 } from "~/integrations"
 
@@ -73,6 +65,24 @@ export interface SearchQuery {
 }
 
 /* ----------------------------------------------------------------------------
+ * Helper types
+ * ------------------------------------------------------------------------- */
+
+/**
+ * Watch options
+ */
+interface WatchOptions {
+  worker$: Subject<SearchMessage>      /* Search worker */
+}
+
+/**
+ * Mount options
+ */
+interface MountOptions {
+  worker$: Subject<SearchMessage>      /* Search worker */
+}
+
+/* ----------------------------------------------------------------------------
  * Functions
  * ------------------------------------------------------------------------- */
 
@@ -83,45 +93,52 @@ export interface SearchQuery {
  * is delayed by `1ms` so the input's empty state is allowed to propagate.
  *
  * @param el - Search query element
- * @param worker - Search worker
+ * @param options - Options
  *
  * @returns Search query observable
  */
 export function watchSearchQuery(
-  el: HTMLInputElement, { rx$ }: SearchWorker
+  el: HTMLInputElement, { worker$ }: WatchOptions
 ): Observable<SearchQuery> {
-  const fn = __search?.transform || defaultTransform
+
+  /* Support search deep linking */
+  const { searchParams } = getLocation()
+  if (searchParams.has("q")) {
+    setToggle("search", true)
+
+    /* Set query from parameter */
+    el.value = searchParams.get("q")!
+    el.focus()
+
+    /* Remove query parameter on close */
+    watchToggle("search")
+      .pipe(
+        first(active => !active)
+      )
+        .subscribe(() => {
+          const url = new URL(location.href)
+          url.searchParams.delete("q")
+          history.replaceState({}, "", `${url}`)
+        })
+  }
 
   /* Intercept focus and input events */
   const focus$ = watchElementFocus(el)
   const value$ = merge(
+    worker$.pipe(first(isSearchReadyMessage)),
     fromEvent(el, "keyup"),
-    fromEvent(el, "focus").pipe(delay(1))
+    focus$
   )
     .pipe(
-      map(() => fn(el.value)),
+      map(() => el.value),
       distinctUntilChanged()
     )
-
-  /* Intercept deep links */
-  const location = getLocation()
-  if (location.searchParams.has("q")) {
-    setToggle("search", true)
-    rx$
-      .pipe(
-        filter(isSearchReadyMessage),
-        take(1)
-      )
-        .subscribe(() => {
-          el.value = location.searchParams.get("q")!
-          setElementFocus(el)
-        })
-  }
 
   /* Combine into single observable */
   return combineLatest([value$, focus$])
     .pipe(
-      map(([value, focus]) => ({ value, focus }))
+      map(([value, focus]) => ({ value, focus })),
+      shareReplay(1)
     )
 }
 
@@ -129,52 +146,52 @@ export function watchSearchQuery(
  * Mount search query
  *
  * @param el - Search query element
- * @param worker - Search worker
+ * @param options - Options
  *
  * @returns Search query component observable
  */
 export function mountSearchQuery(
-  el: HTMLInputElement, { tx$, rx$ }: SearchWorker
+  el: HTMLInputElement, { worker$ }: MountOptions
 ): Observable<Component<SearchQuery, HTMLInputElement>> {
-  const internal$ = new Subject<SearchQuery>()
+  const push$ = new Subject<SearchQuery>()
+  const done$ = push$.pipe(ignoreElements(), endWith(true))
 
-  /* Handle value changes */
-  internal$
+  /* Handle value change */
+  combineLatest([
+    worker$.pipe(first(isSearchReadyMessage)),
+    push$
+  ], (_, query) => query)
     .pipe(
-      distinctUntilKeyChanged("value"),
-      map(({ value }): SearchQueryMessage => ({
+      distinctUntilKeyChanged("value")
+    )
+      .subscribe(({ value }) => worker$.next({
         type: SearchMessageType.QUERY,
         data: value
       }))
-    )
-      .subscribe(tx$.next.bind(tx$))
 
-  /* Handle focus changes */
-  internal$
+  /* Handle focus change */
+  push$
     .pipe(
       distinctUntilKeyChanged("focus")
     )
       .subscribe(({ focus }) => {
-        if (focus) {
+        if (focus)
           setToggle("search", focus)
-          setSearchQueryPlaceholder(el, "")
-        } else {
-          resetSearchQueryPlaceholder(el)
-        }
       })
 
   /* Handle reset */
   fromEvent(el.form!, "reset")
     .pipe(
-      takeUntil(internal$.pipe(takeLast(1)))
+      takeUntil(done$)
     )
-      .subscribe(() => setElementFocus(el))
+      .subscribe(() => el.focus())
 
   /* Create and return component */
-  return watchSearchQuery(el, { tx$, rx$ })
+  return watchSearchQuery(el, { worker$ })
     .pipe(
-      tap(state => internal$.next(state)),
-      finalize(() => internal$.complete()),
-      map(state => ({ ref: el, ...state }))
+      tap(state => push$.next(state)),
+      finalize(() => push$.complete()),
+      map(state => ({ ref: el, ...state })),
+      shareReplay(1)
     )
 }

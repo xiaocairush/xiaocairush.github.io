@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -21,27 +21,20 @@
  */
 
 import {
-  NEVER,
+  EMPTY,
   Observable,
   Subject,
-  animationFrameScheduler
-} from "rxjs"
-import {
+  defer,
   distinctUntilKeyChanged,
   finalize,
   map,
-  observeOn,
   tap
-} from "rxjs/operators"
+} from "rxjs"
 
 import {
-  resetHeaderTitleState,
-  setHeaderTitleState
-} from "~/actions"
-import {
   Viewport,
-  getElement,
   getElementSize,
+  getOptionalElement,
   watchViewportAt
 } from "~/browser"
 
@@ -56,7 +49,7 @@ import { Header } from "../_"
  * Header
  */
 export interface HeaderTitle {
-  active: boolean                      /* User scrolled past first headline */
+  active: boolean                      /* Header title is active */
 }
 
 /* ----------------------------------------------------------------------------
@@ -92,9 +85,9 @@ interface MountOptions {
  * @returns Header title observable
  */
 export function watchHeaderTitle(
-  el: HTMLHeadingElement, { viewport$, header$ }: WatchOptions
+  el: HTMLElement, { viewport$, header$ }: WatchOptions
 ): Observable<HeaderTitle> {
-  return watchViewportAt(el, { header$, viewport$ })
+  return watchViewportAt(el, { viewport$, header$ })
     .pipe(
       map(({ offset: { y } }) => {
         const { height } = getElementSize(el)
@@ -120,28 +113,32 @@ export function watchHeaderTitle(
 export function mountHeaderTitle(
   el: HTMLElement, options: MountOptions
 ): Observable<Component<HeaderTitle>> {
-  const internal$ = new Subject<HeaderTitle>()
-  internal$
-    .pipe(
-      observeOn(animationFrameScheduler)
-    )
-      .subscribe(({ active }) => {
-        if (active)
-          setHeaderTitleState(el, "active")
-        else
-          resetHeaderTitleState(el)
-      })
+  return defer(() => {
+    const push$ = new Subject<HeaderTitle>()
+    push$.subscribe({
 
-  /* Obtain headline, if any */
-  const headline = getElement<HTMLHeadingElement>("article h1")
-  if (typeof headline === "undefined")
-    return NEVER
+      /* Handle emission */
+      next({ active }) {
+        el.classList.toggle("md-header__title--active", active)
+      },
 
-  /* Create and return component */
-  return watchHeaderTitle(headline, options)
-    .pipe(
-      tap(state => internal$.next(state)),
-      finalize(() => internal$.complete()),
-      map(state => ({ ref: el, ...state }))
-    )
+      /* Handle complete */
+      complete() {
+        el.classList.remove("md-header__title--active")
+      }
+    })
+
+    /* Obtain headline, if any */
+    const heading = getOptionalElement("article h1")
+    if (typeof heading === "undefined")
+      return EMPTY
+
+    /* Create and return component */
+    return watchHeaderTitle(heading, options)
+      .pipe(
+        tap(state => push$.next(state)),
+        finalize(() => push$.complete()),
+        map(state => ({ ref: el, ...state }))
+      )
+  })
 }

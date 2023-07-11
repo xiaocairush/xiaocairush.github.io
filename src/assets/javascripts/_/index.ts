@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-import { getElementOrThrow, getLocation } from "~/browser"
+import { getElement, getLocation } from "~/browser"
 
 /* ----------------------------------------------------------------------------
  * Types
@@ -30,17 +30,24 @@ import { getElementOrThrow, getLocation } from "~/browser"
  * Feature flag
  */
 export type Flag =
+  | "announce.dismiss"                 /* Dismissable announcement bar */
+  | "content.code.annotate"            /* Code annotations */
+  | "content.code.copy"                /* Code copy button */
+  | "content.lazy"                     /* Lazy content elements */
+  | "content.tabs.link"                /* Link content tabs */
   | "header.autohide"                  /* Hide header */
   | "navigation.expand"                /* Automatic expansion */
-  | "navigation.instant"               /* Instant loading */
   | "navigation.indexes"               /* Section pages */
+  | "navigation.instant"               /* Instant loading */
   | "navigation.sections"              /* Section navigation */
   | "navigation.tabs"                  /* Tabs navigation */
   | "navigation.tabs.sticky"           /* Tabs navigation (sticky) */
   | "navigation.top"                   /* Back-to-top button */
+  | "navigation.tracking"              /* Anchor tracking */
   | "search.highlight"                 /* Search highlighting */
   | "search.share"                     /* Search sharing */
   | "search.suggest"                   /* Search suggestions */
+  | "toc.follow"                       /* Following table of contents */
   | "toc.integrate"                    /* Integrated table of contents */
 
 /* ------------------------------------------------------------------------- */
@@ -51,10 +58,6 @@ export type Flag =
 export type Translation =
   | "clipboard.copy"                   /* Copy to clipboard */
   | "clipboard.copied"                 /* Copied to clipboard */
-  | "search.config.lang"               /* Search language */
-  | "search.config.pipeline"           /* Search pipeline */
-  | "search.config.separator"          /* Search separator */
-  | "search.placeholder"               /* Search */
   | "search.result.placeholder"        /* Type to start searching */
   | "search.result.none"               /* No matching documents */
   | "search.result.one"                /* 1 matching document */
@@ -62,12 +65,13 @@ export type Translation =
   | "search.result.more.one"           /* 1 more on this page */
   | "search.result.more.other"         /* # more on this page */
   | "search.result.term.missing"       /* Missing */
-  | "select.version.title"             /* Version selector */
+  | "select.version"                   /* Version selector */
 
 /**
  * Translations
  */
-export type Translations = Record<Translation, string>
+export type Translations =
+  Record<Translation, string>
 
 /* ------------------------------------------------------------------------- */
 
@@ -76,6 +80,7 @@ export type Translations = Record<Translation, string>
  */
 export interface Versioning {
   provider: "mike"                     /* Version provider */
+  default?: string                     /* Default version */
 }
 
 /**
@@ -86,6 +91,7 @@ export interface Config {
   features: Flag[]                     /* Feature flags */
   translations: Translations           /* Translations */
   search: string                       /* Search worker URL */
+  tags?: Record<string, string>        /* Tags mapping */
   version?: Versioning                 /* Versioning */
 }
 
@@ -96,7 +102,7 @@ export interface Config {
 /**
  * Retrieve global configuration and make base URL absolute
  */
-const script = getElementOrThrow("#__config")
+const script = getElement("#__config")
 const config: Config = JSON.parse(script.textContent!)
 config.base = `${new URL(config.base, getLocation())}`
 

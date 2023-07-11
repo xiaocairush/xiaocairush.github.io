@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -22,21 +22,22 @@
 
 import { minify as minhtml } from "html-minifier"
 import * as path from "path"
-import { concat, defer, EMPTY, merge, of, zip } from "rxjs"
 import {
-  concatMap,
+  EMPTY,
+  concat,
+  defer,
   map,
+  merge,
+  mergeMap,
+  of,
   reduce,
   scan,
   startWith,
   switchMap,
-  switchMapTo,
-  toArray
-} from "rxjs/operators"
-import {
-  extendDefaultPlugins,
-  optimize
-} from "svgo"
+  toArray,
+  zip
+} from "rxjs"
+import { optimize } from "svgo"
 
 import { IconSearchIndex } from "_/components"
 
@@ -85,13 +86,20 @@ function ext(file: string, extension: string): string {
  * @returns Minified SVG data
  */
 function minsvg(data: string): string {
+  if (!data.startsWith("<"))
+    return data
+
+  /* Optimize SVG */
   const result = optimize(data, {
-    plugins: extendDefaultPlugins([
+    plugins: [
+      "preset-default",
       { name: "removeDimensions", active: true },
       { name: "removeViewBox", active: false }
-    ])
+    ]
   })
-  return result.data || data
+
+  /* Return minified SVG */
+  return result.data
 }
 
 /* ----------------------------------------------------------------------------
@@ -125,6 +133,14 @@ const assets$ = concat(
       transform: async data => minsvg(data)
     })),
 
+  /* Copy Simple icons */
+  ...["**/*.svg", "../LICENSE.md"]
+    .map(pattern => copyAll(pattern, {
+      from: "node_modules/simple-icons/icons",
+      to: `${base}/.icons/simple`,
+      transform: async data => minsvg(data)
+    })),
+
   /* Copy Lunr.js search stemmers and segmenters */
   ...["min/*.js", "tinyseg.js", "wordcut.js"]
     .map(pattern => copyAll(pattern, {
@@ -133,20 +149,27 @@ const assets$ = concat(
     })),
 
   /* Copy images and configurations */
-  ...[".icons/*.svg", "assets/images/*", "**/*.{py,yml}"]
+  ...[".icons/*.svg", "assets/images/*", "**/*.yml"]
     .map(pattern => copyAll(pattern, {
       from: "src",
       to: base
     }))
 )
 
+/* Copy plugins and extensions */
+const sources$ = copyAll("**/*.py", {
+  from: "src",
+  to: base,
+  watch: process.argv.includes("--watch")
+})
+
 /* ------------------------------------------------------------------------- */
 
 /* Transform styles */
 const stylesheets$ = resolve("**/[!_]*.scss", { cwd: "src" })
   .pipe(
-    concatMap(file => zip(
-      of(ext(file, ".css")),
+    mergeMap(file => zip(
+      of(ext(file, ".css").replace(".overrides/", "")),
       transformStyle({
         from: `src/${file}`,
         to: ext(`${base}/${file}`, ".css")
@@ -155,10 +178,10 @@ const stylesheets$ = resolve("**/[!_]*.scss", { cwd: "src" })
   )
 
 /* Transform scripts */
-const javascripts$ = resolve("**/{bundle,search}.ts", { cwd: "src" })
+const javascripts$ = resolve("**/{custom,bundle,search}.ts", { cwd: "src" })
   .pipe(
-    concatMap(file => zip(
-      of(ext(file, ".js")),
+    mergeMap(file => zip(
+      of(ext(file, ".js").replace(".overrides/", "")),
       transformScript({
         from: `src/${file}`,
         to: ext(`${base}/${file}`, ".js")
@@ -179,14 +202,17 @@ const manifest$ = merge(
       )
         .pipe(
           startWith("*"),
-          switchMapTo(observable$.pipe(toArray()))
+          switchMap(() => observable$.pipe(toArray()))
         )
     ))
 )
   .pipe(
     scan((prev, mapping) => (
       mapping.reduce((next, [key, value]) => (
-        next.set(key, value.replace(`${base}/`, ""))
+        next.set(key, value.replace(
+          new RegExp(`${base}\\/(\.overrides\\/)?`),
+          ""
+        ))
       ), prev)
     ), new Map<string, string>()),
   )
@@ -277,10 +303,67 @@ const index$ = zip(icons$, emojis$)
       } as IconSearchIndex
     }),
     switchMap(data => write(
-      `${base}/overrides/assets/javascripts/iconsearch_index.json`,
+      `${base}/.overrides/assets/javascripts/iconsearch_index.json`,
       JSON.stringify(data)
     ))
   )
+
+/* ------------------------------------------------------------------------- */
+
+/* Build schema */
+const schema$ = merge(
+
+  /* Compute fonts schema */
+  defer(() => import("google-fonts-complete"))
+    .pipe(
+      map(({ default: fonts }) => Object.keys(fonts)),
+      map(fonts => ({
+        "$schema": "https://json-schema.org/draft-07/schema",
+        "title": "Google Fonts",
+        "markdownDescription": "https://fonts.google.com/",
+        "type": "string",
+        "oneOf": fonts.map(font => ({
+          "title": font,
+          "markdownDescription": `https://fonts.google.com/specimen/${
+            font.replace(/\s+/g, "+")
+          }`,
+          "enum": [
+            font
+          ],
+        }))
+      })),
+      switchMap(data => write(
+        "docs/schema/assets/fonts.json",
+        JSON.stringify(data, undefined, 2)
+      ))
+    ),
+
+  /* Compute icons schema */
+  icons$
+    .pipe(
+      map(icons => [...icons.values()]),
+      map(icons => ({
+        "$schema": "https://json-schema.org/draft-07/schema",
+        "title": "Icon",
+        "markdownDescription": [
+          "https://squidfunk.github.io/mkdocs-material",
+          "reference/icons-emojis/#search"
+        ].join("/"),
+        "type": "string",
+        "enum": icons.map(icon => icon.replace(".svg", ""))
+      })),
+      switchMap(data => write(
+        "docs/schema/assets/icons.json",
+        JSON.stringify(data, undefined, 2)
+      ))
+    )
+)
+
+/* Build overrides */
+const overrides$ =
+  process.argv.includes("--all")
+    ? merge(index$, schema$)
+    : EMPTY
 
 /* ----------------------------------------------------------------------------
  * Program
@@ -289,8 +372,8 @@ const index$ = zip(icons$, emojis$)
 /* Assemble pipeline */
 const build$ =
   process.argv.includes("--dirty")
-    ? templates$
-    : concat(assets$, merge(templates$, index$))
+    ? merge(templates$, sources$)
+    : concat(assets$, merge(templates$, sources$, overrides$))
 
 /* Let's get rolling */
 build$.subscribe()

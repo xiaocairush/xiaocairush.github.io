@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -22,8 +22,13 @@
 
 import * as fs from "fs/promises"
 import * as path from "path"
-import { Observable, from } from "rxjs"
-import { mapTo, mergeMap, switchMap } from "rxjs/operators"
+import {
+  Observable,
+  from,
+  map,
+  mergeMap,
+  switchMap
+} from "rxjs"
 
 import { mkdir, read, resolve, write } from "../_"
 
@@ -77,7 +82,7 @@ export function copy(
               switchMap(data => write(options.to, data))
             )
       ),
-      mapTo(options.to)
+      map(() => options.to)
     )
 }
 

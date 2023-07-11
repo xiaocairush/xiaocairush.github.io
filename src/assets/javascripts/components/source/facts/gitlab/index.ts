@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -21,8 +21,13 @@
  */
 
 import { ProjectSchema } from "gitlab"
-import { Observable } from "rxjs"
-import { defaultIfEmpty, map } from "rxjs/operators"
+import {
+  EMPTY,
+  Observable,
+  catchError,
+  defaultIfEmpty,
+  map
+} from "rxjs"
 
 import { requestJSON } from "~/browser"
 
@@ -46,6 +51,7 @@ export function fetchSourceFactsFromGitLab(
   const url = `https://${base}/api/v4/projects/${encodeURIComponent(project)}`
   return requestJSON<ProjectSchema>(url)
     .pipe(
+      catchError(() => EMPTY), // @todo refactor instant loading
       map(({ star_count, forks_count }) => ({
         stars: star_count,
         forks: forks_count

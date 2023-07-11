@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,14 +20,15 @@
  * IN THE SOFTWARE.
  */
 
-import { Observable, fromEvent, of } from "rxjs"
 import {
+  Observable,
   filter,
-  mapTo,
+  fromEvent,
+  map,
   mergeMap,
   switchMap,
   tap
-} from "rxjs/operators"
+} from "rxjs"
 
 import { getElements } from "~/browser"
 
@@ -75,12 +76,12 @@ export function patchScrollfix(
 ): void {
   document$
     .pipe(
-      switchMap(() => of(...getElements("[data-md-scrollfix]"))),
+      switchMap(() => getElements("[data-md-scrollfix]")),
       tap(el => el.removeAttribute("data-md-scrollfix")),
       filter(isAppleDevice),
       mergeMap(el => fromEvent(el, "touchstart")
         .pipe(
-          mapTo(el)
+          map(() => el)
         )
       )
     )

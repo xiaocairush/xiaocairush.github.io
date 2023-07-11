@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -38,6 +38,7 @@ type Attributes =
  * Child element
  */
 type Child =
+  | ChildNode
   | HTMLElement
   | Text
   | string
@@ -100,11 +101,16 @@ export function h<T extends h.JSX.Element>(
 
   /* Set attributes, if any */
   if (attributes)
-    for (const attr of Object.keys(attributes))
+    for (const attr of Object.keys(attributes)) {
+      if (typeof attributes[attr] === "undefined")
+        continue
+
+      /* Set default attribute or boolean */
       if (typeof attributes[attr] !== "boolean")
         el.setAttribute(attr, attributes[attr])
-      else if (attributes[attr])
+      else
         el.setAttribute(attr, "")
+    }
 
   /* Append child nodes */
   for (const child of children)

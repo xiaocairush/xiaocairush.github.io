@@ -1,5 +1,5 @@
 <!--
-  Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+  Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to
@@ -41,41 +41,41 @@
 
     <!-- Render item with nested items -->
     <li class="{{ class }} md-nav__item--nested">
+      {% set expanded = "navigation.expand" in features %}
+      {% set active = nav_item.active or expanded %}
+
+      <!-- Determine checked and indeterminate state -->
+      {% set checked = "checked" if nav_item.active %}
+      {% if expanded and not checked %}
+        {% set indeterminate = "md-toggle--indeterminate" %}
+      {% endif %}
 
       <!-- Active checkbox expands items contained within nested section -->
-      {% set checked = "checked" if nav_item.active %}
-      {% if "navigation.expand" in features and not checked %}
-        <input
-          class="md-nav__toggle md-toggle"
-          data-md-toggle="{{ path }}"
-          data-md-state="indeterminate"
-          type="checkbox"
-          id="{{ path }}"
-          checked
-        />
-      {% else %}
-        <input
-          class="md-nav__toggle md-toggle"
-          data-md-toggle="{{ path }}"
-          type="checkbox"
-          id="{{ path }}"
-          {{ checked }}
-        />
-      {% endif %}
+      <input
+        class="md-nav__toggle md-toggle {{ indeterminate }}"
+        type="checkbox"
+        id="{{ path }}"
+        {{ checked }}
+      />
 
       <!-- Determine all nested items that are index pages -->
       {% set indexes = [] %}
       {% if "navigation.indexes" in features %}
-        {% for item in nav_item.children %}
-          {% if item.is_index and not index is defined %}
-            {% set _ = indexes.append(item) %}
+        {% for nav_item in nav_item.children %}
+          {% if nav_item.is_index and not index is defined %}
+            {% set _ = indexes.append(nav_item) %}
           {% endif %}
         {% endfor %}
       {% endif %}
 
       <!-- Render toggle to expand nested items -->
       {% if not indexes %}
-        <label class="md-nav__link" for="{{ path }}">
+        <label
+          class="md-nav__link"
+          for="{{ path }}"
+          id="{{ path }}_label"
+          tabindex="0"
+        >
           {{ nav_item.title }}
           <span class="md-nav__icon md-icon"></span>
         </label>
@@ -84,19 +84,24 @@
       {% else %}
         {% set index = indexes | first %}
         {% set class = "md-nav__link--active" if index == page %}
-        <div class="md-nav__link md-nav__link--container {{ class }}">
+        <div class="md-nav__link md-nav__link--index {{ class }}">
           <a href="{{ index.url | url }}">{{ nav_item.title }}</a>
-          <label for="{{ path }}">
-            <span class="md-nav__icon md-icon"></span>
-          </label>
+
+          <!-- Only render toggle if there's at least one more page -->
+          {% if nav_item.children | length > 1 %}
+            <label for="{{ path }}">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          {% endif %}
         </div>
       {% endif %}
 
       <!-- Render nested navigation -->
       <nav
         class="md-nav"
-        aria-label="{{ nav_item.title }}"
         data-md-level="{{ level }}"
+        aria-labelledby="{{ path }}_label"
+        aria-expanded="{{ nav_item.active | tojson }}"
       >
         <label class="md-nav__title" for="{{ path }}">
           <span class="md-nav__icon md-icon"></span>
@@ -106,9 +111,7 @@
 
           <!-- Render nested item list -->
           {% for nav_item in nav_item.children %}
-            {% if "navigation.indexes" in features and nav_item.is_index %}
-              <!-- Render nothing -->
-            {% else %}
+            {% if not indexes or nav_item != indexes | first %}
               {{ render(nav_item, path ~ "_" ~ loop.index, level + 1) }}
             {% endif %}
           {% endfor %}
@@ -124,7 +127,6 @@
       <!-- Active checkbox expands items contained within nested section -->
       <input
         class="md-nav__toggle md-toggle"
-        data-md-toggle="toc"
         type="checkbox"
         id="__toc"
       />

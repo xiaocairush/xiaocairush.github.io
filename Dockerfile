@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+# Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -18,13 +18,13 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-FROM python:3.9.2-alpine3.13
+FROM python:3.11-alpine3.18
 
 # Build-time flags
 ARG WITH_PLUGINS=true
 
 # Environment variables
-ENV PACKAGES=/usr/local/lib/python3.9/site-packages
+ENV PACKAGES=/usr/local/lib/python3.11/site-packages
 ENV PYTHONDONTWRITEBYTECODE=1
 
 # Set build directory
@@ -32,31 +32,43 @@ WORKDIR /tmp
 
 # Copy files necessary for build
 COPY material material
-COPY MANIFEST.in MANIFEST.in
 COPY package.json package.json
 COPY README.md README.md
-COPY requirements.txt requirements.txt
-COPY setup.py setup.py
+COPY *requirements.txt ./
+COPY pyproject.toml pyproject.toml
 
 # Perform build and cleanup artifacts and caches
 RUN \
   apk upgrade --update-cache -a \
 && \
   apk add --no-cache \
+    cairo \
+    freetype-dev \
     git \
     git-fast-import \
+    jpeg-dev \
     openssh \
+    zlib-dev \
 && \
   apk add --no-cache --virtual .build \
     gcc \
+    libffi-dev \
     musl-dev \
+&& \
+  pip install --no-cache-dir --upgrade pip \
 && \
   pip install --no-cache-dir . \
 && \
   if [ "${WITH_PLUGINS}" = "true" ]; then \
     pip install --no-cache-dir \
       "mkdocs-minify-plugin>=0.3" \
-      "mkdocs-redirects>=1.0"; \
+      "mkdocs-redirects>=1.0" \
+      "pillow>=9.0" \
+      "cairosvg>=2.5"; \
+  fi \
+&& \
+  if [ -e user-requirements.txt ]; then \
+    pip install -U -r user-requirements.txt; \
   fi \
 && \
   apk del .build \
@@ -74,6 +86,10 @@ RUN \
     -type f \
     -path "*/__pycache__/*" \
     -exec rm -f {} \;
+
+# Trust directory, required for git >= 2.35.2
+RUN git config --global --add safe.directory /docs &&\
+    git config --global --add safe.directory /site
 
 # Set working directory
 WORKDIR /docs

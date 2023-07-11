@@ -37,9 +37,9 @@
 </p>
 
 <p align="center">
-  Create a branded static site from a set of Markdown files to host the
-  documentation of your Open Source or commercial project – customizable,
-  searchable, mobile-friendly, 40+ languages. Set up in 5 minutes.
+  Write your documentation in Markdown and create a professional static site for
+  your Open Source or commercial project in minutes – searchable, customizable,
+  more than 60 languages, for all devices.
 </p>
 
 <p align="center">
@@ -58,65 +58,149 @@
 </p>
 
 <h2></h2>
-<p>&nbsp;</p>
-<p id="premium-sponsors" align="center"><strong>Special thanks</strong> to our <strong>premium sponsors</strong>:</p>
-<p>&nbsp;</p>
+<p id="premium-sponsors">&nbsp;</p>
+<p align="center"><strong>Silver sponsors</strong></p>
 <p align="center">
-  <a href="https://hummingbot.io/" target=_blank><img
-    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/hummingbot.png" height="40"
-  /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <a href="https://docs.baslerweb.com/" target=_blank><img
-    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/basler.png" height="40"
-  /></a>&nbsp;&nbsp;
+  <a href="https://fastapi.tiangolo.com/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-fastapi.png" height="120"
+  /></a>
+</p>
+<p>&nbsp;</p>
+<p align="center"><strong>Bronze sponsors</strong></p>
+<p align="center">
   <a href="https://cirrus-ci.org/" target=_blank><img
-    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/cirrus-ci.svg" height="40"
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-cirrus-ci.png" height="58"
+  /></a>
+  <a href="https://docs.baslerweb.com/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-basler.png" height="58"
+  /></a>
+  <a href="https://kx.com/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-kx.png" height="58"
+  /></a>
+  <a href="https://www.manticoregames.com/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-manticore-games.png" height="58"
+  /></a>
+  <a href="https://orion-docs.prefect.io/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-prefect.png" height="58"
+  /></a>
+  <a href="https://datadoghq.com/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-datadog.png" height="58"
+  /></a>
+  <a href="https://www.zenoss.com/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-zenoss.png" height="58"
+  /></a>
+  <a href="https://docs.posit.co" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-posit.png" height="58"
+  /></a>
+  <a href="https://n8n.io" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-n8n.png" height="58"
+  /></a>
+  <a href="https://www.dogado.de" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-dogado.png" height="58"
+  /></a>
+  <a href="https://wwt.com" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-wwt.png" height="58"
+  /></a>
+  <a href="https://coda.io" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-coda.png" height="58"
+  /></a>
+  <a href="https://elastic.co" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-elastic.png" height="58"
+  /></a>
+  <a href="https://ipfabric.io/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-ip-fabric.png" height="58"
+  /></a>
+  <a href="https://www.apex.ai/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-apex-ai.png" height="58"
+  /></a>
+  <a href="https://jitterbit.com/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-jitterbit.png" height="58"
+  /></a>
+  <a href="https://sparkfun.com/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-sparkfun.png" height="58"
+  /></a>
+  <a href="https://eccenca.com/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-eccenca.png" height="58"
+  /></a>
+  <a href="https://neptune.ai/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-neptune-ai.png" height="58"
+  /></a>
+  <a href="https://cash.app/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-cashapp.png" height="58"
+  /></a>
+  <a href="https://rackn.com/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-rackn.png" height="58"
+  /></a>
+  <a href="https://civicactions.com/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-civic-actions.png" height="58"
+  /></a>
+  <a href="https://bitcrowd.net/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-bitcrowd.png" height="58"
+  /></a>
+  <a href="https://getscreen.me/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-getscreenme.png" height="58"
+  /></a>
+  <a href="https://botcity.dev/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-botcity.png" height="58"
+  /></a>
+  <a href="https://www.springernature.com/gp" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-sn-technology.png" height="58"
+  /></a>
+  <a href="https://kolena.io/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-kolena.png" height="58"
+  /></a>
+  <a href="https://www.evergiving.com/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-evergiving.png" height="58"
+  /></a>
+  <a href="https://koor.tech/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-koor.png" height="58"
+  /></a>
+  <a href="https://astral.sh/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-astral.png" height="58"
+  /></a>
+  <a href="https://oikolab.com/" target=_blank><img
+    src="https://raw.githubusercontent.com/squidfunk/mkdocs-material/master/.github/assets/sponsors/sponsor-oikolab.png" height="58"
   /></a>
 </p>
 <p>&nbsp;</p>
 
-## Features
+## Everything you would expect
 
-* **It's just Markdown ...** — write your technical documentation in Markdown –
-  no need to know HTML, JavaScript or CSS. Material for MkDocs will do the heavy
-  lifting and create a beautiful and functional website.
+### It's just Markdown
 
-* **... but there's more** — integrates natively with Python Markdown
-  Extensions, adding callouts, tabbed content containers, mathematical formulas,
-  critic markup, task lists, and [more than 10k icons and emojis][2].
+Focus on the content of your documentation and create a professional static site
+in minutes. No need to know HTML, CSS or JavaScript – let Material for MkDocs do
+the heavy lifting for you.
 
-* **Responsive by design** — built from the ground up to work on all kinds of
-  devices – from mobile phones to widescreens. The underlying fluid layout will
-  always adapt perfectly to the available screen space.
+### Works on all devices
 
-* **Static, but searchable** — almost magically, your technical documentation
-  website will be searchable without any further ado. Material for MkDocs comes
-  with built-in search – no server needed.
+Serve your documentation with confidence – Material for MkDocs automatically
+adapts to perfectly fit the available screen estate, no matter the type or size
+of the viewing device. Desktop. Tablet. Mobile. All great.
 
-* **Many configuration options** — change the color palette, font families,
-  language, icons, favicon and logo. Add a source repository link, links to your
-  social profiles, Google Analytics and Disqus - all with a few lines of config.
+### Made to measure
 
-* **Truly international** — thanks to many contributors, Material for MkDocs
-  includes translations for more than 40 languages and offers full native RTL
-  (right-to-left) support.
+Make it yours – change the colors, fonts, language, icons, logo, and more with
+a few lines of configuration. Material for MkDocs can be easily extended and
+provides many options to alter appearance and behavior.
 
-* **Accessible** — Material for MkDocs provides extensible keyboard navigation
-  and semantic markup including role attributes and landmarks. Furthermore, the
-  layout respects the user's default font size.
+### Fast and lightweight
 
-* **Modern architecture** — Material for MkDocs's underlying codebase is built
-  on top of TypeScript, RxJS, and SCSS, bringing excellent possibilities for
-  theme extension and customization.
+Don't let your users wait – get incredible value with a small footprint by using
+one of the fastest themes available with excellent performance, yielding optimal
+search engine rankings and happy users that return.
 
-_Material for MkDocs uses the [sponsorware][3] release strategy, which means
-that new features are first exclusively released to sponsors as part of Material
-for MkDocs Insiders. Read on to learn [how sponsorship works][4], and how you
-can [become a sponsor][5]._
+### Built for everyone
 
-  [2]: https://squidfunk.github.io/mkdocs-material/reference/icons-emojis/#search
-  [3]: https://github.com/sponsorware/docs
-  [4]: https://squidfunk.github.io/mkdocs-material/insiders/#how-sponsorship-works
-  [5]: https://squidfunk.github.io/mkdocs-material/insiders/#how-to-become-a-sponsor
+Make accessibility a priority – users can navigate your documentation with touch
+devices, keyboards, and screen readers. Semantic markup ensures that your
+documentation works for everyone.
+
+### Open Source
+
+Trust 20,000+ users – choose a mature and actively maintained solution built
+with state-of-the-art Open Source technologies. Keep ownership of your content
+without fear of vendor lock-in. Licensed under MIT.
 
 ## Quick start
 
@@ -126,31 +210,32 @@ Material for MkDocs can be installed with `pip`:
 pip install mkdocs-material
 ```
 
-Add the following line to `mkdocs.yml`:
+Add the following lines to `mkdocs.yml`:
 
 ``` yaml
 theme:
   name: material
 ```
 
-For other installation methods, configuration options, and a demo, visit
-[squidfunk.github.io/mkdocs-material][1]
+For detailed installation instructions, configuration options, and a demo, visit
+[squidfunk.github.io/mkdocs-material][Material for MkDocs]
 
-  [1]: https://squidfunk.github.io/mkdocs-material/
+  [Material for MkDocs]: https://squidfunk.github.io/mkdocs-material/
 
 ## Trusted by ...
 
-### ... leading organizations
+### ... industry leaders
 
 [Atlassian](https://atlassian.github.io/data-center-helm-charts/),
 [AWS](https://aws.github.io/copilot-cli/),
-[Binance](https://docs.binance.org/),
 [Bloomberg](https://bloomberg.github.io/selekt/),
 [CERN](http://abpcomputing.web.cern.ch/),
 [Datadog](https://datadoghq.dev/integrations-core/),
 [Google](https://google.github.io/accompanist/),
+[Hewlett Packard](https://hewlettpackard.github.io/squest/),
 [ING](https://ing-bank.github.io/baker/),
 [Intel](https://open-amt-cloud-toolkit.github.io/docs/),
+[JetBrains](https://jetbrains.github.io/projector-client/mkdocs/),
 [LinkedIn](https://linkedin.github.io/school-of-sre/),
 [Microsoft](https://microsoft.github.io/code-with-engineering-playbook/),
 [Mozilla](https://mozillafoundation.github.io/engineering-handbook/),
@@ -165,27 +250,33 @@ For other installation methods, configuration options, and a demo, visit
 [Arduino](https://arduino.github.io/arduino-cli/),
 [AutoKeras](https://autokeras.com/),
 [BFE](https://www.bfe-networks.net/),
+[CentOS](https://docs.infra.centos.org/),
 [Crystal](https://crystal-lang.org/reference/),
 [Electron](https://www.electron.build/),
 [FastAPI](https://fastapi.tiangolo.com/),
+[GoReleaser](https://goreleaser.com/),
 [Knative](https://knative.dev/docs/),
 [Kubernetes](https://kops.sigs.k8s.io/),
 [kSQL](https://docs.ksqldb.io/),
+[MindsDB](https://docs.mindsdb.com/),
 [Nokogiri](https://nokogiri.org/),
 [OpenFaaS](https://docs.openfaas.com/),
+[Percona](https://docs.percona.com/percona-monitoring-and-management/),
 [Pi-Hole](https://docs.pi-hole.net/),
 [Pydantic](https://pydantic-docs.helpmanual.io/),
-[Renovatebot](https://docs.renovatebot.com/),
+[Renovate](https://docs.renovatebot.com/),
 [Traefik](https://docs.traefik.io/),
+[Trivy](https://github.com/aquasecurity/trivy)
 [Vapor](https://docs.vapor.codes/),
 [ZeroNet](https://zeronet.io/docs/),
+[WebKit](https://docs.webkit.org/),
 [WTF](https://wtfutil.com/)
 
 ## License
 
 **MIT License**
 
-Copyright (c) 2016-2021 Martin Donath
+Copyright (c) 2016-2023 Martin Donath
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to

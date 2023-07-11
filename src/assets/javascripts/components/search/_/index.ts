@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,23 +20,26 @@
  * IN THE SOFTWARE.
  */
 
-import { NEVER, Observable, ObservableInput, merge } from "rxjs"
-import { filter, mergeWith, sample, take } from "rxjs/operators"
+import {
+  NEVER,
+  Observable,
+  ObservableInput,
+  filter,
+  fromEvent,
+  merge,
+  mergeWith
+} from "rxjs"
 
 import { configuration } from "~/_"
 import {
   Keyboard,
   getActiveElement,
   getElements,
-  setElementFocus,
-  setElementSelection,
   setToggle
 } from "~/browser"
 import {
   SearchIndex,
   SearchResult,
-  isSearchQueryMessage,
-  isSearchReadyMessage,
   setupSearchWorker
 } from "~/integrations"
 
@@ -45,10 +48,19 @@ import {
   getComponentElement,
   getComponentElements
 } from "../../_"
-import { SearchQuery, mountSearchQuery } from "../query"
+import {
+  SearchQuery,
+  mountSearchQuery
+} from "../query"
 import { mountSearchResult } from "../result"
-import { SearchShare, mountSearchShare } from "../share"
-import { SearchSuggest, mountSearchSuggest } from "../suggest"
+import {
+  SearchShare,
+  mountSearchShare
+} from "../share"
+import {
+  SearchSuggest,
+  mountSearchSuggest
+} from "../suggest"
 
 /* ----------------------------------------------------------------------------
  * Types
@@ -95,26 +107,20 @@ export function mountSearch(
 ): Observable<Component<Search>> {
   const config = configuration()
   try {
-    const url = __search?.worker || config.search
-    const worker = setupSearchWorker(url, index$)
+    const worker$ = setupSearchWorker(config.search, index$)
 
     /* Retrieve query and result components */
     const query  = getComponentElement("search-query", el)
     const result = getComponentElement("search-result", el)
 
-    /* Re-emit query when search is ready */
-    const { tx$, rx$ } = worker
-    tx$
+    /* Always close search on result selection */
+    fromEvent<PointerEvent>(el, "click")
       .pipe(
-        filter(isSearchQueryMessage),
-        sample(rx$
-          .pipe(
-            filter(isSearchReadyMessage),
-            take(1)
-          )
-        )
+        filter(({ target }) => (
+          target instanceof Element && !!target.closest("a")
+        ))
       )
-        .subscribe(tx$.next.bind(tx$))
+        .subscribe(() => setToggle("search", false))
 
     /* Set up search keyboard handlers */
     keyboard$
@@ -153,14 +159,14 @@ export function mountSearch(
             case "Escape":
             case "Tab":
               setToggle("search", false)
-              setElementFocus(query, false)
+              query.blur()
               break
 
             /* Vertical arrows: select previous or next search result */
             case "ArrowUp":
             case "ArrowDown":
               if (typeof active === "undefined") {
-                setElementFocus(query)
+                query.focus()
               } else {
                 const els = [query, ...getElements(
                   ":not(details) > [href], summary, details[open] [href]",
@@ -171,7 +177,7 @@ export function mountSearch(
                     key.type === "ArrowUp" ? -1 : +1
                   )
                 ) % els.length)
-                setElementFocus(els[i])
+                els[i].focus()
               }
 
               /* Prevent scrolling of page */
@@ -181,14 +187,14 @@ export function mountSearch(
             /* All other keys: hand to search query */
             default:
               if (query !== getActiveElement())
-                setElementFocus(query)
+                query.focus()
           }
         })
 
     /* Set up global keyboard handlers */
     keyboard$
       .pipe(
-        filter(({ mode }) => mode === "global"),
+        filter(({ mode }) => mode === "global")
       )
         .subscribe(key => {
           switch (key.type) {
@@ -197,17 +203,21 @@ export function mountSearch(
             case "f":
             case "s":
             case "/":
-              setElementFocus(query)
-              setElementSelection(query)
+              query.focus()
+              query.select()
+
+              /* Prevent scrolling of page */
               key.claim()
               break
           }
         })
 
     /* Create and return component */
-    const query$  = mountSearchQuery(query, worker)
-    const result$ = mountSearchResult(result, worker, { query$ })
-    return merge(query$, result$)
+    const query$ = mountSearchQuery(query, { worker$ })
+    return merge(
+      query$,
+      mountSearchResult(result, { worker$, query$ })
+    )
       .pipe(
         mergeWith(
 
@@ -217,7 +227,7 @@ export function mountSearch(
 
           /* Search suggestions */
           ...getComponentElements("search-suggest", el)
-            .map(child => mountSearchSuggest(child, worker, { keyboard$ }))
+            .map(child => mountSearchSuggest(child, { worker$, keyboard$ }))
         )
       )
 

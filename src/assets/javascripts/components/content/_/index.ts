@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -25,10 +25,25 @@ import { Observable, merge } from "rxjs"
 import { Viewport, getElements } from "~/browser"
 
 import { Component } from "../../_"
-import { CodeBlock, mountCodeBlock } from "../code"
-import { Details, mountDetails } from "../details"
-import { DataTable, mountDataTable } from "../table"
-import { ContentTabs, mountContentTabs } from "../tabs"
+import { Annotation } from "../annotation"
+import {
+  CodeBlock,
+  Mermaid,
+  mountCodeBlock,
+  mountMermaid
+} from "../code"
+import {
+  Details,
+  mountDetails
+} from "../details"
+import {
+  DataTable,
+  mountDataTable
+} from "../table"
+import {
+  ContentTabs,
+  mountContentTabs
+} from "../tabs"
 
 /* ----------------------------------------------------------------------------
  * Types
@@ -38,8 +53,10 @@ import { ContentTabs, mountContentTabs } from "../tabs"
  * Content
  */
 export type Content =
+  | Annotation
   | ContentTabs
   | CodeBlock
+  | Mermaid
   | DataTable
   | Details
 
@@ -51,9 +68,9 @@ export type Content =
  * Mount options
  */
 interface MountOptions {
-  target$: Observable<HTMLElement>     /* Location target observable */
   viewport$: Observable<Viewport>      /* Viewport observable */
-  print$: Observable<void>             /* Print mode observable */
+  target$: Observable<HTMLElement>     /* Location target observable */
+  print$: Observable<boolean>          /* Media print observable */
 }
 
 /* ----------------------------------------------------------------------------
@@ -72,13 +89,17 @@ interface MountOptions {
  * @returns Content component observable
  */
 export function mountContent(
-  el: HTMLElement, { target$, viewport$, print$ }: MountOptions
+  el: HTMLElement, { viewport$, target$, print$ }: MountOptions
 ): Observable<Component<Content>> {
   return merge(
 
     /* Code blocks */
-    ...getElements("pre > code", el)
-      .map(child => mountCodeBlock(child, { viewport$ })),
+    ...getElements("pre:not(.mermaid) > code", el)
+      .map(child => mountCodeBlock(child, { target$, print$ })),
+
+    /* Mermaid diagrams */
+    ...getElements("pre.mermaid", el)
+      .map(child => mountMermaid(child)),
 
     /* Data tables */
     ...getElements("table:not([class])", el)
@@ -90,6 +111,6 @@ export function mountContent(
 
     /* Content tabs */
     ...getElements("[data-tabs]", el)
-      .map(child => mountContentTabs(child))
+      .map(child => mountContentTabs(child, { viewport$ }))
   )
 }

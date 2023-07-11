@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -24,22 +24,21 @@ import {
   Observable,
   Subject,
   asyncScheduler,
-  fromEvent
-} from "rxjs"
-import {
   combineLatestWith,
   distinctUntilChanged,
   filter,
   finalize,
+  fromEvent,
   map,
+  merge,
   observeOn,
   tap
-} from "rxjs/operators"
+} from "rxjs"
 
 import { Keyboard } from "~/browser"
 import {
+  SearchMessage,
   SearchResult,
-  SearchWorker,
   isSearchResultMessage
 } from "~/integrations"
 
@@ -63,6 +62,7 @@ export interface SearchSuggest {}
  */
 interface MountOptions {
   keyboard$: Observable<Keyboard>      /* Keyboard observable */
+  worker$: Subject<SearchMessage>      /* Search worker */
 }
 
 /* ----------------------------------------------------------------------------
@@ -76,19 +76,21 @@ interface MountOptions {
  * on the vertical offset of the search result container.
  *
  * @param el - Search result list element
- * @param worker - Search worker
  * @param options - Options
  *
  * @returns Search result list component observable
  */
 export function mountSearchSuggest(
-  el: HTMLElement, { rx$ }: SearchWorker, { keyboard$ }: MountOptions
+  el: HTMLElement, { worker$, keyboard$ }: MountOptions
 ): Observable<Component<SearchSuggest>> {
-  const internal$ = new Subject<SearchResult>()
+  const push$ = new Subject<SearchResult>()
 
   /* Retrieve query component and track all changes */
   const query  = getComponentElement("search-query")
-  const query$ = fromEvent(query, "keydown")
+  const query$ = merge(
+    fromEvent(query, "keydown"),
+    fromEvent(query, "focus")
+  )
     .pipe(
       observeOn(asyncScheduler),
       map(() => query.value),
@@ -96,13 +98,13 @@ export function mountSearchSuggest(
     )
 
   /* Update search suggestions */
-  internal$
+  push$
     .pipe(
       combineLatestWith(query$),
-      map(([{ suggestions }, value]) => {
+      map(([{ suggest }, value]) => {
         const words = value.split(/([\s-]+)/)
-        if (suggestions?.length && words[words.length - 1]) {
-          const last = suggestions[suggestions.length - 1]
+        if (suggest?.length && words[words.length - 1]) {
+          const last = suggest[suggest.length - 1]
           if (last.startsWith(words[words.length - 1]))
             words[words.length - 1] = last
         } else {
@@ -136,7 +138,7 @@ export function mountSearchSuggest(
       })
 
   /* Filter search result message */
-  const result$ = rx$
+  const result$ = worker$
     .pipe(
       filter(isSearchResultMessage),
       map(({ data }) => data)
@@ -145,8 +147,8 @@ export function mountSearchSuggest(
   /* Create and return component */
   return result$
     .pipe(
-      tap(state => internal$.next(state)),
-      finalize(() => internal$.complete()),
+      tap(state => push$.next(state)),
+      finalize(() => push$.complete()),
       map(() => ({ ref: el }))
     )
 }

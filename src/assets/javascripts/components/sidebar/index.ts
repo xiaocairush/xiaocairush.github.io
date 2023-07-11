@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -24,24 +24,31 @@ import {
   Observable,
   Subject,
   animationFrameScheduler,
-  combineLatest
-} from "rxjs"
-import {
+  auditTime,
+  combineLatest,
+  defer,
   distinctUntilChanged,
+  endWith,
   finalize,
+  first,
+  from,
+  fromEvent,
+  ignoreElements,
   map,
-  observeOn,
+  mergeMap,
+  takeUntil,
   tap,
   withLatestFrom
-} from "rxjs/operators"
+} from "rxjs"
 
 import {
-  resetSidebarHeight,
-  resetSidebarOffset,
-  setSidebarHeight,
-  setSidebarOffset
-} from "~/actions"
-import { Viewport } from "~/browser"
+  Viewport,
+  getElement,
+  getElementContainer,
+  getElementOffset,
+  getElementSize,
+  getElements
+} from "~/browser"
 
 import { Component } from "../_"
 import { Header } from "../header"
@@ -56,7 +63,7 @@ import { Main } from "../main"
  */
 export interface Sidebar {
   height: number                       /* Sidebar height */
-  locked: boolean                      /* User scrolled past header */
+  locked: boolean                      /* Sidebar is locked */
 }
 
 /* ----------------------------------------------------------------------------
@@ -100,9 +107,10 @@ interface MountOptions {
 export function watchSidebar(
   el: HTMLElement, { viewport$, main$ }: WatchOptions
 ): Observable<Sidebar> {
+  const parent = el.parentElement!
   const adjust =
-    el.parentElement!.offsetTop -
-    el.parentElement!.parentElement!.offsetTop
+    parent.offsetTop -
+    parent.parentElement!.offsetTop
 
   /* Compute the sidebar's available height and if it should be locked */
   return combineLatest([main$, viewport$])
@@ -126,6 +134,19 @@ export function watchSidebar(
 /**
  * Mount sidebar
  *
+ * This function doesn't set the height of the actual sidebar, but of its first
+ * child – the `.md-sidebar__scrollwrap` element in order to mitigiate jittery
+ * sidebars when the footer is scrolled into view. At some point we switched
+ * from `absolute` / `fixed` positioning to `sticky` positioning, significantly
+ * reducing jitter in some browsers (respectively Firefox and Safari) when
+ * scrolling from the top. However, top-aligned sticky positioning means that
+ * the sidebar snaps to the bottom when the end of the container is reached.
+ * This is what leads to the mentioned jitter, as the sidebar's height may be
+ * updated too slowly.
+ *
+ * This behaviour can be mitigiated by setting the height of the sidebar to `0`
+ * while preserving the padding, and the height on its first element.
+ *
  * @param el - Sidebar element
  * @param options - Options
  *
@@ -134,32 +155,70 @@ export function watchSidebar(
 export function mountSidebar(
   el: HTMLElement, { header$, ...options }: MountOptions
 ): Observable<Component<Sidebar>> {
-  const internal$ = new Subject<Sidebar>()
-  internal$
-    .pipe(
-      observeOn(animationFrameScheduler),
-      withLatestFrom(header$)
-    )
+  const inner = getElement(".md-sidebar__scrollwrap", el)
+  const { y } = getElementOffset(inner)
+  return defer(() => {
+    const push$ = new Subject<Sidebar>()
+    const done$ = push$.pipe(ignoreElements(), endWith(true))
+    const next$ = push$
+      .pipe(
+        auditTime(0, animationFrameScheduler)
+      )
+
+    /* Update sidebar height and offset */
+    next$.pipe(withLatestFrom(header$))
       .subscribe({
 
-        /* Update height and offset */
+        /* Handle emission */
         next([{ height }, { height: offset }]) {
-          setSidebarHeight(el, height)
-          setSidebarOffset(el, offset)
+          inner.style.height = `${height - 2 * y}px`
+          el.style.top       = `${offset}px`
         },
 
-        /* Reset on complete */
+        /* Handle complete */
         complete() {
-          resetSidebarOffset(el)
-          resetSidebarHeight(el)
+          inner.style.height = ""
+          el.style.top       = ""
         }
       })
 
-  /* Create and return component */
-  return watchSidebar(el, options)
-    .pipe(
-      tap(state => internal$.next(state)),
-      finalize(() => internal$.complete()),
-      map(state => ({ ref: el, ...state }))
-    )
+    /* Bring active item into view on initial load */
+    next$.pipe(first())
+      .subscribe(() => {
+        for (const item of getElements(".md-nav__link--active[href]", el)) {
+          const container = getElementContainer(item)
+          if (typeof container !== "undefined") {
+            const offset = item.offsetTop - container.offsetTop
+            const { height } = getElementSize(container)
+            container.scrollTo({
+              top: offset - height / 2
+            })
+          }
+        }
+      })
+
+    /* Handle accessibility for expandable items, see https://bit.ly/3jaod9p */
+    from(getElements<HTMLLabelElement>("label[tabindex]", el))
+      .pipe(
+        mergeMap(label => fromEvent(label, "click")
+          .pipe(
+            map(() => label),
+            takeUntil(done$)
+          )
+        )
+      )
+        .subscribe(label => {
+          const input = getElement<HTMLInputElement>(`[id="${label.htmlFor}"]`)
+          const nav = getElement(`[aria-labelledby="${label.id}"]`)
+          nav.setAttribute("aria-expanded", `${input.checked}`)
+        })
+
+    /* Create and return component */
+    return watchSidebar(el, options)
+      .pipe(
+        tap(state => push$.next(state)),
+        finalize(() => push$.complete()),
+        map(state => ({ ref: el, ...state }))
+      )
+  })
 }

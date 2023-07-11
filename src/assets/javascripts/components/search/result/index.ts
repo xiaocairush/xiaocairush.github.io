@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -21,42 +21,42 @@
  */
 
 import {
+  EMPTY,
   Observable,
   Subject,
-  animationFrameScheduler,
-  merge,
-  of
-} from "rxjs"
-import {
   bufferCount,
   filter,
   finalize,
+  first,
+  fromEvent,
   map,
-  observeOn,
+  merge,
+  mergeMap,
+  of,
+  share,
+  skipUntil,
   switchMap,
-  take,
+  takeUntil,
   tap,
   withLatestFrom,
   zipWith
-} from "rxjs/operators"
+} from "rxjs"
 
+import { translation } from "~/_"
 import {
-  addToSearchResultList,
-  resetSearchResultList,
-  resetSearchResultMeta,
-  setSearchResultMeta
-} from "~/actions"
-import {
-  getElementOrThrow,
-  watchElementThreshold
+  getElement,
+  getOptionalElement,
+  watchElementBoundary,
+  watchToggle
 } from "~/browser"
 import {
+  SearchMessage,
   SearchResult,
-  SearchWorker,
   isSearchReadyMessage,
   isSearchResultMessage
 } from "~/integrations"
 import { renderSearchResultItem } from "~/templates"
+import { round } from "~/utilities"
 
 import { Component } from "../../_"
 import { SearchQuery } from "../query"
@@ -70,6 +70,7 @@ import { SearchQuery } from "../query"
  */
 interface MountOptions {
   query$: Observable<SearchQuery>      /* Search query observable */
+  worker$: Subject<SearchMessage>      /* Search worker */
 }
 
 /* ----------------------------------------------------------------------------
@@ -83,68 +84,104 @@ interface MountOptions {
  * the vertical offset of the search result container.
  *
  * @param el - Search result list element
- * @param worker - Search worker
  * @param options - Options
  *
  * @returns Search result list component observable
  */
 export function mountSearchResult(
-  el: HTMLElement, { rx$ }: SearchWorker, { query$ }: MountOptions
+  el: HTMLElement, { worker$, query$ }: MountOptions
 ): Observable<Component<SearchResult>> {
-  const internal$ = new Subject<SearchResult>()
-  const boundary$ = watchElementThreshold(el.parentElement!)
+  const push$ = new Subject<SearchResult>()
+  const boundary$ = watchElementBoundary(el.parentElement!)
     .pipe(
       filter(Boolean)
     )
 
-  /* Retrieve nested components */
-  const meta = getElementOrThrow(":scope > :first-child", el)
-  const list = getElementOrThrow(":scope > :last-child", el)
+  /* Retrieve container */
+  const container = el.parentElement!
 
-  /* Update search result metadata when ready */
-  rx$
-    .pipe(
-      filter(isSearchReadyMessage),
-      take(1)
-    )
-      .subscribe(() => {
-        resetSearchResultMeta(meta)
-      })
+  /* Retrieve nested components */
+  const meta = getElement(":scope > :first-child", el)
+  const list = getElement(":scope > :last-child", el)
+
+  /* Reveal to accessibility tree – see https://bit.ly/3iAA7t8 */
+  watchToggle("search")
+    .subscribe(active => list.setAttribute(
+      "role", active ? "list" : "presentation"
+    ))
 
   /* Update search result metadata */
-  internal$
+  push$
     .pipe(
-      observeOn(animationFrameScheduler),
-      withLatestFrom(query$)
+      withLatestFrom(query$),
+      skipUntil(worker$.pipe(first(isSearchReadyMessage)))
     )
       .subscribe(([{ items }, { value }]) => {
-        if (value)
-          setSearchResultMeta(meta, items.length)
-        else
-          resetSearchResultMeta(meta)
+        switch (items.length) {
+
+          /* No results */
+          case 0:
+            meta.textContent = value.length
+              ? translation("search.result.none")
+              : translation("search.result.placeholder")
+            break
+
+          /* One result */
+          case 1:
+            meta.textContent = translation("search.result.one")
+            break
+
+          /* Multiple result */
+          default:
+            const count = round(items.length)
+            meta.textContent = translation("search.result.other", count)
+        }
       })
 
-  /* Update search result list */
-  internal$
+  /* Render search result item */
+  const render$ = push$
     .pipe(
-      observeOn(animationFrameScheduler),
-      tap(() => resetSearchResultList(list)),
+      tap(() => list.innerHTML = ""),
       switchMap(({ items }) => merge(
         of(...items.slice(0, 10)),
         of(...items.slice(10))
           .pipe(
             bufferCount(4),
             zipWith(boundary$),
-            switchMap(([chunk]) => of(...chunk))
+            switchMap(([chunk]) => chunk)
           )
-      ))
+      )),
+      map(renderSearchResultItem),
+      share()
     )
-      .subscribe(result => {
-        addToSearchResultList(list, renderSearchResultItem(result))
+
+  /* Update search result list */
+  render$.subscribe(item => list.appendChild(item))
+  render$
+    .pipe(
+      mergeMap(item => {
+        const details = getOptionalElement("details", item)
+        if (typeof details === "undefined")
+          return EMPTY
+
+        /* Keep position of details element stable */
+        return fromEvent(details, "toggle")
+          .pipe(
+            takeUntil(push$),
+            map(() => details)
+          )
+      })
+    )
+      .subscribe(details => {
+        if (
+          details.open === false &&
+          details.offsetTop <= container.scrollTop
+        )
+          container.scrollTo({ top: details.offsetTop })
       })
 
   /* Filter search result message */
-  const result$ = rx$
+  const result$ = worker$
     .pipe(
       filter(isSearchResultMessage),
       map(({ data }) => data)
@@ -153,8 +190,8 @@ export function mountSearchResult(
   /* Create and return component */
   return result$
     .pipe(
-      tap(state => internal$.next(state)),
-      finalize(() => internal$.complete()),
+      tap(state => push$.next(state)),
+      finalize(() => push$.complete()),
       map(state => ({ ref: el, ...state }))
     )
 }

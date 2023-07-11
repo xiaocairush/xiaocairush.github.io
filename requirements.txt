@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+# Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -18,10 +18,15 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-# Direct dependencies
-mkdocs>=1.2.2
-Pygments>=2.4
+# Requirements for core
+jinja2>=3.0
 markdown>=3.2
-pymdown-extensions>=8.2
-mkdocs-material-extensions>=1.0
-mkdocs-redirects
+mkdocs>=1.4.2
+mkdocs-material-extensions>=1.1
+pygments>=2.14
+pymdown-extensions>=9.9.1
+
+# Requirements for plugins
+colorama>=0.4
+regex>=2022.4.24
+requests>=2.26

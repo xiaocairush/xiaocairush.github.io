@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Martin Donath <martin.donath@squidfunk.com>
+ * Copyright (c) 2016-2023 Martin Donath <martin.donath@squidfunk.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -23,20 +23,16 @@
 import {
   Observable,
   Subject,
-  animationFrameScheduler,
-  of
-} from "rxjs"
-import {
+  defer,
   distinctUntilKeyChanged,
   finalize,
   map,
-  observeOn,
+  of,
   switchMap,
   tap
-} from "rxjs/operators"
+} from "rxjs"
 
 import { feature } from "~/_"
-import { resetTabsState, setTabsState } from "~/actions"
 import {
   Viewport,
   watchElementSize,
@@ -54,7 +50,7 @@ import { Header } from "../header"
  * Navigation tabs
  */
 export interface Tabs {
-  hidden: boolean                      /* User scrolled past tabs */
+  hidden: boolean                      /* Navigation tabs are hidden */
 }
 
 /* ----------------------------------------------------------------------------
@@ -118,36 +114,31 @@ export function watchTabs(
 export function mountTabs(
   el: HTMLElement, options: MountOptions
 ): Observable<Component<Tabs>> {
-  const internal$ = new Subject<Tabs>()
-  internal$
-    .pipe(
-      observeOn(animationFrameScheduler)
+  return defer(() => {
+    const push$ = new Subject<Tabs>()
+    push$.subscribe({
+
+      /* Handle emission */
+      next({ hidden }) {
+        el.hidden = hidden
+      },
+
+      /* Handle complete */
+      complete() {
+        el.hidden = false
+      }
+    })
+
+    /* Create and return component */
+    return (
+      feature("navigation.tabs.sticky")
+        ? of({ hidden: false })
+        : watchTabs(el, options)
     )
-      .subscribe({
-
-        /* Update state */
-        next({ hidden }) {
-          if (hidden)
-            setTabsState(el, "hidden")
-          else
-            resetTabsState(el)
-        },
-
-        /* Reset on complete */
-        complete() {
-          resetTabsState(el)
-        }
-      })
-
-  /* Create and return component */
-  return (
-    feature("navigation.tabs.sticky")
-      ? of({ hidden: false })
-      : watchTabs(el, options)
-  )
-    .pipe(
-      tap(state => internal$.next(state)),
-      finalize(() => internal$.complete()),
-      map(state => ({ ref: el, ...state }))
-    )
+      .pipe(
+        tap(state => push$.next(state)),
+        finalize(() => push$.complete()),
+        map(state => ({ ref: el, ...state }))
+      )
+  })
 }
