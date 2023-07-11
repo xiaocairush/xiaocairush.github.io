@@ -350,7 +350,7 @@ ReduceOps类：
 - Stream 实际上是一个双向链表，链表中每个节点的类型是 ReferencePipeline，每个节点对应了一个特定的计算过程，例如 ReferencePipeline.Head（链表的第一个节点）， StatelessOp（例如 filter()操作，一般作为流中的中间计算过程）、ReduceOp(例如 count()，collect()操作，它是一个 TerminalOp)等。
 - 除了 TerminalOp，每个计算过程（即链表中的每个节点）例如 StatelessOp 都支持装饰器模式，重写了`opWrapSink(sink)`对 sink 进行装饰，修改 sink 对象的 accept()行为，例如 filter 对应的 StatelessOp 中如果 sink 接收的对象不符合条件，那么 sink 拒绝接收该对象。
 - 最终`Spliterator`中的`tryAdvace()`负责将会不断推进计算过程的真正执行。也就是遍历 stream 源头的所有元素，将每一个元素递交给经过装饰的 sink 对象，调用`wrappedSink.accept()`
-- sink 装饰器链层层调用，得到 lStream 最终的计算结果。
+- sink装饰器链层层调用，得到 Stream 最终的计算结果。
 
 ---
 
