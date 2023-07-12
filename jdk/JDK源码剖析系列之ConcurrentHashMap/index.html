@@ -1,0 +1,955 @@
+<!doctype html><html lang=en class=no-js> <head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content=总结知识><meta name=author content=xiaocairush><link href=https://xiaocairush.github.io/jdk/JDK%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90%E7%B3%BB%E5%88%97%E4%B9%8BConcurrentHashMap/ rel=canonical><link href=../JDK%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90%E7%B3%BB%E5%88%97%E4%B9%8BStream/ rel=prev><link href=../%E5%90%8C%E6%AD%A5%E5%B7%A5%E5%85%B7%E7%B1%BB/ rel=next><link rel=icon href=../../assets/favicon.png><meta name=generator content="mkdocs-1.4.3, mkdocs-material-9.1.18"><title>JDK源码剖析系列之ConcurrentHashMap - 知识整理</title><link rel=stylesheet href=../../assets/stylesheets/main.26e3688c.min.css><link rel=stylesheet href=../../assets/stylesheets/palette.ecc896b0.min.css><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback"><style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style><script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script><script>"undefined"!=typeof __md_analytics&&__md_analytics()</script><link rel=stylesheet href=../../assets/stylesheets/custom.f7ec4df2.min.css></head> <body dir=ltr data-md-color-scheme=default data-md-color-primary=indigo data-md-color-accent=indigo> <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script> <input class=md-toggle data-md-toggle=drawer type=checkbox id=__drawer autocomplete=off> <input class=md-toggle data-md-toggle=search type=checkbox id=__search autocomplete=off> <label class=md-overlay for=__drawer></label> <div data-md-component=skip> <a href=#jdkconcurrenthashmap class=md-skip> Skip to content </a> </div> <div data-md-component=announce> </div> <header class=md-header data-md-component=header> <nav class="md-header__inner md-grid" aria-label=Header> <a href=../.. title=知识整理 class="md-header__button md-logo" aria-label=知识整理 data-md-component=logo> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 89 89"> <path d=M3.136,17.387l0,42.932l42.932,21.467l-42.932,-64.399Z /> <path d=M21.91,8l42.933,64.398l-18.775,9.388l-42.932,-64.399l18.774,-9.387Z style="fill-opacity: 0.5"/> <path d=M67.535,17.387l-27.262,18.156l21.878,32.818l5.384,2.691l0,-53.665Z /> <path d=M67.535,17.387l0,53.666l18.774,-9.388l0,-53.665l-18.774,9.387Z style="fill-opacity: 0.25"/> </svg> </a> <label class="md-header__button md-icon" for=__drawer> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg> </label> <div class=md-header__title data-md-component=header-title> <div class=md-header__ellipsis> <div class=md-header__topic> <span class=md-ellipsis> 知识整理 </span> </div> <div class=md-header__topic data-md-component=header-topic> <span class=md-ellipsis> JDK源码剖析系列之ConcurrentHashMap </span> </div> </div> </div> <form class=md-header__option data-md-component=palette> <input class=md-option data-md-color-media data-md-color-scheme=default data-md-color-primary=indigo data-md-color-accent=indigo aria-label="Switch to dark mode" type=radio name=__palette id=__palette_1> <label class="md-header__button md-icon" title="Switch to dark mode" for=__palette_2 hidden> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg> </label> <input class=md-option data-md-color-media data-md-color-scheme=slate data-md-color-primary=indigo data-md-color-accent=indigo aria-label="Switch to light mode" type=radio name=__palette id=__palette_2> <label class="md-header__button md-icon" title="Switch to light mode" for=__palette_1 hidden> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg> </label> </form> <label class="md-header__button md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg> </label> <div class=md-search data-md-component=search role=dialog> <label class=md-search__overlay for=__search></label> <div class=md-search__inner role=search> <form class=md-search__form name=search> <input type=text class=md-search__input name=query aria-label=Search placeholder=Search autocapitalize=off autocorrect=off autocomplete=off spellcheck=false data-md-component=search-query required> <label class="md-search__icon md-icon" for=__search> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg> </label> <nav class=md-search__options aria-label=Search> <a href=javascript:void(0) class="md-search__icon md-icon" title=Share aria-label=Share data-clipboard data-clipboard-text data-md-component=search-share tabindex=-1> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg> </a> <button type=reset class="md-search__icon md-icon" title=Clear aria-label=Clear tabindex=-1> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg> </button> </nav> <div class=md-search__suggest data-md-component=search-suggest></div> </form> <div class=md-search__output> <div class=md-search__scrollwrap data-md-scrollfix> <div class=md-search-result data-md-component=search-result> <div class=md-search-result__meta> Initializing search </div> <ol class=md-search-result__list role=presentation></ol> </div> </div> </div> </div> </div> <div class=md-header__source> <a href=https://github.com/xiaocairush/xiaocairush.github.io title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 448 512"><!-- Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg> </div> <div class=md-source__repository> xiaocairush/xiaocairush.github.io </div> </a> </div> </nav> </header> <div class=md-container data-md-component=container> <nav class=md-tabs aria-label=Tabs data-md-component=tabs> <div class=md-grid> <ul class=md-tabs__list> <li class=md-tabs__item> <a href=../.. class=md-tabs__link> 博客运维 </a> </li> <li class=md-tabs__item> <a href=../JDK%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90%E7%B3%BB%E5%88%97%E4%B9%8BStream/ class="md-tabs__link md-tabs__link--active"> JDK </a> </li> <li class=md-tabs__item> <a href=../../java/ZooKeeper-overview/ class=md-tabs__link> java </a> </li> <li class=md-tabs__item> <a href=../../contest/ class=md-tabs__link> 比赛相关 </a> </li> <li class=md-tabs__item> <a href=../../tools/ class=md-tabs__link> 工具软件 </a> </li> <li class=md-tabs__item> <a href=../../lang/ class=md-tabs__link> 语言基础 </a> </li> <li class=md-tabs__item> <a href=../../basic/ class=md-tabs__link> 算法基础 </a> </li> <li class=md-tabs__item> <a href=../../search/ class=md-tabs__link> 搜索 </a> </li> <li class=md-tabs__item> <a href=../../dp/ class=md-tabs__link> 动态规划 </a> </li> <li class=md-tabs__item> <a href=../../string/ class=md-tabs__link> 字符串 </a> </li> <li class=md-tabs__item> <a href=../../math/ class=md-tabs__link> 数学 </a> </li> <li class=md-tabs__item> <a href=../../ds/ class=md-tabs__link> 数据结构 </a> </li> <li class=md-tabs__item> <a href=../../graph/ class=md-tabs__link> 图论 </a> </li> <li class=md-tabs__item> <a href=../../geometry/ class=md-tabs__link> 计算几何 </a> </li> <li class=md-tabs__item> <a href=../../misc/ class=md-tabs__link> 杂项 </a> </li> <li class=md-tabs__item> <a href=../../topic/rmq/ class=md-tabs__link> 专题 </a> </li> </ul> </div> </nav> <main class=md-main data-md-component=main> <div class="md-main__inner md-grid"> <div class="md-sidebar md-sidebar--primary" data-md-component=sidebar data-md-type=navigation> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--primary md-nav--lifted" aria-label=Navigation data-md-level=0> <label class=md-nav__title for=__drawer> <a href=../.. title=知识整理 class="md-nav__button md-logo" aria-label=知识整理 data-md-component=logo> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 89 89"> <path d=M3.136,17.387l0,42.932l42.932,21.467l-42.932,-64.399Z /> <path d=M21.91,8l42.933,64.398l-18.775,9.388l-42.932,-64.399l18.774,-9.387Z style="fill-opacity: 0.5"/> <path d=M67.535,17.387l-27.262,18.156l21.878,32.818l5.384,2.691l0,-53.665Z /> <path d=M67.535,17.387l0,53.666l18.774,-9.388l0,-53.665l-18.774,9.387Z style="fill-opacity: 0.25"/> </svg> </a> 知识整理 </label> <div class=md-nav__source> <a href=https://github.com/xiaocairush/xiaocairush.github.io title="Go to repository" class=md-source data-md-component=source> <div class="md-source__icon md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 448 512"><!-- Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg> </div> <div class=md-source__repository> xiaocairush/xiaocairush.github.io </div> </a> </div> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../.. class=md-nav__link> 博客运维 </a> </li> <li class="md-nav__item md-nav__item--active md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_2 checked> <label class=md-nav__link for=__nav_2 id=__nav_2_label tabindex=0> JDK <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_2_label aria-expanded=true> <label class=md-nav__title for=__nav_2> <span class="md-nav__icon md-icon"></span> JDK </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../JDK%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90%E7%B3%BB%E5%88%97%E4%B9%8BStream/ class=md-nav__link> JDK源码剖析系列之Stream </a> </li> <li class="md-nav__item md-nav__item--active"> <input class="md-nav__toggle md-toggle" type=checkbox id=__toc> <label class="md-nav__link md-nav__link--active" for=__toc> JDK源码剖析系列之ConcurrentHashMap <span class="md-nav__icon md-icon"></span> </label> <a href=./ class="md-nav__link md-nav__link--active"> JDK源码剖析系列之ConcurrentHashMap </a> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#_1 class=md-nav__link> 数据结构 </a> <nav class=md-nav aria-label=数据结构> <ul class=md-nav__list> <li class=md-nav__item> <a href=#node class=md-nav__link> Node </a> </li> <li class=md-nav__item> <a href=#forwardingnode class=md-nav__link> ForwardingNode </a> </li> <li class=md-nav__item> <a href=#treenode class=md-nav__link> TreeNode </a> </li> <li class=md-nav__item> <a href=#treebin class=md-nav__link> TreeBin </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#_2 class=md-nav__link> 核心成员 </a> </li> <li class=md-nav__item> <a href=#_3 class=md-nav__link> 核心函数 </a> <nav class=md-nav aria-label=核心函数> <ul class=md-nav__list> <li class=md-nav__item> <a href=#concurrenthashmapint-initialcapacity class=md-nav__link> ConcurrentHashMap(int initialCapacity) </a> </li> <li class=md-nav__item> <a href=#inittable class=md-nav__link> initTable </a> </li> <li class=md-nav__item> <a href=#put class=md-nav__link> put </a> </li> <li class=md-nav__item> <a href=#get class=md-nav__link> get </a> </li> <li class=md-nav__item> <a href=#treeifybin class=md-nav__link> treeifyBin </a> </li> <li class=md-nav__item> <a href=#trypresize class=md-nav__link> tryPresize </a> </li> <li class=md-nav__item> <a href=#transfer class=md-nav__link> transfer </a> </li> <li class=md-nav__item> <a href=#addcount class=md-nav__link> addCount </a> </li> </ul> </nav> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../%E5%90%8C%E6%AD%A5%E5%B7%A5%E5%85%B7%E7%B1%BB/ class=md-nav__link> 同步工具类 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_3> <label class=md-nav__link for=__nav_3 id=__nav_3_label tabindex=0> java <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_3_label aria-expanded=false> <label class=md-nav__title for=__nav_3> <span class="md-nav__icon md-icon"></span> java </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../java/ZooKeeper-overview/ class=md-nav__link> ZooKeeper </a> </li> <li class=md-nav__item> <a href=../../java/Spark-Overview/ class=md-nav__link> Spark </a> </li> <li class=md-nav__item> <a href=../../java/Resources/ class=md-nav__link> Resources </a> </li> <li class=md-nav__item> <a href=../../java/java-SE8-in-practice/ class=md-nav__link> java-SE8-in-practice </a> </li> <li class=md-nav__item> <a href=../../java/vim-learning-notes/ class=md-nav__link> vim </a> </li> <li class=md-nav__item> <a href=../../java/understanding-REST/ class=md-nav__link> 理解REST </a> </li> <li class=md-nav__item> <a href=../../java/spring-callstack/ class=md-nav__link> spring </a> </li> <li class=md-nav__item> <a href=../../java/BlockingQueue%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/ class=md-nav__link> BlockingQueue源码剖析 </a> </li> <li class=md-nav__item> <a href=../../java/java.util.concurrent.locks%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90/ class=md-nav__link> java.util.concurrent.locks源码剖析 </a> </li> <li class=md-nav__item> <a href=../../java/Redis-CheatSheet/ class=md-nav__link> Redis </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_4> <div class="md-nav__link md-nav__link--index "> <a href=../../contest/ >比赛相关</a> <label for=__nav_4> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_4_label aria-expanded=false> <label class=md-nav__title for=__nav_4> <span class="md-nav__icon md-icon"></span> 比赛相关 </label> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_4_2> <label class=md-nav__link for=__nav_4_2 id=__nav_4_2_label tabindex=0> 赛事 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_4_2_label aria-expanded=false> <label class=md-nav__title for=__nav_4_2> <span class="md-nav__icon md-icon"></span> 赛事 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../contest/oi/ class=md-nav__link> OI 赛事与赛制 </a> </li> <li class=md-nav__item> <a href=../../contest/icpc/ class=md-nav__link> ICPC/CCPC 赛事与赛制 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_4_3> <label class=md-nav__link for=__nav_4_3 id=__nav_4_3_label tabindex=0> 题型 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_4_3_label aria-expanded=false> <label class=md-nav__title for=__nav_4_3> <span class="md-nav__icon md-icon"></span> 题型 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../contest/problems/ class=md-nav__link> 题型概述 </a> </li> <li class=md-nav__item> <a href=../../contest/interaction/ class=md-nav__link> 交互题 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../contest/roadmap/ class=md-nav__link> 学习路线 </a> </li> <li class=md-nav__item> <a href=../../contest/resources/ class=md-nav__link> 学习资源 </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_4_6> <label class=md-nav__link for=__nav_4_6 id=__nav_4_6_label tabindex=0> 技巧 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_4_6_label aria-expanded=false> <label class=md-nav__title for=__nav_4_6> <span class="md-nav__icon md-icon"></span> 技巧 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../contest/io/ class=md-nav__link> 读入、输出优化 </a> </li> <li class=md-nav__item> <a href=../../contest/dictionary/ class=md-nav__link> 分段打表 </a> </li> <li class=md-nav__item> <a href=../../contest/common-mistakes/ class=md-nav__link> 常见错误 </a> </li> <li class=md-nav__item> <a href=../../contest/common-tricks/ class=md-nav__link> 常见技巧 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_4_7> <label class=md-nav__link for=__nav_4_7 id=__nav_4_7_label tabindex=0> 出题相关 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_4_7_label aria-expanded=false> <label class=md-nav__title for=__nav_4_7> <span class="md-nav__icon md-icon"></span> 出题相关 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../contest/problemsetting/ class=md-nav__link> 出题 </a> </li> </ul> </nav> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_5> <div class="md-nav__link md-nav__link--index "> <a href=../../tools/ >工具软件</a> <label for=__nav_5> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_5_label aria-expanded=false> <label class=md-nav__title for=__nav_5> <span class="md-nav__icon md-icon"></span> 工具软件 </label> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_5_2> <label class=md-nav__link for=__nav_5_2 id=__nav_5_2_label tabindex=0> 代码编辑工具 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_5_2_label aria-expanded=false> <label class=md-nav__title for=__nav_5_2> <span class="md-nav__icon md-icon"></span> 代码编辑工具 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../tools/editor/vim/ class=md-nav__link> Vim </a> </li> <li class=md-nav__item> <a href=../../tools/editor/emacs/ class=md-nav__link> Emacs </a> </li> <li class=md-nav__item> <a href=../../tools/editor/vscode/ class=md-nav__link> VS Code </a> </li> <li class=md-nav__item> <a href=../../tools/editor/atom/ class=md-nav__link> Atom </a> </li> <li class=md-nav__item> <a href=../../tools/editor/eclipse/ class=md-nav__link> Eclipse </a> </li> <li class=md-nav__item> <a href=../../tools/editor/npp/ class=md-nav__link> Notepad++ </a> </li> <li class=md-nav__item> <a href=../../tools/editor/kate/ class=md-nav__link> Kate </a> </li> <li class=md-nav__item> <a href=../../tools/editor/devcpp/ class=md-nav__link> Dev-C++ </a> </li> <li class=md-nav__item> <a href=../../tools/editor/clion/ class=md-nav__link> CLion </a> </li> <li class=md-nav__item> <a href=../../tools/editor/geany/ class=md-nav__link> Geany </a> </li> <li class=md-nav__item> <a href=../../tools/editor/xcode/ class=md-nav__link> Xcode </a> </li> <li class=md-nav__item> <a href=../../tools/editor/guide/ class=md-nav__link> GUIDE </a> </li> <li class=md-nav__item> <a href=../../tools/editor/sublime/ class=md-nav__link> Sublime Text </a> </li> <li class=md-nav__item> <a href=../../tools/editor/cpeditor/ class=md-nav__link> CP Editor </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_5_3> <div class="md-nav__link md-nav__link--index "> <a href=../../tools/judger/ >评测工具</a> <label for=__nav_5_3> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_5_3_label aria-expanded=false> <label class=md-nav__title for=__nav_5_3> <span class="md-nav__icon md-icon"></span> 评测工具 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../tools/judger/arbiter/ class=md-nav__link> Arbiter </a> </li> <li class=md-nav__item> <a href=../../tools/judger/cena/ class=md-nav__link> Cena </a> </li> <li class=md-nav__item> <a href=../../tools/judger/ccr-plus/ class=md-nav__link> CCR Plus </a> </li> <li class=md-nav__item> <a href=../../tools/judger/lemon/ class=md-nav__link> Lemon </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../tools/cmd/ class=md-nav__link> 命令行 </a> </li> <li class=md-nav__item> <a href=../../tools/compiler/ class=md-nav__link> 编译器 </a> </li> <li class=md-nav__item> <a href=../../tools/wsl/ class=md-nav__link> WSL (Windows 10) </a> </li> <li class=md-nav__item> <a href=../../tools/special-judge/ class=md-nav__link> Special Judge </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_5_8> <div class="md-nav__link md-nav__link--index "> <a href=../../tools/testlib/ >Testlib</a> <label for=__nav_5_8> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_5_8_label aria-expanded=false> <label class=md-nav__title for=__nav_5_8> <span class="md-nav__icon md-icon"></span> Testlib </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../tools/testlib/general/ class=md-nav__link> 通用 </a> </li> <li class=md-nav__item> <a href=../../tools/testlib/generator/ class=md-nav__link> Generator </a> </li> <li class=md-nav__item> <a href=../../tools/testlib/validator/ class=md-nav__link> Validator </a> </li> <li class=md-nav__item> <a href=../../tools/testlib/interactor/ class=md-nav__link> Interactor </a> </li> <li class=md-nav__item> <a href=../../tools/testlib/checker/ class=md-nav__link> Checker </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../tools/polygon/ class=md-nav__link> Polygon </a> </li> <li class=md-nav__item> <a href=../../tools/oj-tool/ class=md-nav__link> OJ 工具 </a> </li> <li class=md-nav__item> <a href=../../tools/latex/ class=md-nav__link> LaTeX 入门 </a> </li> <li class=md-nav__item> <a href=../../tools/git/ class=md-nav__link> Git </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_6> <div class="md-nav__link md-nav__link--index "> <a href=../../lang/ >语言基础</a> <label for=__nav_6> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_6_label aria-expanded=false> <label class=md-nav__title for=__nav_6> <span class="md-nav__icon md-icon"></span> 语言基础 </label> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_6_2> <label class=md-nav__link for=__nav_6_2 id=__nav_6_2_label tabindex=0> C++ 基础 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_6_2_label aria-expanded=false> <label class=md-nav__title for=__nav_6_2> <span class="md-nav__icon md-icon"></span> C++ 基础 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../lang/helloworld/ class=md-nav__link> Hello, World! </a> </li> <li class=md-nav__item> <a href=../../lang/basic/ class=md-nav__link> C++ 语法基础 </a> </li> <li class=md-nav__item> <a href=../../lang/var/ class=md-nav__link> 变量 </a> </li> <li class=md-nav__item> <a href=../../lang/op/ class=md-nav__link> 运算 </a> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_6_2_5> <label class=md-nav__link for=__nav_6_2_5 id=__nav_6_2_5_label tabindex=0> 流程控制语句 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=3 aria-labelledby=__nav_6_2_5_label aria-expanded=false> <label class=md-nav__title for=__nav_6_2_5> <span class="md-nav__icon md-icon"></span> 流程控制语句 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../lang/branch/ class=md-nav__link> 分支 </a> </li> <li class=md-nav__item> <a href=../../lang/loop/ class=md-nav__link> 循环 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_6_2_6> <label class=md-nav__link for=__nav_6_2_6 id=__nav_6_2_6_label tabindex=0> 高级数据类型 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=3 aria-labelledby=__nav_6_2_6_label aria-expanded=false> <label class=md-nav__title for=__nav_6_2_6> <span class="md-nav__icon md-icon"></span> 高级数据类型 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../lang/array/ class=md-nav__link> 数组 </a> </li> <li class=md-nav__item> <a href=../../lang/struct/ class=md-nav__link> 结构体 </a> </li> <li class=md-nav__item> <a href=../../lang/pointer/ class=md-nav__link> 指针 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../lang/func/ class=md-nav__link> 函数 </a> </li> <li class=md-nav__item> <a href=../../lang/file-op/ class=md-nav__link> 文件操作 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_6_3> <div class="md-nav__link md-nav__link--index "> <a href=../../lang/csl/ >C++ 标准库</a> <label for=__nav_6_3> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_6_3_label aria-expanded=false> <label class=md-nav__title for=__nav_6_3> <span class="md-nav__icon md-icon"></span> C++ 标准库 </label> <ul class=md-nav__list data-md-scrollfix> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_6_3_2> <label class=md-nav__link for=__nav_6_3_2 id=__nav_6_3_2_label tabindex=0> STL 容器 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=3 aria-labelledby=__nav_6_3_2_label aria-expanded=false> <label class=md-nav__title for=__nav_6_3_2> <span class="md-nav__icon md-icon"></span> STL 容器 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../lang/csl/container/ class=md-nav__link> STL 容器简介 </a> </li> <li class=md-nav__item> <a href=../../lang/csl/iterator/ class=md-nav__link> 迭代器 </a> </li> <li class=md-nav__item> <a href=../../lang/csl/sequence-container/ class=md-nav__link> 序列式容器 </a> </li> <li class=md-nav__item> <a href=../../lang/csl/associative-container/ class=md-nav__link> 关联式容器 </a> </li> <li class=md-nav__item> <a href=../../lang/csl/unordered-container/ class=md-nav__link> 无序关联式容器 </a> </li> <li class=md-nav__item> <a href=../../lang/csl/container-adapter/ class=md-nav__link> 容器适配器 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../lang/csl/algorithm/ class=md-nav__link> STL 算法 </a> </li> <li class=md-nav__item> <a href=../../lang/csl/bitset/ class=md-nav__link> bitset </a> </li> <li class=md-nav__item> <a href=../../lang/csl/string/ class=md-nav__link> string </a> </li> <li class=md-nav__item> <a href=../../lang/csl/pair/ class=md-nav__link> pair </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_6_4> <label class=md-nav__link for=__nav_6_4 id=__nav_6_4_label tabindex=0> C++ 进阶 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_6_4_label aria-expanded=false> <label class=md-nav__title for=__nav_6_4> <span class="md-nav__icon md-icon"></span> C++ 进阶 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../lang/class/ class=md-nav__link> 类 </a> </li> <li class=md-nav__item> <a href=../../lang/namespace/ class=md-nav__link> 命名空间 </a> </li> <li class=md-nav__item> <a href=../../lang/value-category/ class=md-nav__link> 值类别 </a> </li> <li class=md-nav__item> <a href=../../lang/op-overload/ class=md-nav__link> 重载运算符 </a> </li> <li class=md-nav__item> <a href=../../lang/reference/ class=md-nav__link> 引用 </a> </li> <li class=md-nav__item> <a href=../../lang/const/ class=md-nav__link> 常值 </a> </li> <li class=md-nav__item> <a href=../../lang/new/ class=md-nav__link> 新版 C++ 特性 </a> </li> <li class=md-nav__item> <a href=../../lang/lambda/ class=md-nav__link> Lambda 表达式 </a> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_6_4_9> <div class="md-nav__link md-nav__link--index "> <a href=../../lang/pb-ds/ >pb_ds</a> <label for=__nav_6_4_9> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=3 aria-labelledby=__nav_6_4_9_label aria-expanded=false> <label class=md-nav__title for=__nav_6_4_9> <span class="md-nav__icon md-icon"></span> pb_ds </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../lang/pb-ds/pq/ class=md-nav__link> 堆 </a> </li> <li class=md-nav__item> <a href=../../lang/pb-ds/tree/ class=md-nav__link> 平衡树 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../lang/optimizations/ class=md-nav__link> 编译优化 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../lang/cpp-other-langs/ class=md-nav__link> C++ 与其他常用语言的区别 </a> </li> <li class=md-nav__item> <a href=../../lang/pas-cpp/ class=md-nav__link> Pascal 转 C++ 急救 </a> </li> <li class=md-nav__item> <a href=../../lang/python/ class=md-nav__link> Python 速成 </a> </li> <li class=md-nav__item> <a href=../../lang/java/ class=md-nav__link> Java 速成 </a> </li> <li class=md-nav__item> <a href=../../lang/java-pro/ class=md-nav__link> Java 进阶 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_7> <div class="md-nav__link md-nav__link--index "> <a href=../../basic/ >算法基础</a> <label for=__nav_7> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_7_label aria-expanded=false> <label class=md-nav__title for=__nav_7> <span class="md-nav__icon md-icon"></span> 算法基础 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../basic/complexity/ class=md-nav__link> 复杂度 </a> </li> <li class=md-nav__item> <a href=../../basic/enumerate/ class=md-nav__link> 枚举 </a> </li> <li class=md-nav__item> <a href=../../basic/simulate/ class=md-nav__link> 模拟 </a> </li> <li class=md-nav__item> <a href=../../basic/divide-and-conquer/ class=md-nav__link> 递归 & 分治 </a> </li> <li class=md-nav__item> <a href=../../basic/greedy/ class=md-nav__link> 贪心 </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_7_7> <label class=md-nav__link for=__nav_7_7 id=__nav_7_7_label tabindex=0> 排序 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_7_7_label aria-expanded=false> <label class=md-nav__title for=__nav_7_7> <span class="md-nav__icon md-icon"></span> 排序 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../basic/sort-intro/ class=md-nav__link> 排序简介 </a> </li> <li class=md-nav__item> <a href=../../basic/selection-sort/ class=md-nav__link> 选择排序 </a> </li> <li class=md-nav__item> <a href=../../basic/bubble-sort/ class=md-nav__link> 冒泡排序 </a> </li> <li class=md-nav__item> <a href=../../basic/insertion-sort/ class=md-nav__link> 插入排序 </a> </li> <li class=md-nav__item> <a href=../../basic/counting-sort/ class=md-nav__link> 计数排序 </a> </li> <li class=md-nav__item> <a href=../../basic/radix-sort/ class=md-nav__link> 基数排序 </a> </li> <li class=md-nav__item> <a href=../../basic/quick-sort/ class=md-nav__link> 快速排序 </a> </li> <li class=md-nav__item> <a href=../../basic/merge-sort/ class=md-nav__link> 归并排序 </a> </li> <li class=md-nav__item> <a href=../../basic/heap-sort/ class=md-nav__link> 堆排序 </a> </li> <li class=md-nav__item> <a href=../../basic/bucket-sort/ class=md-nav__link> 桶排序 </a> </li> <li class=md-nav__item> <a href=../../basic/shell-sort/ class=md-nav__link> 希尔排序 </a> </li> <li class=md-nav__item> <a href=../../basic/tournament-sort/ class=md-nav__link> 锦标赛排序 </a> </li> <li class=md-nav__item> <a href=../../basic/tim-sort/ class=md-nav__link> tim排序 </a> </li> <li class=md-nav__item> <a href=../../basic/stl-sort/ class=md-nav__link> 排序相关 STL </a> </li> <li class=md-nav__item> <a href=../../basic/use-of-sort/ class=md-nav__link> 排序应用 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../basic/prefix-sum/ class=md-nav__link> 前缀和 & 差分 </a> </li> <li class=md-nav__item> <a href=../../basic/binary/ class=md-nav__link> 二分 </a> </li> <li class=md-nav__item> <a href=../../basic/binary-lifting/ class=md-nav__link> 倍增 </a> </li> <li class=md-nav__item> <a href=../../basic/construction/ class=md-nav__link> 构造 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_8> <div class="md-nav__link md-nav__link--index "> <a href=../../search/ >搜索</a> <label for=__nav_8> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_8_label aria-expanded=false> <label class=md-nav__title for=__nav_8> <span class="md-nav__icon md-icon"></span> 搜索 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../search/dfs/ class=md-nav__link> DFS（搜索） </a> </li> <li class=md-nav__item> <a href=../../search/bfs/ class=md-nav__link> BFS（搜索） </a> </li> <li class=md-nav__item> <a href=../../search/bidirectional/ class=md-nav__link> 双向搜索 </a> </li> <li class=md-nav__item> <a href=../../search/heuristic/ class=md-nav__link> 启发式搜索 </a> </li> <li class=md-nav__item> <a href=../../search/astar/ class=md-nav__link> A* </a> </li> <li class=md-nav__item> <a href=../../search/iterative/ class=md-nav__link> 迭代加深搜索 </a> </li> <li class=md-nav__item> <a href=../../search/idastar/ class=md-nav__link> IDA* </a> </li> <li class=md-nav__item> <a href=../../search/backtracking/ class=md-nav__link> 回溯法 </a> </li> <li class=md-nav__item> <a href=../../search/dlx/ class=md-nav__link> Dancing Links </a> </li> <li class=md-nav__item> <a href=../../search/alpha-beta/ class=md-nav__link> Alpha-Beta 剪枝 </a> </li> <li class=md-nav__item> <a href=../../search/opt/ class=md-nav__link> 优化 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_9> <div class="md-nav__link md-nav__link--index "> <a href=../../dp/ >动态规划</a> <label for=__nav_9> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_9_label aria-expanded=false> <label class=md-nav__title for=__nav_9> <span class="md-nav__icon md-icon"></span> 动态规划 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../dp/basic/ class=md-nav__link> 动态规划基础 </a> </li> <li class=md-nav__item> <a href=../../dp/memo/ class=md-nav__link> 记忆化搜索 </a> </li> <li class=md-nav__item> <a href=../../dp/knapsack/ class=md-nav__link> 背包 DP </a> </li> <li class=md-nav__item> <a href=../../dp/interval/ class=md-nav__link> 区间 DP </a> </li> <li class=md-nav__item> <a href=../../dp/dag/ class=md-nav__link> DAG 上的 DP </a> </li> <li class=md-nav__item> <a href=../../dp/tree/ class=md-nav__link> 树形 DP </a> </li> <li class=md-nav__item> <a href=../../dp/state/ class=md-nav__link> 状压 DP </a> </li> <li class=md-nav__item> <a href=../../dp/number/ class=md-nav__link> 数位 DP </a> </li> <li class=md-nav__item> <a href=../../dp/plug/ class=md-nav__link> 插头 DP </a> </li> <li class=md-nav__item> <a href=../../dp/count/ class=md-nav__link> 计数 DP </a> </li> <li class=md-nav__item> <a href=../../dp/dynamic/ class=md-nav__link> 动态 DP </a> </li> <li class=md-nav__item> <a href=../../dp/probability/ class=md-nav__link> 概率 DP </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_9_14> <label class=md-nav__link for=__nav_9_14 id=__nav_9_14_label tabindex=0> DP 优化 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_9_14_label aria-expanded=false> <label class=md-nav__title for=__nav_9_14> <span class="md-nav__icon md-icon"></span> DP 优化 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../dp/opt/monotonous-queue-stack/ class=md-nav__link> 单调队列/单调栈优化 </a> </li> <li class=md-nav__item> <a href=../../dp/opt/slope/ class=md-nav__link> 斜率优化 </a> </li> <li class=md-nav__item> <a href=../../dp/opt/quadrangle/ class=md-nav__link> 四边形不等式优化 </a> </li> <li class=md-nav__item> <a href=../../dp/opt/state/ class=md-nav__link> 状态设计优化 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../dp/misc/ class=md-nav__link> 其它 DP 方法 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_10> <div class="md-nav__link md-nav__link--index "> <a href=../../string/ >字符串</a> <label for=__nav_10> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_10_label aria-expanded=false> <label class=md-nav__title for=__nav_10> <span class="md-nav__icon md-icon"></span> 字符串 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../string/basic/ class=md-nav__link> 字符串基础 </a> </li> <li class=md-nav__item> <a href=../../string/lib-func/ class=md-nav__link> 标准库 </a> </li> <li class=md-nav__item> <a href=../../string/match/ class=md-nav__link> 字符串匹配 </a> </li> <li class=md-nav__item> <a href=../../string/hash/ class=md-nav__link> 字符串哈希 </a> </li> <li class=md-nav__item> <a href=../../string/trie/ class=md-nav__link> 字典树 (Trie) </a> </li> <li class=md-nav__item> <a href=../../string/kmp/ class=md-nav__link> 前缀函数与 KMP 算法 </a> </li> <li class=md-nav__item> <a href=../../string/bm/ class=md-nav__link> Boyer-Moore算法 </a> </li> <li class=md-nav__item> <a href=../../string/z-func/ class=md-nav__link> Z 函数（扩展 KMP） </a> </li> <li class=md-nav__item> <a href=../../string/automaton/ class=md-nav__link> 自动机 </a> </li> <li class=md-nav__item> <a href=../../string/ac-automaton/ class=md-nav__link> AC 自动机 </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_10_12> <label class=md-nav__link for=__nav_10_12 id=__nav_10_12_label tabindex=0> 后缀数组 (SA) <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_10_12_label aria-expanded=false> <label class=md-nav__title for=__nav_10_12> <span class="md-nav__icon md-icon"></span> 后缀数组 (SA) </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../string/sa/ class=md-nav__link> 后缀数组简介 </a> </li> <li class=md-nav__item> <a href=../../string/sa-optimal-inplace/ class=md-nav__link> 最优原地后缀排序算法 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../string/sam/ class=md-nav__link> 后缀自动机 (SAM) </a> </li> <li class=md-nav__item> <a href=../../string/suffix-bst/ class=md-nav__link> 后缀平衡树 </a> </li> <li class=md-nav__item> <a href=../../string/general-sam/ class=md-nav__link> 广义后缀自动机 </a> </li> <li class=md-nav__item> <a href=../../string/suffix-tree/ class=md-nav__link> 后缀树 </a> </li> <li class=md-nav__item> <a href=../../string/manacher/ class=md-nav__link> Manacher </a> </li> <li class=md-nav__item> <a href=../../string/pam/ class=md-nav__link> 回文树 </a> </li> <li class=md-nav__item> <a href=../../string/seq-automaton/ class=md-nav__link> 序列自动机 </a> </li> <li class=md-nav__item> <a href=../../string/minimal-string/ class=md-nav__link> 最小表示法 </a> </li> <li class=md-nav__item> <a href=../../string/lyndon/ class=md-nav__link> Lyndon 分解 </a> </li> <li class=md-nav__item> <a href=../../string/main-lorentz/ class=md-nav__link> Main-Lorentz 算法 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_11> <div class="md-nav__link md-nav__link--index "> <a href=../../math/ >数学</a> <label for=__nav_11> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_11_label aria-expanded=false> <label class=md-nav__title for=__nav_11> <span class="md-nav__icon md-icon"></span> 数学 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../math/notation/ class=md-nav__link> 符号 </a> </li> <li class=md-nav__item> <a href=../../math/base/ class=md-nav__link> 进位制 </a> </li> <li class=md-nav__item> <a href=../../math/bit/ class=md-nav__link> 位运算 </a> </li> <li class=md-nav__item> <a href=../../math/binary-set/ class=md-nav__link> 二进制集合操作 </a> </li> <li class=md-nav__item> <a href=../../math/balanced-ternary/ class=md-nav__link> 平衡三进制 </a> </li> <li class=md-nav__item> <a href=../../math/bignum/ class=md-nav__link> 高精度计算 </a> </li> <li class=md-nav__item> <a href=../../math/binary-exponentiation/ class=md-nav__link> 快速幂 </a> </li> <li class=md-nav__item> <a href=../../math/permulation/ class=md-nav__link> 置换和排列 </a> </li> <li class=md-nav__item> <a href=../../math/coordinate/ class=md-nav__link> 弧度制与坐标系 </a> </li> <li class=md-nav__item> <a href=../../math/complex/ class=md-nav__link> 复数 </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_11_12> <label class=md-nav__link for=__nav_11_12 id=__nav_11_12_label tabindex=0> 数论 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_11_12_label aria-expanded=false> <label class=md-nav__title for=__nav_11_12> <span class="md-nav__icon md-icon"></span> 数论 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../math/number-theory/basic/ class=md-nav__link> 数论基础 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/prime/ class=md-nav__link> 素数 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/gcd/ class=md-nav__link> 最大公约数 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/sqrt-decomposition/ class=md-nav__link> 数论分块 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/euler/ class=md-nav__link> 欧拉函数 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/sieve/ class=md-nav__link> 筛法 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/meissel-lehmer/ class=md-nav__link> Meissel–Lehmer 算法 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/pollard-rho/ class=md-nav__link> 分解质因数 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/bezouts/ class=md-nav__link> 裴蜀定理 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/euclidean/ class=md-nav__link> 类欧几里德算法 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/fermat/ class=md-nav__link> 欧拉定理 & 费马小定理 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/inverse/ class=md-nav__link> 乘法逆元 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/linear-equation/ class=md-nav__link> 线性同余方程 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/crt/ class=md-nav__link> 中国剩余定理 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/wilson/ class=md-nav__link> 威尔逊定理 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/lift-the-exponent/ class=md-nav__link> 升幂定理 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/lucas/ class=md-nav__link> 卢卡斯定理 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/lagrange/ class=md-nav__link> 拉格朗日定理 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/primitive-root/ class=md-nav__link> 原根 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/discrete-logarithm/ class=md-nav__link> 离散对数 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/residue/ class=md-nav__link> 剩余与单位根 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/quad-residue/ class=md-nav__link> 二次剩余 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/mobius/ class=md-nav__link> 莫比乌斯反演 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/du/ class=md-nav__link> 杜教筛 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/powerful-number/ class=md-nav__link> Powerful Number 筛 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/min-25/ class=md-nav__link> Min_25 筛 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/zhou/ class=md-nav__link> 洲阁筛 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/continued-fraction/ class=md-nav__link> 连分数 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/stern-brocot/ class=md-nav__link> Stern–Brocot 树与 Farey 序列 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/quadratic/ class=md-nav__link> 二次域 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/periodic-continued-fraction/ class=md-nav__link> 循环连分数 </a> </li> <li class=md-nav__item> <a href=../../math/number-theory/pell-equation/ class=md-nav__link> Pell 方程 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_11_13> <label class=md-nav__link for=__nav_11_13 id=__nav_11_13_label tabindex=0> 多项式与生成函数 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_11_13_label aria-expanded=false> <label class=md-nav__title for=__nav_11_13> <span class="md-nav__icon md-icon"></span> 多项式与生成函数 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../math/poly/intro/ class=md-nav__link> 多项式与生成函数简介 </a> </li> <li class=md-nav__item> <a href=../../math/poly/fundamental/ class=md-nav__link> 代数基本定理 </a> </li> <li class=md-nav__item> <a href=../../math/poly/fft/ class=md-nav__link> 快速傅里叶变换 </a> </li> <li class=md-nav__item> <a href=../../math/poly/ntt/ class=md-nav__link> 快速数论变换 </a> </li> <li class=md-nav__item> <a href=../../math/poly/fwt/ class=md-nav__link> 快速沃尔什变换 </a> </li> <li class=md-nav__item> <a href=../../math/poly/czt/ class=md-nav__link> Chirp Z 变换 </a> </li> <li class=md-nav__item> <a href=../../math/poly/newton/ class=md-nav__link> 多项式牛顿迭代 </a> </li> <li class=md-nav__item> <a href=../../math/poly/multipoint-eval-interpolation/ class=md-nav__link> 多项式多点求值|快速插值 </a> </li> <li class=md-nav__item> <a href=../../math/poly/elementary-func/ class=md-nav__link> 多项式初等函数 </a> </li> <li class=md-nav__item> <a href=../../math/poly/linear-recurrence/ class=md-nav__link> 常系数齐次线性递推 </a> </li> <li class=md-nav__item> <a href=../../math/poly/shift/ class=md-nav__link> 多项式平移|连续点值平移 </a> </li> <li class=md-nav__item> <a href=../../math/poly/symbolic-method/ class=md-nav__link> 符号化方法 </a> </li> <li class=md-nav__item> <a href=../../math/poly/ogf/ class=md-nav__link> 普通生成函数 </a> </li> <li class=md-nav__item> <a href=../../math/poly/egf/ class=md-nav__link> 指数生成函数 </a> </li> <li class=md-nav__item> <a href=../../math/poly/dgf/ class=md-nav__link> 狄利克雷生成函数 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_11_14> <label class=md-nav__link for=__nav_11_14 id=__nav_11_14_label tabindex=0> 组合数学 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_11_14_label aria-expanded=false> <label class=md-nav__title for=__nav_11_14> <span class="md-nav__icon md-icon"></span> 组合数学 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../math/combinatorics/combination/ class=md-nav__link> 排列组合 </a> </li> <li class=md-nav__item> <a href=../../math/combinatorics/drawer-principle/ class=md-nav__link> 抽屉原理 </a> </li> <li class=md-nav__item> <a href=../../math/combinatorics/inclusion-exclusion-principle/ class=md-nav__link> 容斥原理 </a> </li> <li class=md-nav__item> <a href=../../math/combinatorics/cantor/ class=md-nav__link> 康托展开 </a> </li> <li class=md-nav__item> <a href=../../math/combinatorics/fibonacci/ class=md-nav__link> 斐波那契数列 </a> </li> <li class=md-nav__item> <a href=../../math/combinatorics/derangement/ class=md-nav__link> 错位排列 </a> </li> <li class=md-nav__item> <a href=../../math/combinatorics/catalan/ class=md-nav__link> 卡特兰数 </a> </li> <li class=md-nav__item> <a href=../../math/combinatorics/stirling/ class=md-nav__link> 斯特林数 </a> </li> <li class=md-nav__item> <a href=../../math/combinatorics/bell/ class=md-nav__link> 贝尔数 </a> </li> <li class=md-nav__item> <a href=../../math/combinatorics/bernoulli/ class=md-nav__link> 伯努利数 </a> </li> <li class=md-nav__item> <a href=../../math/combinatorics/entringer/ class=md-nav__link> Entringer Number </a> </li> <li class=md-nav__item> <a href=../../math/combinatorics/eulerian/ class=md-nav__link> Eulerian Number </a> </li> <li class=md-nav__item> <a href=../../math/combinatorics/partition/ class=md-nav__link> 分拆数 </a> </li> <li class=md-nav__item> <a href=../../math/combinatorics/vandermonde-convolution/ class=md-nav__link> 范德蒙德卷积 </a> </li> <li class=md-nav__item> <a href=../../math/combinatorics/graph-enumeration/ class=md-nav__link> 图论计数 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_11_15> <div class="md-nav__link md-nav__link--index "> <a href=../../math/linear-algebra/ >线性代数</a> <label for=__nav_11_15> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_11_15_label aria-expanded=false> <label class=md-nav__title for=__nav_11_15> <span class="md-nav__icon md-icon"></span> 线性代数 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../math/linear-algebra/vector/ class=md-nav__link> 向量 </a> </li> <li class=md-nav__item> <a href=../../math/linear-algebra/product/ class=md-nav__link> 内积和外积 </a> </li> <li class=md-nav__item> <a href=../../math/linear-algebra/matrix/ class=md-nav__link> 矩阵 </a> </li> <li class=md-nav__item> <a href=../../math/linear-algebra/elementary-operations/ class=md-nav__link> 初等变换 </a> </li> <li class=md-nav__item> <a href=../../math/linear-algebra/determinant/ class=md-nav__link> 行列式 </a> </li> <li class=md-nav__item> <a href=../../math/linear-algebra/vector-space/ class=md-nav__link> 线性空间 </a> </li> <li class=md-nav__item> <a href=../../math/linear-algebra/basis/ class=md-nav__link> 线性基 </a> </li> <li class=md-nav__item> <a href=../../math/linear-algebra/linear-mapping/ class=md-nav__link> 线性映射 </a> </li> <li class=md-nav__item> <a href=../../math/linear-algebra/char-poly/ class=md-nav__link> 特征多项式 </a> </li> <li class=md-nav__item> <a href=../../math/linear-algebra/diagonalization/ class=md-nav__link> 对角化 </a> </li> <li class=md-nav__item> <a href=../../math/linear-algebra/jordan/ class=md-nav__link> Jordan标准型 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_11_16> <label class=md-nav__link for=__nav_11_16 id=__nav_11_16_label tabindex=0> 线性规划 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_11_16_label aria-expanded=false> <label class=md-nav__title for=__nav_11_16> <span class="md-nav__icon md-icon"></span> 线性规划 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../math/linear-programming/ class=md-nav__link> 线性规划简介 </a> </li> <li class=md-nav__item> <a href=../../math/simplex/ class=md-nav__link> 单纯形算法 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_11_17> <label class=md-nav__link for=__nav_11_17 id=__nav_11_17_label tabindex=0> 群论 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_11_17_label aria-expanded=false> <label class=md-nav__title for=__nav_11_17> <span class="md-nav__icon md-icon"></span> 群论 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../math/group-theory/ class=md-nav__link> 群论简介 </a> </li> <li class=md-nav__item> <a href=../../math/permutation-group/ class=md-nav__link> 置换群 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_11_18> <label class=md-nav__link for=__nav_11_18 id=__nav_11_18_label tabindex=0> 概率论 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_11_18_label aria-expanded=false> <label class=md-nav__title for=__nav_11_18> <span class="md-nav__icon md-icon"></span> 概率论 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../math/probability/basic-conception/ class=md-nav__link> 基本概念 </a> </li> <li class=md-nav__item> <a href=../../math/probability/conditional-probability/ class=md-nav__link> 条件概率与独立性 </a> </li> <li class=md-nav__item> <a href=../../math/probability/random-variable/ class=md-nav__link> 随机变量 </a> </li> <li class=md-nav__item> <a href=../../math/probability/exp-var/ class=md-nav__link> 随机变量的数字特征 </a> </li> <li class=md-nav__item> <a href=../../math/probability/concentration-inequality/ class=md-nav__link> 概率不等式 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_11_19> <label class=md-nav__link for=__nav_11_19 id=__nav_11_19_label tabindex=0> 博弈论 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_11_19_label aria-expanded=false> <label class=md-nav__title for=__nav_11_19> <span class="md-nav__icon md-icon"></span> 博弈论 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../math/game-theory/intro/ class=md-nav__link> 博弈论简介 </a> </li> <li class=md-nav__item> <a href=../../math/game-theory/impartial-game/ class=md-nav__link> 公平组合游戏 </a> </li> <li class=md-nav__item> <a href=../../math/game-theory/partizan-game/ class=md-nav__link> 非公平组合游戏 </a> </li> <li class=md-nav__item> <a href=../../math/game-theory/misere-game/ class=md-nav__link> 反常游戏 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_11_20> <label class=md-nav__link for=__nav_11_20 id=__nav_11_20_label tabindex=0> 数值算法 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_11_20_label aria-expanded=false> <label class=md-nav__title for=__nav_11_20> <span class="md-nav__icon md-icon"></span> 数值算法 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../math/numerical/lagrange/ class=md-nav__link> 拉格朗日插值 </a> </li> <li class=md-nav__item> <a href=../../math/numerical/integral/ class=md-nav__link> 数值积分 </a> </li> <li class=md-nav__item> <a href=../../math/numerical/gauss/ class=md-nav__link> 高斯消元 </a> </li> <li class=md-nav__item> <a href=../../math/numerical/newton/ class=md-nav__link> 牛顿迭代法 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../math/fourier-motzkin-elimination/ class=md-nav__link> 傅里叶-莫茨金消元法 </a> </li> <li class=md-nav__item> <a href=../../math/order-theory/ class=md-nav__link> 序理论 </a> </li> <li class=md-nav__item> <a href=../../math/young-tableau/ class=md-nav__link> 杨氏矩阵 </a> </li> <li class=md-nav__item> <a href=../../math/schreier-sims/ class=md-nav__link> Schreier–Sims 算法 </a> </li> <li class=md-nav__item> <a href=../../math/berlekamp-massey/ class=md-nav__link> Berlekamp–Massey 算法 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_12> <div class="md-nav__link md-nav__link--index "> <a href=../../ds/ >数据结构</a> <label for=__nav_12> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_12_label aria-expanded=false> <label class=md-nav__title for=__nav_12> <span class="md-nav__icon md-icon"></span> 数据结构 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../ds/stack/ class=md-nav__link> 栈 </a> </li> <li class=md-nav__item> <a href=../../ds/queue/ class=md-nav__link> 队列 </a> </li> <li class=md-nav__item> <a href=../../ds/linked-list/ class=md-nav__link> 链表 </a> </li> <li class=md-nav__item> <a href=../../ds/hash/ class=md-nav__link> 哈希表 </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_12_6> <label class=md-nav__link for=__nav_12_6 id=__nav_12_6_label tabindex=0> 并查集 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_12_6_label aria-expanded=false> <label class=md-nav__title for=__nav_12_6> <span class="md-nav__icon md-icon"></span> 并查集 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../ds/dsu/ class=md-nav__link> 并查集 </a> </li> <li class=md-nav__item> <a href=../../ds/dsu-complexity/ class=md-nav__link> 并查集复杂度 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_12_7> <label class=md-nav__link for=__nav_12_7 id=__nav_12_7_label tabindex=0> 堆 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_12_7_label aria-expanded=false> <label class=md-nav__title for=__nav_12_7> <span class="md-nav__icon md-icon"></span> 堆 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../ds/heap/ class=md-nav__link> 堆简介 </a> </li> <li class=md-nav__item> <a href=../../ds/binary-heap/ class=md-nav__link> 二叉堆 </a> </li> <li class=md-nav__item> <a href=../../ds/pairing-heap/ class=md-nav__link> 配对堆 </a> </li> <li class=md-nav__item> <a href=../../ds/leftist-tree/ class=md-nav__link> 左偏树 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_12_8> <label class=md-nav__link for=__nav_12_8 id=__nav_12_8_label tabindex=0> 块状数据结构 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_12_8_label aria-expanded=false> <label class=md-nav__title for=__nav_12_8> <span class="md-nav__icon md-icon"></span> 块状数据结构 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../ds/decompose/ class=md-nav__link> 分块思想 </a> </li> <li class=md-nav__item> <a href=../../ds/block-array/ class=md-nav__link> 块状数组 </a> </li> <li class=md-nav__item> <a href=../../ds/block-list/ class=md-nav__link> 块状链表 </a> </li> <li class=md-nav__item> <a href=../../ds/tree-decompose/ class=md-nav__link> 树分块 </a> </li> <li class=md-nav__item> <a href=../../ds/sqrt-tree/ class=md-nav__link> Sqrt Tree </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../ds/monotonous-stack/ class=md-nav__link> 单调栈 </a> </li> <li class=md-nav__item> <a href=../../ds/monotonous-queue/ class=md-nav__link> 单调队列 </a> </li> <li class=md-nav__item> <a href=../../ds/sparse-table/ class=md-nav__link> ST 表 </a> </li> <li class=md-nav__item> <a href=../../ds/fenwick/ class=md-nav__link> 树状数组 </a> </li> <li class=md-nav__item> <a href=../../ds/seg/ class=md-nav__link> 线段树 </a> </li> <li class=md-nav__item> <a href=../../ds/li-chao-tree/ class=md-nav__link> 李超线段树 </a> </li> <li class=md-nav__item> <a href=../../ds/seg-beats/ class=md-nav__link> 区间最值操作 & 区间历史最值 </a> </li> <li class=md-nav__item> <a href=../../ds/dividing/ class=md-nav__link> 划分树 </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_12_17> <label class=md-nav__link for=__nav_12_17 id=__nav_12_17_label tabindex=0> 二叉搜索树 & 平衡树 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_12_17_label aria-expanded=false> <label class=md-nav__title for=__nav_12_17> <span class="md-nav__icon md-icon"></span> 二叉搜索树 & 平衡树 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../ds/bst/ class=md-nav__link> 二叉搜索树简介 </a> </li> <li class=md-nav__item> <a href=../../ds/treap/ class=md-nav__link> Treap </a> </li> <li class=md-nav__item> <a href=../../ds/splay/ class=md-nav__link> Splay </a> </li> <li class=md-nav__item> <a href=../../ds/wblt/ class=md-nav__link> WBLT </a> </li> <li class=md-nav__item> <a href=../../ds/sbt/ class=md-nav__link> Size Balanced Tree </a> </li> <li class=md-nav__item> <a href=../../ds/avl/ class=md-nav__link> AVL 树 </a> </li> <li class=md-nav__item> <a href=../../ds/b-tree/ class=md-nav__link> B 树 </a> </li> <li class=md-nav__item> <a href=../../ds/bplus-tree/ class=md-nav__link> B+ 树 </a> </li> <li class=md-nav__item> <a href=../../ds/sgt/ class=md-nav__link> 替罪羊树 </a> </li> <li class=md-nav__item> <a href=../../ds/leafy-tree/ class=md-nav__link> Leafy Tree </a> </li> <li class=md-nav__item> <a href=../../ds/cartesian-tree/ class=md-nav__link> 笛卡尔树 </a> </li> <li class=md-nav__item> <a href=../../ds/rbtree/ class=md-nav__link> 红黑树 </a> </li> <li class=md-nav__item> <a href=../../ds/llrbt/ class=md-nav__link> 左偏红黑树 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../ds/skiplist/ class=md-nav__link> 跳表 </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_12_19> <label class=md-nav__link for=__nav_12_19 id=__nav_12_19_label tabindex=0> 可持久化数据结构 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_12_19_label aria-expanded=false> <label class=md-nav__title for=__nav_12_19> <span class="md-nav__icon md-icon"></span> 可持久化数据结构 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../ds/persistent/ class=md-nav__link> 可持久化数据结构简介 </a> </li> <li class=md-nav__item> <a href=../../ds/persistent-seg/ class=md-nav__link> 可持久化线段树 </a> </li> <li class=md-nav__item> <a href=../../ds/persistent-block-array/ class=md-nav__link> 可持久化块状数组 </a> </li> <li class=md-nav__item> <a href=../../ds/persistent-balanced/ class=md-nav__link> 可持久化平衡树 </a> </li> <li class=md-nav__item> <a href=../../ds/persistent-trie/ class=md-nav__link> 可持久化字典树 </a> </li> <li class=md-nav__item> <a href=../../ds/persistent-heap/ class=md-nav__link> 可持久化可并堆 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_12_20> <label class=md-nav__link for=__nav_12_20 id=__nav_12_20_label tabindex=0> 树套树 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_12_20_label aria-expanded=false> <label class=md-nav__title for=__nav_12_20> <span class="md-nav__icon md-icon"></span> 树套树 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../ds/seg-in-seg/ class=md-nav__link> 线段树套线段树 </a> </li> <li class=md-nav__item> <a href=../../ds/seg-in-balanced/ class=md-nav__link> 平衡树套线段树 </a> </li> <li class=md-nav__item> <a href=../../ds/balanced-in-seg/ class=md-nav__link> 线段树套平衡树 </a> </li> <li class=md-nav__item> <a href=../../ds/seg-in-bit/ class=md-nav__link> 树状数组套权值线段树 </a> </li> <li class=md-nav__item> <a href=../../ds/bit-in-block-array/ class=md-nav__link> 分块套树状数组 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../ds/kdt/ class=md-nav__link> K-D Tree </a> </li> <li class=md-nav__item> <a href=../../misc/odt/ class=md-nav__link> 珂朵莉树 </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_12_23> <label class=md-nav__link for=__nav_12_23 id=__nav_12_23_label tabindex=0> 动态树 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_12_23_label aria-expanded=false> <label class=md-nav__title for=__nav_12_23> <span class="md-nav__icon md-icon"></span> 动态树 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../ds/lct/ class=md-nav__link> Link Cut Tree </a> </li> <li class=md-nav__item> <a href=../../ds/ett/ class=md-nav__link> Euler Tour Tree </a> </li> <li class=md-nav__item> <a href=../../ds/top-tree/ class=md-nav__link> Top Tree </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../ds/divide-combine/ class=md-nav__link> 析合树 </a> </li> <li class=md-nav__item> <a href=../../ds/pq-tree/ class=md-nav__link> PQ 树 </a> </li> <li class=md-nav__item> <a href=../../ds/finger-tree/ class=md-nav__link> 手指树 </a> </li> <li class=md-nav__item> <a href=../../ds/huffman-tree/ class=md-nav__link> 霍夫曼树 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_13> <div class="md-nav__link md-nav__link--index "> <a href=../../graph/ >图论</a> <label for=__nav_13> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_13_label aria-expanded=false> <label class=md-nav__title for=__nav_13> <span class="md-nav__icon md-icon"></span> 图论 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../graph/concept/ class=md-nav__link> 图论相关概念 </a> </li> <li class=md-nav__item> <a href=../../graph/save/ class=md-nav__link> 图的存储 </a> </li> <li class=md-nav__item> <a href=../../graph/dfs/ class=md-nav__link> DFS（图论） </a> </li> <li class=md-nav__item> <a href=../../graph/bfs/ class=md-nav__link> BFS（图论） </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_13_6> <label class=md-nav__link for=__nav_13_6 id=__nav_13_6_label tabindex=0> 树上问题 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_13_6_label aria-expanded=false> <label class=md-nav__title for=__nav_13_6> <span class="md-nav__icon md-icon"></span> 树上问题 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../graph/tree-basic/ class=md-nav__link> 树基础 </a> </li> <li class=md-nav__item> <a href=../../graph/tree-diameter/ class=md-nav__link> 树的直径 </a> </li> <li class=md-nav__item> <a href=../../graph/lca/ class=md-nav__link> 最近公共祖先 </a> </li> <li class=md-nav__item> <a href=../../graph/tree-centroid/ class=md-nav__link> 树的重心 </a> </li> <li class=md-nav__item> <a href=../../graph/hld/ class=md-nav__link> 树链剖分 </a> </li> <li class=md-nav__item> <a href=../../graph/dsu-on-tree/ class=md-nav__link> 树上启发式合并 </a> </li> <li class=md-nav__item> <a href=../../graph/virtual-tree/ class=md-nav__link> 虚树 </a> </li> <li class=md-nav__item> <a href=../../graph/tree-divide/ class=md-nav__link> 树分治 </a> </li> <li class=md-nav__item> <a href=../../graph/dynamic-tree-divide/ class=md-nav__link> 动态树分治 </a> </li> <li class=md-nav__item> <a href=../../graph/tree-ahu/ class=md-nav__link> AHU算法 </a> </li> <li class=md-nav__item> <a href=../../graph/tree-hash/ class=md-nav__link> 树哈希 </a> </li> <li class=md-nav__item> <a href=../../graph/tree-random-walk/ class=md-nav__link> 树上随机游走 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../graph/matrix-tree/ class=md-nav__link> 矩阵树定理 </a> </li> <li class=md-nav__item> <a href=../../graph/dag/ class=md-nav__link> 有向无环图 </a> </li> <li class=md-nav__item> <a href=../../graph/topo/ class=md-nav__link> 拓扑排序 </a> </li> <li class=md-nav__item> <a href=../../graph/mst/ class=md-nav__link> 最小生成树 </a> </li> <li class=md-nav__item> <a href=../../graph/steiner-tree/ class=md-nav__link> 斯坦纳树 </a> </li> <li class=md-nav__item> <a href=../../graph/dmst/ class=md-nav__link> 最小树形图 </a> </li> <li class=md-nav__item> <a href=../../graph/mdst/ class=md-nav__link> 最小直径生成树 </a> </li> <li class=md-nav__item> <a href=../../graph/shortest-path/ class=md-nav__link> 最短路 </a> </li> <li class=md-nav__item> <a href=../../graph/node/ class=md-nav__link> 拆点 </a> </li> <li class=md-nav__item> <a href=../../graph/diff-constraints/ class=md-nav__link> 差分约束 </a> </li> <li class=md-nav__item> <a href=../../graph/kth-path/ class=md-nav__link> k 短路 </a> </li> <li class=md-nav__item> <a href=../../graph/mod-shortest-path/ class=md-nav__link> 同余最短路 </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_13_19> <label class=md-nav__link for=__nav_13_19 id=__nav_13_19_label tabindex=0> 连通性相关 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_13_19_label aria-expanded=false> <label class=md-nav__title for=__nav_13_19> <span class="md-nav__icon md-icon"></span> 连通性相关 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../graph/scc/ class=md-nav__link> 强连通分量 </a> </li> <li class=md-nav__item> <a href=../../graph/bcc/ class=md-nav__link> 双连通分量 </a> </li> <li class=md-nav__item> <a href=../../graph/cut/ class=md-nav__link> 割点和桥 </a> </li> <li class=md-nav__item> <a href=../../graph/block-forest/ class=md-nav__link> 圆方树 </a> </li> <li class=md-nav__item> <a href=../../graph/connectivity/ class=md-nav__link> 点/边连通度 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../graph/2-sat/ class=md-nav__link> 2-SAT </a> </li> <li class=md-nav__item> <a href=../../graph/euler/ class=md-nav__link> 欧拉图 </a> </li> <li class=md-nav__item> <a href=../../graph/hamilton/ class=md-nav__link> 哈密顿图 </a> </li> <li class=md-nav__item> <a href=../../graph/bi-graph/ class=md-nav__link> 二分图 </a> </li> <li class=md-nav__item> <a href=../../graph/min-circle/ class=md-nav__link> 最小环 </a> </li> <li class=md-nav__item> <a href=../../graph/planar/ class=md-nav__link> 平面图 </a> </li> <li class=md-nav__item> <a href=../../graph/color/ class=md-nav__link> 图的着色 </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_13_27> <label class=md-nav__link for=__nav_13_27 id=__nav_13_27_label tabindex=0> 网络流 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_13_27_label aria-expanded=false> <label class=md-nav__title for=__nav_13_27> <span class="md-nav__icon md-icon"></span> 网络流 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../graph/flow/ class=md-nav__link> 网络流简介 </a> </li> <li class=md-nav__item> <a href=../../graph/flow/max-flow/ class=md-nav__link> 最大流 </a> </li> <li class=md-nav__item> <a href=../../graph/flow/min-cut/ class=md-nav__link> 最小割 </a> </li> <li class=md-nav__item> <a href=../../graph/flow/min-cost/ class=md-nav__link> 费用流 </a> </li> <li class=md-nav__item> <a href=../../graph/flow/bound/ class=md-nav__link> 上下界网络流 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../graph/stoer-wagner/ class=md-nav__link> Stoer-Wagner 算法 </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_13_29> <label class=md-nav__link for=__nav_13_29 id=__nav_13_29_label tabindex=0> 图的匹配 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_13_29_label aria-expanded=false> <label class=md-nav__title for=__nav_13_29> <span class="md-nav__icon md-icon"></span> 图的匹配 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../graph/graph-matching/graph-match/ class=md-nav__link> 图匹配 </a> </li> <li class=md-nav__item> <a href=../../graph/graph-matching/augment/ class=md-nav__link> 增广路 </a> </li> <li class=md-nav__item> <a href=../../graph/graph-matching/bigraph-match/ class=md-nav__link> 二分图最大匹配 </a> </li> <li class=md-nav__item> <a href=../../graph/graph-matching/bigraph-weight-match/ class=md-nav__link> 二分图最大权匹配 </a> </li> <li class=md-nav__item> <a href=../../graph/graph-matching/general-match/ class=md-nav__link> 一般图最大匹配 </a> </li> <li class=md-nav__item> <a href=../../graph/graph-matching/general-weight-match/ class=md-nav__link> 一般图最大权匹配 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../graph/prufer/ class=md-nav__link> Prufer 序列 </a> </li> <li class=md-nav__item> <a href=../../graph/lgv/ class=md-nav__link> LGV 引理 </a> </li> <li class=md-nav__item> <a href=../../graph/chord/ class=md-nav__link> 弦图 </a> </li> <li class=md-nav__item> <a href=../../graph/max-clique/ class=md-nav__link> 最大团搜索算法 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_14> <div class="md-nav__link md-nav__link--index "> <a href=../../geometry/ >计算几何</a> <label for=__nav_14> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_14_label aria-expanded=false> <label class=md-nav__title for=__nav_14> <span class="md-nav__icon md-icon"></span> 计算几何 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../geometry/2d/ class=md-nav__link> 二维计算几何基础 </a> </li> <li class=md-nav__item> <a href=../../geometry/3d/ class=md-nav__link> 三维计算几何基础 </a> </li> <li class=md-nav__item> <a href=../../geometry/polar-coordinate/ class=md-nav__link> 极坐标系 </a> </li> <li class=md-nav__item> <a href=../../geometry/distance/ class=md-nav__link> 距离 </a> </li> <li class=md-nav__item> <a href=../../geometry/pick/ class=md-nav__link> Pick 定理 </a> </li> <li class=md-nav__item> <a href=../../geometry/triangulation/ class=md-nav__link> 三角剖分 </a> </li> <li class=md-nav__item> <a href=../../geometry/convex-hull/ class=md-nav__link> 凸包 </a> </li> <li class=md-nav__item> <a href=../../geometry/scanning/ class=md-nav__link> 扫描线 </a> </li> <li class=md-nav__item> <a href=../../geometry/rotating-calipers/ class=md-nav__link> 旋转卡壳 </a> </li> <li class=md-nav__item> <a href=../../geometry/half-plane/ class=md-nav__link> 半平面交 </a> </li> <li class=md-nav__item> <a href=../../geometry/nearest-points/ class=md-nav__link> 平面最近点对 </a> </li> <li class=md-nav__item> <a href=../../geometry/random-incremental/ class=md-nav__link> 随机增量法 </a> </li> <li class=md-nav__item> <a href=../../geometry/inverse/ class=md-nav__link> 反演变换 </a> </li> <li class=md-nav__item> <a href=../../geometry/misc/ class=md-nav__link> 计算几何杂项 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_15> <div class="md-nav__link md-nav__link--index "> <a href=../../misc/ >杂项</a> <label for=__nav_15> <span class="md-nav__icon md-icon"></span> </label> </div> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_15_label aria-expanded=false> <label class=md-nav__title for=__nav_15> <span class="md-nav__icon md-icon"></span> 杂项 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../misc/discrete/ class=md-nav__link> 离散化 </a> </li> <li class=md-nav__item> <a href=../../misc/two-pointer/ class=md-nav__link> 双指针 </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_15_4> <label class=md-nav__link for=__nav_15_4 id=__nav_15_4_label tabindex=0> 离线算法 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_15_4_label aria-expanded=false> <label class=md-nav__title for=__nav_15_4> <span class="md-nav__icon md-icon"></span> 离线算法 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../misc/offline/ class=md-nav__link> 离线算法简介 </a> </li> <li class=md-nav__item> <a href=../../misc/cdq-divide/ class=md-nav__link> CDQ 分治 </a> </li> <li class=md-nav__item> <a href=../../misc/parallel-binsearch/ class=md-nav__link> 整体二分 </a> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_15_4_4> <label class=md-nav__link for=__nav_15_4_4 id=__nav_15_4_4_label tabindex=0> 莫队算法 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=3 aria-labelledby=__nav_15_4_4_label aria-expanded=false> <label class=md-nav__title for=__nav_15_4_4> <span class="md-nav__icon md-icon"></span> 莫队算法 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../misc/mo-algo-intro/ class=md-nav__link> 莫队算法简介 </a> </li> <li class=md-nav__item> <a href=../../misc/mo-algo/ class=md-nav__link> 普通莫队算法 </a> </li> <li class=md-nav__item> <a href=../../misc/modifiable-mo-algo/ class=md-nav__link> 带修改莫队 </a> </li> <li class=md-nav__item> <a href=../../misc/mo-algo-on-tree/ class=md-nav__link> 树上莫队 </a> </li> <li class=md-nav__item> <a href=../../misc/rollback-mo-algo/ class=md-nav__link> 回滚莫队 </a> </li> <li class=md-nav__item> <a href=../../misc/mo-algo-2dimen/ class=md-nav__link> 二维莫队 </a> </li> <li class=md-nav__item> <a href=../../misc/mo-algo-secondary-offline/ class=md-nav__link> 莫队二次离线 </a> </li> <li class=md-nav__item> <a href=../../misc/mo-algo-with-bitset/ class=md-nav__link> 莫队配合 bitset </a> </li> </ul> </nav> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../misc/frac-programming/ class=md-nav__link> 分数规划 </a> </li> <li class="md-nav__item md-nav__item--section md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_15_6> <label class=md-nav__link for=__nav_15_6 id=__nav_15_6_label tabindex=0> 随机化 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=2 aria-labelledby=__nav_15_6_label aria-expanded=false> <label class=md-nav__title for=__nav_15_6> <span class="md-nav__icon md-icon"></span> 随机化 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../misc/random/ class=md-nav__link> 随机函数 </a> </li> <li class=md-nav__item> <a href=../../misc/rand-technique/ class=md-nav__link> 随机化技巧 </a> </li> <li class=md-nav__item> <a href=../../misc/hill-climbing/ class=md-nav__link> 爬山算法 </a> </li> <li class=md-nav__item> <a href=../../misc/simulated-annealing/ class=md-nav__link> 模拟退火 </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=../../misc/hoverline/ class=md-nav__link> 悬线法 </a> </li> <li class=md-nav__item> <a href=../../misc/cc-basic/ class=md-nav__link> 计算理论基础 </a> </li> <li class=md-nav__item> <a href=../../misc/endianness/ class=md-nav__link> 字节顺序 </a> </li> <li class=md-nav__item> <a href=../../misc/josephus/ class=md-nav__link> 约瑟夫问题 </a> </li> <li class=md-nav__item> <a href=../../misc/gray-code/ class=md-nav__link> 格雷码 </a> </li> <li class=md-nav__item> <a href=../../misc/expression/ class=md-nav__link> 表达式求值 </a> </li> <li class=md-nav__item> <a href=../../misc/job-order/ class=md-nav__link> 在一台机器上规划任务 </a> </li> <li class=md-nav__item> <a href=../../misc/main-element/ class=md-nav__link> 主元素问题 </a> </li> <li class=md-nav__item> <a href=../../misc/garsia-wachs/ class=md-nav__link> Garsia–Wachs 算法 </a> </li> <li class=md-nav__item> <a href=../../misc/15-puzzle/ class=md-nav__link> 15-puzzle </a> </li> <li class=md-nav__item> <a href=../../misc/kahan-summation/ class=md-nav__link> Kahan 求和 </a> </li> <li class=md-nav__item> <a href=../../misc/odt/ class=md-nav__link> 珂朵莉树/颜色段均摊 </a> </li> </ul> </nav> </li> <li class="md-nav__item md-nav__item--nested"> <input class="md-nav__toggle md-toggle " type=checkbox id=__nav_16> <label class=md-nav__link for=__nav_16 id=__nav_16_label tabindex=0> 专题 <span class="md-nav__icon md-icon"></span> </label> <nav class=md-nav data-md-level=1 aria-labelledby=__nav_16_label aria-expanded=false> <label class=md-nav__title for=__nav_16> <span class="md-nav__icon md-icon"></span> 专题 </label> <ul class=md-nav__list data-md-scrollfix> <li class=md-nav__item> <a href=../../topic/rmq/ class=md-nav__link> RMQ </a> </li> <li class=md-nav__item> <a href=../../topic/dsu-app/ class=md-nav__link> 并查集应用 </a> </li> <li class=md-nav__item> <a href=../../topic/bracket/ class=md-nav__link> 括号序列 </a> </li> <li class=md-nav__item> <a href=../../topic/segment-tree-offline/ class=md-nav__link> 线段树与离线询问 </a> </li> </ul> </nav> </li> </ul> </nav> </div> </div> </div> <div class="md-sidebar md-sidebar--secondary" data-md-component=sidebar data-md-type=toc> <div class=md-sidebar__scrollwrap> <div class=md-sidebar__inner> <nav class="md-nav md-nav--secondary" aria-label="Table of contents"> <label class=md-nav__title for=__toc> <span class="md-nav__icon md-icon"></span> Table of contents </label> <ul class=md-nav__list data-md-component=toc data-md-scrollfix> <li class=md-nav__item> <a href=#_1 class=md-nav__link> 数据结构 </a> <nav class=md-nav aria-label=数据结构> <ul class=md-nav__list> <li class=md-nav__item> <a href=#node class=md-nav__link> Node </a> </li> <li class=md-nav__item> <a href=#forwardingnode class=md-nav__link> ForwardingNode </a> </li> <li class=md-nav__item> <a href=#treenode class=md-nav__link> TreeNode </a> </li> <li class=md-nav__item> <a href=#treebin class=md-nav__link> TreeBin </a> </li> </ul> </nav> </li> <li class=md-nav__item> <a href=#_2 class=md-nav__link> 核心成员 </a> </li> <li class=md-nav__item> <a href=#_3 class=md-nav__link> 核心函数 </a> <nav class=md-nav aria-label=核心函数> <ul class=md-nav__list> <li class=md-nav__item> <a href=#concurrenthashmapint-initialcapacity class=md-nav__link> ConcurrentHashMap(int initialCapacity) </a> </li> <li class=md-nav__item> <a href=#inittable class=md-nav__link> initTable </a> </li> <li class=md-nav__item> <a href=#put class=md-nav__link> put </a> </li> <li class=md-nav__item> <a href=#get class=md-nav__link> get </a> </li> <li class=md-nav__item> <a href=#treeifybin class=md-nav__link> treeifyBin </a> </li> <li class=md-nav__item> <a href=#trypresize class=md-nav__link> tryPresize </a> </li> <li class=md-nav__item> <a href=#transfer class=md-nav__link> transfer </a> </li> <li class=md-nav__item> <a href=#addcount class=md-nav__link> addCount </a> </li> </ul> </nav> </li> </ul> </nav> </div> </div> </div> <div class=md-content data-md-component=content> <article class="md-content__inner md-typeset"> <h1 id=jdkconcurrenthashmap>JDK源码剖析系列之ConcurrentHashMap<a class=headerlink href=#jdkconcurrenthashmap title="Permanent link">&para;</a></h1> <p>基于jdk1.8。</p> <p>参考文章： <a href=https://yq.aliyun.com/articles/36781>https://yq.aliyun.com/articles/36781</a> <br> <a href=http://blog.csdn.net/u012834750/article/details/71536618>http://blog.csdn.net/u012834750/article/details/71536618</a></p> <h2 id=_1>数据结构<a class=headerlink href=#_1 title="Permanent link">&para;</a></h2> <p>仅列出最重要的代码片段</p> <h3 id=node>Node<a class=headerlink href=#node title="Permanent link">&para;</a></h3> <div class=highlight><pre><span></span><code>static class Node&lt;K,V&gt; implements Map.Entry&lt;K,V&gt; {
+        final int hash;
+        final K key;
+        volatile V val;
+        volatile Node&lt;K,V&gt; next;
+
+        /**
+         * 子类中重写了这个方法，这里的find实现了在链表中查找hash值等于h且key等于k的节点
+         */
+        Node&lt;K,V&gt; find(int h, Object k) {
+            Node&lt;K,V&gt; e = this;
+            if (k != null) {
+                do {
+                    K ek;
+                    if (e.hash == h &amp;&amp;
+                        ((ek = e.key) == k || (ek != null &amp;&amp; k.equals(ek))))
+                        return e;
+                } while ((e = e.next) != null);
+            }
+            return null;
+        }
+ }
+</code></pre></div> <h3 id=forwardingnode>ForwardingNode<a class=headerlink href=#forwardingnode title="Permanent link">&para;</a></h3> <div class=highlight><pre><span></span><code>     /**
+     * A node inserted at head of bins during transfer operations.
+     */
+     // 并不是我们传统的包含key-value的节点，只是一个标志节点，并且指向nextTable，提供find方法而已。生命周期：仅存活于扩容操作且bin不为null时，一定会出现在每个bin的首位。
+    static final class ForwardingNode&lt;K,V&gt; extends Node&lt;K,V&gt; {
+        final Node&lt;K,V&gt;[] nextTable;
+        ForwardingNode(Node&lt;K,V&gt;[] tab) {
+            super(MOVED, null, null, null);
+            this.nextTable = tab;
+        }
+
+        Node&lt;K,V&gt; find(int h, Object k) {
+            // loop to avoid arbitrarily deep recursion on forwarding nodes
+            outer: for (Node&lt;K,V&gt;[] tab = nextTable;;) {
+                Node&lt;K,V&gt; e; int n;
+                if (k == null || tab == null || (n = tab.length) == 0 ||
+                    (e = tabAt(tab, (n - 1) &amp; h)) == null)// 头结点存在e中
+                    return null;
+                for (;;) {
+                // 检查头结点是否为要找的node
+                    int eh; K ek;
+                    if ((eh = e.hash) == h &amp;&amp;
+                        ((ek = e.key) == k || (ek != null &amp;&amp; k.equals(ek))))
+                        return e;
+                        // 如果头结点不是要找的节点
+                    if (eh &lt; 0) {
+                        // 头结点hash值小于0
+                        // 如果头结点是ForwardingNode，那么继续下一个ForwardingNode的find逻辑
+                        if (e instanceof ForwardingNode) {
+                            tab = ((ForwardingNode&lt;K,V&gt;)e).nextTable;
+                            continue outer;
+                        }
+                        // 如果头结点不是ForwardingNode，就进行相应的find逻辑
+                        else
+                            return e.find(h, k);
+                    }
+                    // 查找到尾部仍然没有找到对应的node
+                    if ((e = e.next) == null)
+                        return null;
+                }
+            }
+        }
+    }
+</code></pre></div> <h3 id=treenode>TreeNode<a class=headerlink href=#treenode title="Permanent link">&para;</a></h3> <p>红黑树中的节点类，值得注意的是：TreeNode可用于构造双向链表，Node包含next成员，同时，TreeNode加入了prev成员。</p> <div class=highlight><pre><span></span><code>static final class TreeNode&lt;K,V&gt; extends Node&lt;K,V&gt; {
+        TreeNode&lt;K,V&gt; parent;  // red-black tree links
+        TreeNode&lt;K,V&gt; left;
+        TreeNode&lt;K,V&gt; right;
+        TreeNode&lt;K,V&gt; prev;    // needed to unlink next upon deletion
+        boolean red;
+
+        TreeNode(int hash, K key, V val, Node&lt;K,V&gt; next,
+                 TreeNode&lt;K,V&gt; parent) {
+            super(hash, key, val, next);
+            this.parent = parent;
+        }
+
+        Node&lt;K,V&gt; find(int h, Object k) {
+            return findTreeNode(h, k, null);
+        }
+
+        final TreeNode&lt;K,V&gt; findTreeNode(int h, Object k, Class&lt;?&gt; kc) {
+            if (k != null) {
+                TreeNode&lt;K,V&gt; p = this;
+                do  {
+                    int ph, dir; K pk; TreeNode&lt;K,V&gt; q;
+                    TreeNode&lt;K,V&gt; pl = p.left, pr = p.right;
+                    if ((ph = p.hash) &gt; h)
+                        p = pl;
+                    else if (ph &lt; h)
+                        p = pr;
+                    else if ((pk = p.key) == k || (pk != null &amp;&amp; k.equals(pk)))
+                        return p;
+                    // hash值相等，key不等，左子树不存在，搜索右子树
+                    else if (pl == null)
+                        p = pr;
+                    // hash值相等，key不等，右子树不存在，搜索左子树
+                    else if (pr == null)
+                        p = pl;
+                   /*
+                    * comparableClassFor的作用是:
+                    * 如果k实现了Comparable接口，返回k的Class,
+                    * 否则返回null。
+                    * compareComparables的作用是：
+                    * 将k与pk做比较
+                    * 如果TreeNode的Key可以作比较，就可以继续在树中搜索
+                    */
+                    else if ((kc != null ||
+                              (kc = comparableClassFor(k)) != null) &amp;&amp;
+                             (dir = compareComparables(kc, k, pk)) != 0)
+                        p = (dir &lt; 0) ? pl : pr;
+                    // 由于hash相等，key无法做比较，因此先在右子树中找
+                    else if ((q = pr.findTreeNode(h, k, kc)) != null)
+                        return q;
+                    // 右子树没有找到，继续从当前的节点的左子树中找
+                    else
+                        p = pl;
+                } while (p != null);
+            }
+            return null;
+        }
+    }
+</code></pre></div> <h3 id=treebin>TreeBin<a class=headerlink href=#treebin title="Permanent link">&para;</a></h3> <p>TreeBin封装了红黑树的逻辑，有关红黑树, 可以参考的资料有<a href=http://algs4.cs.princeton.edu/33balanced/ >《Algorithm》网站</a> 以及 <a href=http://www.cnblogs.com/yangecnu/p/Introduce-Red-Black-Tree.html>中文翻译</a></p> <p>也可以试玩<a href=https://www.cs.usfca.edu/~galles/visualization/RedBlack.html>Red/Black Tree Visualization</a> 。</p> <p>附文章中提到的红黑树旋转的动图与TreeBin中的rotateLeft、rotateRight代码片段帮助理解。</p> <p>左旋： <img alt=rotateLeft src=https://img-blog.csdnimg.cn/20201207195154448.gif></p> <p>对应代码 <div class=highlight><pre><span></span><code>    static &lt;K,V&gt; TreeNode&lt;K,V&gt; rotateLeft(TreeNode&lt;K,V&gt; root,
+                                              TreeNode&lt;K,V&gt; p) {
+            TreeNode&lt;K,V&gt; r, pp, rl;
+            // p是图中的E节点，r是图中的S节点
+            if (p != null &amp;&amp; (r = p.right) != null) {
+                if ((rl = p.right = r.left) != null)
+                    rl.parent = p;
+                // p是根节点，则根节点需要变化
+                if ((pp = r.parent = p.parent) == null)
+                    (root = r).red = false;
+                // p不是根节点，如果p是pp的左节点，就更新pp的left
+                else if (pp.left == p)
+                    pp.left = r;
+                else
+                    pp.right = r;
+                // 把p放在左子树中
+                r.left = p;
+                p.parent = r;
+            }
+            return root;
+        }
+</code></pre></div></p> <p>右旋： <img alt=rotateRight src=https://img-blog.csdnimg.cn/20201207195312438.gif></p> <p>对应代码</p> <div class=highlight><pre><span></span><code>        static &lt;K,V&gt; TreeNode&lt;K,V&gt; rotateRight(TreeNode&lt;K,V&gt; root,
+                                               TreeNode&lt;K,V&gt; p) {
+            TreeNode&lt;K,V&gt; l, pp, lr;
+            // p是途中的S，l是图中的E
+            if (p != null &amp;&amp; (l = p.left) != null) {
+                if ((lr = p.left = l.right) != null)
+                    lr.parent = p;
+                // p是根节点，则根节点需要变化
+                if ((pp = l.parent = p.parent) == null)
+                    (root = l).red = false;
+                else if (pp.right == p)
+                    pp.right = l;
+                else
+                    pp.left = l;
+                l.right = p;
+                p.parent = l;
+            }
+            return root;
+        }
+</code></pre></div> <p>仅列出Treebin数据成员以及部分方法：</p> <div class=highlight><pre><span></span><code>// 维护了一个红黑树
+static final class TreeBin&lt;K,V&gt; extends Node&lt;K,V&gt; {
+        TreeNode&lt;K,V&gt; root;
+        // 链表头结点，每次都将新节点插入到链表的头部，成为新的头结点
+        // 因此该链表中节点的顺序与插入顺序相反
+        volatile TreeNode&lt;K,V&gt; first;
+        volatile Thread waiter;
+        volatile int lockState;
+
+         /**
+         * 返回匹配的node或者没有匹配的就返回null. 在树中从根节点开始比较，
+         * 当锁不可用的时候进行线性搜索
+         */
+        final Node&lt;K,V&gt; find(int h, Object k) {
+            if (k != null) {
+                for (Node&lt;K,V&gt; e = first; e != null; ) {
+                    int s; K ek;
+                    // 锁不可用，lockState包含了WAITER或者WRITER标志位
+                    if (((s = lockState) &amp; (WAITER|WRITER)) != 0) {
+                        if (e.hash == h &amp;&amp;
+                            ((ek = e.key) == k || (ek != null &amp;&amp; k.equals(ek))))
+                            return e;
+                        e = e.next;
+                    }
+                    // 锁可用，当前对象设置为READER状态
+                    else if (U.compareAndSwapInt(this, LOCKSTATE, s,
+                                                 s + READER)) {
+                        TreeNode&lt;K,V&gt; r, p;
+                        try {
+                            // 在树中查找匹配的节点
+                            p = ((r = root) == null ? null :
+                                 r.findTreeNode(h, k, null));
+                        } finally {
+                            Thread w;
+                            // 取消当前锁的READER状态
+                            if (U.getAndAddInt(this, LOCKSTATE, -READER) ==
+                                (READER|WAITER) &amp;&amp; (w = waiter) != null)
+                                LockSupport.unpark(w);
+                        }
+                        return p;
+                    }
+                }
+            }
+            return null;
+        }
+
+         // 寻找或者添加一个节点
+        final TreeNode&lt;K,V&gt; putTreeVal(int h, K k, V v) {
+            Class&lt;?&gt; kc = null;
+            boolean searched = false;
+            for (TreeNode&lt;K,V&gt; p = root;;) {
+                int dir, ph; K pk;
+                //  红黑树是空，直接插入到根节点
+                if (p == null) {
+                    first = root = new TreeNode&lt;K,V&gt;(h, k, v, null, null);
+                    break;
+                }
+                // 根据hash值设置标记位
+                else if ((ph = p.hash) &gt; h)
+                    dir = -1;
+                else if (ph &lt; h)
+                    dir = 1;
+                // hash值相同，并且k与pk相等（equals），直接返回
+                else if ((pk = p.key) == k || (pk != null &amp;&amp; k.equals(pk)))
+                    return p;
+                // hash相同，p与pk不equals，但是按照比较接口发现p与pk相等
+                else if ((kc == null &amp;&amp;
+                          (kc = comparableClassFor(k)) == null) ||
+                         (dir = compareComparables(kc, k, pk)) == 0) {
+                    if (!searched) {
+                        TreeNode&lt;K,V&gt; q, ch;
+                        searched = true;
+                        if (((ch = p.left) != null &amp;&amp;
+                             (q = ch.findTreeNode(h, k, kc)) != null) ||
+                            ((ch = p.right) != null &amp;&amp;
+                             (q = ch.findTreeNode(h, k, kc)) != null))
+                            return q;
+                    }
+                    // 根据一种确定的规则来进行比较，至于规则本身具体是什么病不重要
+                    dir = tieBreakOrder(k, pk);
+                }
+
+                // 程序运行到这里，说明当前节点不匹配，但子树中可能会有匹配的Node
+                TreeNode&lt;K,V&gt; xp = p;
+                // 根据大小关系移动p到左子树或者右子树
+                // 如果满足p为null，则说明树中没有节点能与之匹配，应当在p位置插入新节点，然后维护红黑树的性质
+                if ((p = (dir &lt;= 0) ? p.left : p.right) == null) {
+                    TreeNode&lt;K,V&gt; x, f = first;
+                    first = x = new TreeNode&lt;K,V&gt;(h, k, v, f, xp);
+                    if (f != null)
+                        f.prev = x;
+                    if (dir &lt;= 0)
+                        xp.left = x;
+                    else
+                        xp.right = x;
+                    // 优先将新节点染为红色
+                    if (!xp.red)
+                        x.red = true;
+                    else {
+                        lockRoot();
+                        try {
+                            root = balanceInsertion(root, x);
+                        } finally {
+                            unlockRoot();
+                        }
+                    }
+                    break;
+                }
+            }
+            assert checkInvariants(root);
+            return null;
+        }
+}
+
+// 红黑树的平衡插入
+static &lt;K,V&gt; TreeNode&lt;K,V&gt; balanceInsertion(TreeNode&lt;K,V&gt; root,
+                                                    TreeNode&lt;K,V&gt; x) {
+            x.red = true; // 将x染成红色
+            for (TreeNode&lt;K,V&gt; xp, xpp, xppl, xppr;;) {
+                // 根节点必须是黑色
+                if ((xp = x.parent) == null) {
+                    x.red = false;
+                    return x;
+                }
+                // 父节点是黑色或者父节点是根节点
+                // 总之父节点是黑色，那么不会违反红黑树性质
+                // 不需要调整结构，直接返回根节点即可
+                else if (!xp.red || (xpp = xp.parent) == null)
+                    return root;
+                // 父节点是红色（需要调整），且在祖父节点的左子树中
+                if (xp == (xppl = xpp.left)) {
+                    // 因为父节点为红色，所以xppr必须是红色或空，不可能是黑色
+                    // 祖父节点的右节点为红色
+                    if ((xppr = xpp.right) != null &amp;&amp; xppr.red) {
+
+                   /**
+                     *     黑                  红
+                     *    /  \    （染色后）    / \
+                     *   红   红    -&gt;        黑  黑
+                     *  /                   /
+                     * 红                  红
+                     * 
+                     * 可见通过调整颜色后，子树不需要旋转就可以满足红黑树的性质
+                     * 但由于xpp变成了红色，有可能违反红黑树性质，仍然需要向上调整
+                    */
+
+                        xppr.red = false;
+                        xp.red = false;
+                        xpp.red = true;
+                        x = xpp;
+                    }
+                    // xppr是空
+                    else {
+                       /**
+                        *      黑
+                        *     /
+                        *    红 
+                        *      \
+                        *       红
+                        */
+                        if (x == xp.right) {
+                            /**
+                                * 进行左旋操作，变为以下形式，
+                                * 可以看出此时任然违反红黑树的性质，
+                                * 然而x仍然指向了最下面冲突的红色节点，
+                                * 此处仅仅调整了树的形状
+                                *
+                                *      黑
+                                *     /
+                                *    红
+                                *   /
+                                *  红
+                                */
+                            root = rotateLeft(root, x = xp);
+                            xpp = (xp = x.parent) == null ? null : xp.parent;
+                        }
+                        /*
+                         * 由于调整了树的形状，因此此时树一定长成这个样子
+                         * 
+                         *      黑
+                         *     /
+                         *    红
+                         *   /
+                         *  红
+                         * 
+                         * 在染色并右旋之后，变为
+                         * 
+                         *    黑
+                         *   /  \
+                         * 红     红
+                         */
+                        if (xp != null) {
+                            xp.red = false;
+                            if (xpp != null) {
+                                xpp.red = true;
+
+                                root = rotateRight(root, xpp);
+                            }
+                        }
+                    }
+                }
+                // x在祖父节点的右子树中，这种情况与x在祖父节点左子树中类似，因此不多作解释，不明白的话类比即可。
+                else {
+                /**
+                *   黑                    红
+                *  /  \     (染色后)      / \
+                * 红    红   -&gt;         黑   黑
+                *        \                    \
+                *         红                   红色
+                */
+                    if (xppl != null &amp;&amp; xppl.red) {
+                        xppl.red = false;
+                        xp.red = false;
+                        xpp.red = true;
+                        x = xpp;
+                    }
+                    else {
+                        if (x == xp.left) {
+                            root = rotateRight(root, x = xp);
+                            xpp = (xp = x.parent) == null ? null : xp.parent;
+                        }
+                        if (xp != null) {
+                            xp.red = false;
+                            if (xpp != null) {
+                                xpp.red = true;
+                                root = rotateLeft(root, xpp);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+</code></pre></div> <h2 id=_2>核心成员<a class=headerlink href=#_2 title="Permanent link">&para;</a></h2> <div class=highlight><pre><span></span><code>    // ForwardingNode的hash值都是-1
+    static final int MOVED     = -1; 
+    // Treebin的hash值是-2
+    static final int TREEBIN   = -2; 
+
+    /**
+     * 在第一次insert的时候才进行初始化(延迟初始化)
+     * Size总是2的幂. 直接通过迭代器访问.
+     */
+    transient volatile Node&lt;K,V&gt;[] table;
+
+    // nextTable的用途：只有在扩容时是非空的
+    private transient volatile Node&lt;K,V&gt;[] nextTable;
+
+    /**
+     * Base counter value, used mainly when there is no contention,
+     * but also as a fallback during table initialization
+     * races. Updated via CAS.
+     */
+    private transient volatile long baseCount;
+
+    /**
+     * sizeCtl是控制标识符，不同的值表示不同的意义。
+     * -1代表正在初始化； 
+     * -(1+有效扩容线程的数量)，比如，-N 表示有N-1个线程正在进行扩容操作；
+     * 0 表示还未进行初始化
+     * 正数代表初始化或下一次进行扩容的大小，类似于扩容阈值。它的值始终是当前ConcurrentHashMap容量的0.75倍，这与loadfactor是对应的。实际容量&gt;=sizeCtl，则扩容。
+     */
+    private transient volatile int sizeCtl;
+
+
+     // 扩容的时候，next数组下标+1
+    private transient volatile int transferIndex;
+
+    /**
+     * Spinlock (locked via CAS) used when resizing and/or creating CounterCells.
+     */
+    private transient volatile int cellsBusy;
+
+    /**
+     * Table of counter cells. When non-null, size is a power of 2.
+     */
+    private transient volatile CounterCell[] counterCells;
+
+    // 视图
+    private transient KeySetView&lt;K,V&gt; keySet;
+    private transient ValuesView&lt;K,V&gt; values;
+    private transient EntrySetView&lt;K,V&gt; entrySet;
+</code></pre></div> <h2 id=_3>核心函数<a class=headerlink href=#_3 title="Permanent link">&para;</a></h2> <h3 id=concurrenthashmapint-initialcapacity>ConcurrentHashMap(int initialCapacity)<a class=headerlink href=#concurrenthashmapint-initialcapacity title="Permanent link">&para;</a></h3> <p>之所以列出这个函数，是因为这个函数初始化了sizeCtl，并且可以看出table在这里并没有被初始化，而是在插入元素的时候进行延迟初始化。 我们要注意的是table的长度始终是2的幂，sizeCtl的值为正数时表示扩容的最小阀值。</p> <div class=highlight><pre><span></span><code> // 需要注意的是，构造了一个能够容纳initialCapacity个元素的对象，
+ // 但实际table的大小比1.5倍的initialCapacity还多
+ public ConcurrentHashMap(int initialCapacity) {
+        if (initialCapacity &lt; 0)
+            throw new IllegalArgumentException();
+        // 保证cap是2的幂，其中tableSizeFor返回大于入参的最小的2的幂
+        int cap = ((initialCapacity &gt;= (MAXIMUM_CAPACITY &gt;&gt;&gt; 1)) ?
+                   MAXIMUM_CAPACITY :
+                   tableSizeFor(initialCapacity + (initialCapacity &gt;&gt;&gt; 1) + 1));
+        this.sizeCtl = cap;
+    }
+</code></pre></div> <h3 id=inittable>initTable<a class=headerlink href=#inittable title="Permanent link">&para;</a></h3> <div class=highlight><pre><span></span><code>     // 初始化table，使用sizeCtl记录table的容量
+     // 为了保证并发访问不会出现冲突，使用了Unsafe的CAS操作
+    private final Node&lt;K,V&gt;[] initTable() {
+        Node&lt;K,V&gt;[] tab; int sc;
+        // tab是空的
+        while ((tab = table) == null || tab.length == 0) {
+            // 如果已经初始化过
+            if ((sc = sizeCtl) &lt; 0)
+                Thread.yield(); // 退出初始化数组的竞争; just spin
+            // 如果没有线程在初始化，将sizeCtl设置为-1，表示正在初始化
+            // CAS操作，由此可见sizeCtl维护table的并发访问
+            else if (U.compareAndSwapInt(this, SIZECTL, sc, -1)) {
+                try {
+                    // 再次检查table是否为空
+                    if ((tab = table) == null || tab.length == 0) {
+                        // 计算分配多少个Node
+                        // sc大于0的时候表示要分配的大小
+                        // 否则默认分配16个node
+                        int n = (sc &gt; 0) ? sc : DEFAULT_CAPACITY;
+                        @SuppressWarnings(&quot;unchecked&quot;)
+                        Node&lt;K,V&gt;[] nt = (Node&lt;K,V&gt;[])new Node&lt;?,?&gt;[n];
+                        table = tab = nt;
+                        // 下次扩容的最小阀值0.75*n
+                        // 注意0.75 * n &lt; n，而且它很可能不是2的幂，
+                        // 例如n = 16， 则sc = 12；
+                        // 因此这个阀值在后续扩容情况下实际上不会成为数组的容量值，但它可以用来能保证用户提供了容量大小时，能够容纳用户要求数目的元素。
+                        sc = n - (n &gt;&gt;&gt; 2);
+                    }
+                } finally {
+                    sizeCtl = sc;
+                }
+                break;
+            }
+        }
+        return tab;
+    }
+</code></pre></div> <h3 id=put>put<a class=headerlink href=#put title="Permanent link">&para;</a></h3> <p>put过程的描述：</p> <p>为表述方便，用符号i 来表示 (n - 1) &amp; hash，用newNode表示使用key,value创建的节点</p> <div class=highlight><pre><span></span><code>loop:
+{
+    if table == null
+    {
+        初始化一个默认长度为16的数组
+    }
+    else table[i] == null
+    {   
+        table[i] = newNode
+    }
+    else hash == -1，table[i]是ForwardingNode
+    {
+        进行整合表的操作
+    }
+    else
+    {
+        if hash &gt;= 0，table[i]不是特殊Node(链表中的Node)
+        {
+            将newNode插入到链表中
+        }
+        else table[i]是TreeBin
+        {
+             newNode插入到TreeNode中
+        }
+    }
+    addCount(1L, binCount);
+}
+</code></pre></div> <p>通过研读代码，发现Doug Lea使用了一种有效且高效的技巧： 在循环里面嵌套使用CAS操作。这种技巧把临界区变得很小，因此比较高效。</p> <p>put源码如下：</p> <div class=highlight><pre><span></span><code>    public V put(K key, V value) {
+        return putVal(key, value, false);
+    }
+
+/** put和putIfAbsent都是通过调用putVal方法来实现的*/
+    final V putVal(K key, V value, boolean onlyIfAbsent) {
+        // ConcurrentHashMap不支持key和value是null
+        if (key == null || value == null) throw new NullPointerException();
+        // 获取hash值
+        int hash = spread(key.hashCode());
+        int binCount = 0;
+        for (Node&lt;K,V&gt;[] tab = table;;) {
+            Node&lt;K,V&gt; f; int n, i, fh;
+            // case 1：tab为null，需要初始化tab
+            if (tab == null || (n = tab.length) == 0)
+                tab = initTable();
+            // case 2: 没有任何节点hash值与当前要插入的节点相同
+            else if ((f = tabAt(tab, i = (n - 1) &amp; hash)) == null) {
+                if (casTabAt(tab, i, null,
+                             new Node&lt;K,V&gt;(hash, key, value, null)))
+                    break;                   // no lock when adding to empty bin
+            }
+            // case 3: 当遇到表连接点时，需要进行整合表的操作
+            // 需要注意的是，遇到连接点的时候，并没有插入新节点，仅仅帮助扩容，因为当前线程迫切需要尽快插入新节点，只能等待扩容完毕才有可能插入新节点
+            else if ((fh = f.hash) == MOVED)
+                tab = helpTransfer(tab, f);
+            // case 4: 找到对应于hash值的链表首节点，且该节点不是连接节点
+            else {
+                V oldVal = null;
+                synchronized (f) {
+                    if (tabAt(tab, i) == f) {
+                        if (fh &gt;= 0) {
+                            binCount = 1;
+                            for (Node&lt;K,V&gt; e = f;; ++binCount) {
+                                K ek;
+                                // 如果找到相同key的node，根据onlyIfAbsent来更新node的值
+                                if (e.hash == hash &amp;&amp;
+                                    ((ek = e.key) == key ||
+                                     (ek != null &amp;&amp; key.equals(ek)))) {
+                                    oldVal = e.val;
+                                    if (!onlyIfAbsent)
+                                        e.val = value;
+                                    break;
+                                }
+                                // 如果一直到链表的尾部都没有找到任何node的key与key相同，就插入到链表的尾部
+                                Node&lt;K,V&gt; pred = e;
+                                if ((e = e.next) == null) {
+                                    pred.next = new Node&lt;K,V&gt;(hash, key,
+                                                              value, null);
+                                    break;
+                                }
+                            }
+                        }
+                        // 如果该节点是TreeBin，就插入到TreeBin中
+                        else if (f instanceof TreeBin) {
+                            Node&lt;K,V&gt; p;
+                            binCount = 2;
+                            // 当存在相同的key时，putTreeVal不会修改那个TreeNode，而是返回给p，由onlyIfAbsent决定是否修改p.val
+                            if ((p = ((TreeBin&lt;K,V&gt;)f).putTreeVal(hash, key,
+                                                           value)) != null) {
+                                oldVal = p.val;
+                                if (!onlyIfAbsent)
+                                    p.val = value;
+                            }
+                        }
+                    }
+                }
+                // 若链表长度不低于8，就将链表转换为树
+                if (binCount != 0) {
+                    if (binCount &gt;= TREEIFY_THRESHOLD)
+                        treeifyBin(tab, i);
+                    if (oldVal != null)
+                        return oldVal;
+                    break;
+                }
+            }
+        }
+        // 添加计数，如有需要，扩容
+        addCount(1L, binCount);
+        return null;
+    }
+
+    // 给tab[i]赋值
+    // 如果tab[i]等于c,就将tab[i]与v交换数值
+    static final &lt;K,V&gt; boolean casTabAt(Node&lt;K,V&gt;[] tab, int i,
+                                        Node&lt;K,V&gt; c, Node&lt;K,V&gt; v) {
+        return U.compareAndSwapObject(tab, ((long)i &lt;&lt; ASHIFT) + ABASE, c, v);
+    }
+
+    /**
+    * 协助扩容方法。
+    * 多线程下，当前线程检测到其他线程正进行扩容操作，则协助其一起扩容；
+    *（只有这种情况会被调用）从某种程度上说，其“优先级”很高，
+    * 只要检测到扩容，就会放下其他工作，先扩容。
+    * 调用之前，nextTable一定已存在。
+    */
+    final Node&lt;K,V&gt;[] helpTransfer(Node&lt;K,V&gt;[] tab, Node&lt;K,V&gt; f) {
+        Node&lt;K,V&gt;[] nextTab; int sc;
+        // 如果f是tab中的连接节点，并且它所连接的table非空
+        if (tab != null &amp;&amp; (f instanceof ForwardingNode) &amp;&amp;
+            (nextTab = ((ForwardingNode&lt;K,V&gt;)f).nextTable) != null) {
+            // 标志位
+            int rs = resizeStamp(tab.length);
+            // 当正在扩容时，帮助扩容
+            while (nextTab == nextTable &amp;&amp; table == tab &amp;&amp;
+                   (sc = sizeCtl) &lt; 0) {
+                if ((sc &gt;&gt;&gt; RESIZE_STAMP_SHIFT) != rs || sc == rs + 1 ||
+                    sc == rs + MAX_RESIZERS || transferIndex &lt;= 0)
+                    break;
+                if (U.compareAndSwapInt(this, SIZECTL, sc, sc + 1)) {
+                    transfer(tab, nextTab);
+                    break;
+                }
+            }
+            return nextTab;
+        }
+        return table;
+    }
+</code></pre></div> <h3 id=get>get<a class=headerlink href=#get title="Permanent link">&para;</a></h3> <p>get方法比较简单，没有使用锁，而是用Unsafe来保证获取的头结点是volatile的</p> <div class=highlight><pre><span></span><code> public V get(Object key) {
+        Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; e, p; int n, eh; K ek;
+        // 获取hash值h
+        int h = spread(key.hashCode());
+        // tab只是保存了hash值相同的头结点
+        if ((tab = table) != null &amp;&amp; (n = tab.length) &gt; 0 &amp;&amp; // table里面有元素
+            (e = tabAt(tab, (n - 1) &amp; h)) != null) {// 根据h来获取头结点e
+            // hash值相同，如果找到key，直接返回
+            if ((eh = e.hash) == h) {
+                if ((ek = e.key) == key || (ek != null &amp;&amp; key.equals(ek)))
+                    return e.val;
+            }
+            // todo：看一下hash值什么时候小于0
+            else if (eh &lt; 0)
+                return (p = e.find(h, key)) != null ? p.val : null;
+            while ((e = e.next) != null) {
+                if (e.hash == h &amp;&amp;
+                    ((ek = e.key) == key || (ek != null &amp;&amp; key.equals(ek))))
+                    return e.val;
+            }
+        }
+        return null;
+    }
+
+//tableAt方法使用了Unsafe对象来获取数组中下标为i的对象
+static final &lt;K,V&gt; Node&lt;K,V&gt; tabAt(Node&lt;K,V&gt;[] tab, int i) {
+        // 第i个元素实际地址i * (2^ASHIFT) + ABASE
+        return (Node&lt;K,V&gt;)U.getObjectVolatile(tab, ((long)i &lt;&lt; ASHIFT) + ABASE);
+    }
+</code></pre></div> <h3 id=treeifybin>treeifyBin<a class=headerlink href=#treeifybin title="Permanent link">&para;</a></h3> <div class=highlight><pre><span></span><code>     // 如果tab的长度很小，小于64个，就尝试进行扩容为两倍，
+     // 否则就将以tab[index]开头的链表转换为Treebin
+    private final void treeifyBin(Node&lt;K,V&gt;[] tab, int index) {
+        Node&lt;K,V&gt; b; int n, sc;
+        if (tab != null) {
+            // tab的长度小于64，就尝试进行扩容
+            if ((n = tab.length) &lt; MIN_TREEIFY_CAPACITY)
+                tryPresize(n &lt;&lt; 1);
+            else if ((b = tabAt(tab, index)) != null &amp;&amp; b.hash &gt;= 0) {
+                synchronized (b) {
+                    if (tabAt(tab, index) == b) {
+                        TreeNode&lt;K,V&gt; hd = null, tl = null;
+                        // 这个循环建立了TreeNode中的双向链表，hd保存了双向链表的头结点
+                        for (Node&lt;K,V&gt; e = b; e != null; e = e.next) {
+                            TreeNode&lt;K,V&gt; p =
+                                new TreeNode&lt;K,V&gt;(e.hash, e.key, e.val,
+                                                  null, null);
+                            if ((p.prev = tl) == null)
+                                hd = p;
+                            else
+                                tl.next = p;
+                            tl = p;
+                        }
+                        setTabAt(tab, index, new TreeBin&lt;K,V&gt;(hd));
+                    }
+                }
+            }
+        }
+    }
+</code></pre></div> <h3 id=trypresize>tryPresize<a class=headerlink href=#trypresize title="Permanent link">&para;</a></h3> <p>有关扩容，可以参考<a href=http://www.jianshu.com/p/f6730d5784ad>深入分析 ConcurrentHashMap 1.8 的扩容实现</a> 这篇文章。</p> <div class=highlight><pre><span></span><code>    // 尝试扩容使它能放size个元素
+    private final void tryPresize(int size) {
+        // 计算扩容后的数量
+        int c = (size &gt;= (MAXIMUM_CAPACITY &gt;&gt;&gt; 1)) ? MAXIMUM_CAPACITY :
+            tableSizeFor(size + (size &gt;&gt;&gt; 1) + 1);
+        int sc;
+        while ((sc = sizeCtl) &gt;= 0) {
+            Node&lt;K,V&gt;[] tab = table; int n;
+            // 如果tab是空的，直接扩容
+            if (tab == null || (n = tab.length) == 0) {
+                // 计算扩容后的容量
+                n = (sc &gt; c) ? sc : c;
+                if (U.compareAndSwapInt(this, SIZECTL, sc, -1)) {
+                    try {
+                        if (table == tab) {
+                            @SuppressWarnings(&quot;unchecked&quot;)
+                            Node&lt;K,V&gt;[] nt = (Node&lt;K,V&gt;[])new Node&lt;?,?&gt;[n];
+                            table = nt;
+                            // 下次扩容的容量阀值是0.75 * n
+                            sc = n - (n &gt;&gt;&gt; 2);
+                        }
+                    } finally {
+                        sizeCtl = sc;
+                    }
+                }
+            }
+            // 容量已经够用，不需要进行扩容；或者容量太大，无法进行扩容。
+            else if (c &lt;= sc || n &gt;= MAXIMUM_CAPACITY)
+                break;
+            // 仍然需要扩容
+            else if (tab == table) {
+                int rs = resizeStamp(n);
+                // todo：不是很懂为什么会出现 sc &lt; 0 ？先看一下transfer的实现
+                if (sc &lt; 0) {
+                    Node&lt;K,V&gt;[] nt;
+                    if ((sc &gt;&gt;&gt; RESIZE_STAMP_SHIFT) != rs || sc == rs + 1 ||
+                        sc == rs + MAX_RESIZERS || (nt = nextTable) == null ||
+                        transferIndex &lt;= 0)
+                        break;
+                    if (U.compareAndSwapInt(this, SIZECTL, sc, sc + 1))
+                        transfer(tab, nt);
+                }
+                else if (U.compareAndSwapInt(this, SIZECTL, sc,
+                                             (rs &lt;&lt; RESIZE_STAMP_SHIFT) + 2))
+                    transfer(tab, null);
+            }
+        }
+    }
+</code></pre></div> <h3 id=transfer>transfer<a class=headerlink href=#transfer title="Permanent link">&para;</a></h3> <div class=highlight><pre><span></span><code>伪代码：
+
+n = table.length
+
+nextTable = new Node[2 * n]
+
+forwardingNode = new ForwardingNode
+
+forwardingNode.nextTable = nextTable;
+
+for(table[i] : table)
+{
+    for(p = table[i]; p != null ; p = p.next)
+    {
+        if(p.hash &amp; n == 0)
+            将p放入nextTable[i]的数据集合中
+        else
+            将p放入nextTable[i+n]的数据集合中
+    }
+    table[i] = forwardingNode;
+}
+
+table = nextTable;
+
+nextTable = null;
+</code></pre></div> <p>数学公式：</p> <blockquote> <p>已知：n = 2 ^ k ， hash &amp; (n-1) = i，显而易见： （1）若 hash &amp; n = 0， 则 hash &amp;(2*n - 1) = i ； （2）若 hash &amp; n != 0, 则 hash&amp;(2*n - 1) = i + n。</p> </blockquote> <p>源代码在此：</p> <div class=highlight><pre><span></span><code>     // 把table中所有的Node放入新的table中
+    private final void transfer(Node&lt;K,V&gt;[] tab, Node&lt;K,V&gt;[] nextTab) {
+        int n = tab.length, stride;
+        if ((stride = (NCPU &gt; 1) ? (n &gt;&gt;&gt; 3) / NCPU : n) &lt; MIN_TRANSFER_STRIDE)
+            stride = MIN_TRANSFER_STRIDE; // subdivide range
+        if (nextTab == null) {            // initiating
+            try {
+                @SuppressWarnings(&quot;unchecked&quot;)
+                Node&lt;K,V&gt;[] nt = (Node&lt;K,V&gt;[])new Node&lt;?,?&gt;[n &lt;&lt; 1];
+                nextTab = nt;
+            } catch (Throwable ex) {      // try to cope with OOME
+                sizeCtl = Integer.MAX_VALUE;
+                return;
+            }
+            nextTable = nextTab;
+            transferIndex = n;
+        }
+        int nextn = nextTab.length;
+        ForwardingNode&lt;K,V&gt; fwd = new ForwardingNode&lt;K,V&gt;(nextTab);
+        boolean advance = true;
+        boolean finishing = false; // to ensure sweep before committing nextTab
+        for (int i = 0, bound = 0;;) {
+            Node&lt;K,V&gt; f; int fh;
+            while (advance) {
+                int nextIndex, nextBound;
+                if (--i &gt;= bound || finishing)
+                    advance = false;
+                else if ((nextIndex = transferIndex) &lt;= 0) {
+                    i = -1;
+                    advance = false;
+                }
+                else if (U.compareAndSwapInt
+                         (this, TRANSFERINDEX, nextIndex,
+                          nextBound = (nextIndex &gt; stride ?
+                                       nextIndex - stride : 0))) {
+                    bound = nextBound;
+                    i = nextIndex - 1;
+                    advance = false;
+                }
+            }
+            if (i &lt; 0 || i &gt;= n || i + n &gt;= nextn) {
+                int sc;
+                if (finishing) {
+                    nextTable = null;
+                    table = nextTab;
+                    sizeCtl = (n &lt;&lt; 1) - (n &gt;&gt;&gt; 1);
+                    return;
+                }
+                if (U.compareAndSwapInt(this, SIZECTL, sc = sizeCtl, sc - 1)) {
+                    if ((sc - 2) != resizeStamp(n) &lt;&lt; RESIZE_STAMP_SHIFT)
+                        return;
+                    finishing = advance = true;
+                    i = n; // recheck before commit
+                }
+            }
+            else if ((f = tabAt(tab, i)) == null)
+                advance = casTabAt(tab, i, null, fwd);
+            else if ((fh = f.hash) == MOVED)
+                advance = true; // already processed
+            else {
+                synchronized (f) {
+                    if (tabAt(tab, i) == f) {
+                        Node&lt;K,V&gt; ln, hn;
+                        if (fh &gt;= 0) {
+
+                            int runBit = fh &amp; n;
+                            Node&lt;K,V&gt; lastRun = f;
+                            for (Node&lt;K,V&gt; p = f.next; p != null; p = p.next) {
+                                int b = p.hash &amp; n;
+                                if (b != runBit) {
+                                    runBit = b;
+                                    lastRun = p;
+                                }
+                            }
+                            if (runBit == 0) {
+                                ln = lastRun;
+                                hn = null;
+                            }
+                            else {
+                                hn = lastRun;
+                                ln = null;
+                            }
+                            for (Node&lt;K,V&gt; p = f; p != lastRun; p = p.next) {
+                                int ph = p.hash; K pk = p.key; V pv = p.val;
+                                if ((ph &amp; n) == 0)
+                                    ln = new Node&lt;K,V&gt;(ph, pk, pv, ln);
+                                else
+                                    hn = new Node&lt;K,V&gt;(ph, pk, pv, hn);
+                            }
+                            setTabAt(nextTab, i, ln);
+                            setTabAt(nextTab, i + n, hn);
+                            setTabAt(tab, i, fwd);
+                            advance = true;
+                        }
+                        else if (f instanceof TreeBin) {
+                            TreeBin&lt;K,V&gt; t = (TreeBin&lt;K,V&gt;)f;
+                            TreeNode&lt;K,V&gt; lo = null, loTail = null;
+                            TreeNode&lt;K,V&gt; hi = null, hiTail = null;
+                            int lc = 0, hc = 0;
+                            for (Node&lt;K,V&gt; e = t.first; e != null; e = e.next) {
+                                int h = e.hash;
+                                TreeNode&lt;K,V&gt; p = new TreeNode&lt;K,V&gt;
+                                    (h, e.key, e.val, null, null);
+                                if ((h &amp; n) == 0) {
+                                    if ((p.prev = loTail) == null)
+                                        lo = p;
+                                    else
+                                        loTail.next = p;
+                                    loTail = p;
+                                    ++lc;
+                                }
+                                else {
+                                    if ((p.prev = hiTail) == null)
+                                        hi = p;
+                                    else
+                                        hiTail.next = p;
+                                    hiTail = p;
+                                    ++hc;
+                                }
+                            }
+                            ln = (lc &lt;= UNTREEIFY_THRESHOLD) ? untreeify(lo) :
+                                (hc != 0) ? new TreeBin&lt;K,V&gt;(lo) : t;
+                            hn = (hc &lt;= UNTREEIFY_THRESHOLD) ? untreeify(hi) :
+                                (lc != 0) ? new TreeBin&lt;K,V&gt;(hi) : t;
+                            setTabAt(nextTab, i, ln);
+                            setTabAt(nextTab, i + n, hn);
+                            setTabAt(tab, i, fwd);
+                            advance = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+</code></pre></div> <h3 id=addcount>addCount<a class=headerlink href=#addcount title="Permanent link">&para;</a></h3> <div class=highlight><pre><span></span><code>    /**
+     * Adds to count, and if table is too small and not already
+     * resizing, initiates transfer. If already resizing, helps
+     * perform transfer if work is available.  Rechecks occupancy
+     * after a transfer to see if another resize is already needed
+     * because resizings are lagging additions.
+     *
+     * @param x the count to add
+     * @param check if &lt;0, don&#39;t check resize, if &lt;= 1 only check if uncontended
+     */
+    // 添加计数，如果table太小且table没有在扩容，就进行扩容
+    private final void addCount(long x, int check) {
+        CounterCell[] as; long b, s;
+        // 利用CAS快速更新baseCount的值
+        if ((as = counterCells) != null ||
+            !U.compareAndSwapLong(this, BASECOUNT, b = baseCount, s = b + x)) {
+            CounterCell a; long v; int m;
+            boolean uncontended = true;
+            if (as == null || (m = as.length - 1) &lt; 0 ||
+                (a = as[ThreadLocalRandom.getProbe() &amp; m]) == null ||
+                !(uncontended =
+                  U.compareAndSwapLong(a, CELLVALUE, v = a.value, v + x))) {
+                fullAddCount(x, uncontended);
+                return;
+            }
+            if (check &lt;= 1)
+                return;
+            s = sumCount();
+        }
+
+        // 当之前检查的节点个数大于等于0时，才考虑扩容
+        if (check &gt;= 0) {
+            Node&lt;K,V&gt;[] tab, nt; int n, sc;
+            while (s &gt;= (long)(sc = sizeCtl) &amp;&amp; (tab = table) != null &amp;&amp;
+                   (n = tab.length) &lt; MAXIMUM_CAPACITY) {
+                // 为当前的n保留一个数，不同的数组n（这里n=2^k）得到的结果必然不同，可类比时间戳
+                int rs = resizeStamp(n);
+                // 如果有线程正在扩容，就帮助其扩容
+                if (sc &lt; 0) {
+                    if ((sc &gt;&gt;&gt; RESIZE_STAMP_SHIFT) != rs || sc == rs + 1 ||
+                        sc == rs + MAX_RESIZERS || (nt = nextTable) == null ||
+                        transferIndex &lt;= 0)
+                        break;
+                    if (U.compareAndSwapInt(this, SIZECTL, sc, sc + 1))
+                        transfer(tab, nt);
+                }
+                // 没有线程在扩容，直接扩容
+                else if (U.compareAndSwapInt(this, SIZECTL, sc,
+                                             (rs &lt;&lt; RESIZE_STAMP_SHIFT) + 2))
+                    transfer(tab, null);
+                s = sumCount();
+            }
+        }
+    }
+</code></pre></div> </article> </div> </div> <button type=button class="md-top md-icon" data-md-component=top hidden> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg> Back to top </button> </main> <footer class=md-footer> <nav class="md-footer__inner md-grid" aria-label=Footer> <a href=../JDK%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90%E7%B3%BB%E5%88%97%E4%B9%8BStream/ class="md-footer__link md-footer__link--prev" aria-label="Previous: JDK源码剖析系列之Stream" rel=prev> <div class="md-footer__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg> </div> <div class=md-footer__title> <span class=md-footer__direction> Previous </span> <div class=md-ellipsis> JDK源码剖析系列之Stream </div> </div> </a> <a href=../%E5%90%8C%E6%AD%A5%E5%B7%A5%E5%85%B7%E7%B1%BB/ class="md-footer__link md-footer__link--next" aria-label="Next: 同步工具类" rel=next> <div class=md-footer__title> <span class=md-footer__direction> Next </span> <div class=md-ellipsis> 同步工具类 </div> </div> <div class="md-footer__button md-icon"> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg> </div> </a> </nav> <div class="md-footer-meta md-typeset"> <div class="md-footer-meta__inner md-grid"> <div class=md-copyright> <div class=md-copyright__highlight> Copyright &copy; 2016 - 2023 xiaocairush </div> Made with <a href=https://squidfunk.github.io/mkdocs-material/ target=_blank rel=noopener> Material for MkDocs </a> </div> <div class=md-social> <a href=https://github.com/xiaocairush target=_blank rel=noopener title=github.com class=md-social__link> <svg xmlns=http://www.w3.org/2000/svg viewbox="0 0 496 512"><!-- Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg> </a> </div> </div> </div> </footer> </div> <div class=md-dialog data-md-component=dialog> <div class="md-dialog__inner md-typeset"></div> </div> <script id=__config type=application/json>{"base": "../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script> <script src=../../assets/javascripts/bundle.220ee61c.min.js></script> <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> <script src=https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js></script> <script src=../../assets/javascripts/custom.a678ee80.min.js></script> </body> </html>
