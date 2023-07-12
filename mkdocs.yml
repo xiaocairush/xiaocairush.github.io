@@ -40,6 +40,7 @@ extra_javascript:
 # Configuration
 theme:
   name: material
+  language: zh
   custom_dir: material/.overrides
   features:
     - announce.dismiss
@@ -53,7 +54,7 @@ theme:
     # - navigation.expand
     - navigation.footer
     - navigation.indexes
-    # - navigation.instant
+    - navigation.instant
     # - navigation.prune
     - navigation.sections
     - navigation.tabs
@@ -155,11 +156,11 @@ markdown_extensions:
 # Page tree
 nav:
   - 博客运维: index.md
-  - JDK:
-    - JDK源码剖析系列之Stream: jdk/JDK源码剖析系列之Stream.markdown
-    - JDK源码剖析系列之ConcurrentHashMap: jdk/JDK源码剖析系列之ConcurrentHashMap.markdown
-    - 同步工具类: jdk/同步工具类.markdown
   - java:
+    - JDK源码剖析系列:
+      - Stream: java/jdk/Stream.markdown
+      - ConcurrentHashMap: java/jdk/ConcurrentHashMap.markdown
+    - 同步工具类: java/同步工具类.markdown
     - ZooKeeper: java/ZooKeeper-overview.markdown
     - Spark: java/Spark-Overview.markdown
     - Resources: java/Resources.markdown
@@ -504,9 +505,9 @@ nav:
     - 区间最值操作 & 区间历史最值: ds/seg-beats.md
     - 划分树: ds/dividing.md
     - 二叉搜索树 & 平衡树:
-      - 二叉搜索树简介: ds/bst.md
+      - 二叉搜索树 & 平衡树: ds/bst.md
       - Treap: ds/treap.md
-      - Splay: ds/splay.md
+      - Splay 树: ds/splay.md
       - WBLT: ds/wblt.md
       - Size Balanced Tree: ds/sbt.md
       - AVL 树: ds/avl.md
@@ -532,7 +533,6 @@ nav:
       - 树状数组套权值线段树: ds/seg-in-bit.md
       - 分块套树状数组: ds/bit-in-block-array.md
     - K-D Tree: ds/kdt.md
-    - 珂朵莉树: misc/odt.md
     - 动态树:
       - Link Cut Tree: ds/lct.md
       - Euler Tour Tree: ds/ett.md

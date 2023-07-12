@@ -1,11 +1,65 @@
 
 # JDK源码剖析系列之ConcurrentHashMap
 
-基于jdk1.8。
+> 本文基于jdk1.8版本，如果你想看懂源码而不是仅仅停留在理解概念上，那么你应该完整的看完本文，否则你可以仅阅读概念部分而不用看代码实现细节部分，因为真正读懂源码非常耗时。或许对于应付面试来说你更应该去理解概念而不是弄清楚代码细节。当然如果你能真正读懂源码，并体会其中的精髓，自然不会再怕面试问到相关问题了。当然，你可以边阅读源码，边参考本文代码实现部分，这样你会轻松很多，笔者将一些代码的讲解直接放在了代码注释中了，代码细节主要来自于笔者n年前第一次阅读源码时留下的记录。
 
-参考文章：
-https://yq.aliyun.com/articles/36781 <br/>
-http://blog.csdn.net/u012834750/article/details/71536618
+
+# 概念部分
+
+## 哈希表
+
+其实使用哈希表我们就可以实现hashmap。 故名思义，哈希表由两部分组成：hash函数和表。
+
+
+### hash函数
+
+就是一个映射函数，一般将输入映射为一个整数，一般使用这个整数对table的长度n取余数。比如你想往map里面put(key, value)，你可以使用一个hash函数将key映射为一个整数m, 然后 计算i = m % n得到hash的值，i就是你要放入的桶的下标。一般来说针对你的数据分布情况选择冲突较少hash函数，哈希表的查找效率会更高。
+
+### 表(table)
+
+其实就是一个长为n的数组，数组中的每一个位置都放了一个桶(也就是源码中的bin)。每个桶是一个容器（数组，链表，红黑树都是用来存放元素的容器），一个桶里面可以放很多元素，同一个桶里面的元素hash值是相同的。为了保证线程安全，可以对桶加锁，在`ConcurrentHashmap`里面，如果桶是空的，直接使用CAS来保证桶的访问是线程安全的，如果桶不是空的，使用`synchonized`对桶加锁（在put操作中你会看到这部分加锁的代码）
+
+还不明白可以点击[我的博客](https://xiaocairush.github.io/ds/hash)了解更多关于哈希表的知识
+
+## 扩容
+
+那么有一个问题是，哈希表的数组应该多大才能保证查询效率足够高呢？如果数组太小，hash冲突就太多，效率就会很低。如果太大的话，占用内存就会很大，超出一定大小后，内存的分配时间和回收时间对效率的影响会变得无法忽视，因此不是越大越好。所以确定桶的数量是一个很重要的事。
+
+`ConcurrentHashmap`允许你通过构造函数告诉他默认的容量（也用来计算table的长度）。如果你没有设置这个参数，那么它就是16。
+
+一个新问题，使用固定数量的桶明显是不合适的，因为随着map中存储的东西越多，`get`和`put`的效率会越來越低。因此，需要动态的调整桶的数量，这个过程就称为扩容。
+
+新的问题，在什么时机需要进行扩容呢？你可能猜测在初始化和put的时候需要进行扩容，但是究竟在数据量达到一个什么样的规模时进行扩容呢。在ConcurrentHashmap里有两个参数`sizeCtl`，`loadFactor`，当map中元素的数量超过sizeCtl的时候就会进行扩容。这个sizeCtl是动态计算得到的，假设桶的数量是n, 那么这个`sizeCtl`就是 `loadFactor * n`，而loadFactor的默认值是0.75。举例来说，目前map有16个桶，当超过元素个数超过`16 * 0.75 = 12`个时就会进行扩容，扩容的策略是翻倍，从16扩容到32，32到64，依次类推...
+
+另外就是初始化的时候需要计算出桶的数量。还记得之前说过你可以通过构造函数告诉他默认的容量是initialCapacity吗，ConcurrentHashmap并不是设置桶的数量为initialCapacity，而是找到一个大于`initialCapacity / loadFactor + 1`的最小的2^k作为桶的数量，比如你设置的initialCapacity是9，那么`9 / 0.75 + 1 = 13`，而大于13的最小的2^k是16，所以初始桶的数量就是16，sizeCtl = 16 * 0.75 = 12，当map中元素数量超过12的时候就会从16扩容为32，重新计算sizeCtl = 32 * 0.75 = 24，依次类推...
+
+
+## 转移
+
+现在我们知道了扩容是什么，采用什么策略进行扩容，那么如果一个桶里面有m个元素，扩容之后这m个元素还应该存放在原来的桶里吗？因为桶的数量发生了变化，hash函数得到的数值也可能会发生变化，这样的话，就不一定要存放在原来的桶内了。这个问题该如何解决呢。
+
+`ConcurrentHashmap`利用了一个巧妙的数字关系来处理这种情况。值得注意的是，源码作者Doug Lea将桶的数量n设计为一直是2^k。
+
+首先由于数字n的特殊性，假设元素的哈希值是hash，`hash % n `和`hash & (n - 1)`得到的结果是相同的，这样就可以使用位运算替代效率低的取模运算。
+
+其次，如果当前的桶数量是`n`， 扩容应该为`2*n`，对于桶`i`中的元素，这个元素在扩容后要么放在原来的桶中，要么放在i + n这个桶中。具体怎么放是由hash值决定的，如果`hash & n `等于 0，那么就放在原来的桶中；如果`hash & n `不等于 0，那么就放在`i + n`这个桶中。
+
+
+```
+数学公式证明：
+已知：n = 2 ^ k ， hash & (n-1) = i，显而易见：
+（1）若 hash & n = 0， 则 hash &(2*n - 1) = i ；
+（2）若 hash & n != 0,  则 hash&(2*n - 1) = i + n。
+```
+
+## 红黑树
+
+前面说过，桶就是一个容器，可以是链表类型，当然也可以是红黑树这种类型。链表插入查询删除等操作的算法复杂度是o(N)，而红黑树是o(logN)，所以在桶中元素数量比较大的时候红黑树的查询效率更高。`ConcurrentHashmap`中如果桶中元素的数量超过了8个，就会将桶从链表转换为红黑树来存储。值得注意的情况是，当桶的数量不超过64个的时候，即使桶中元素数量超过8个，只会进行扩容，不会将链表变为红黑树。
+
+您可以在[我的博客](https://xiaocairush.github.io/ds/rbtree)了解更多关于红黑树的知识
+
+
+# 代码细节部分
 
 ## 数据结构
 
@@ -13,7 +67,9 @@ http://blog.csdn.net/u012834750/article/details/71536618
 
 ### Node
 
-```
+链表的节点
+
+```java
 static class Node<K,V> implements Map.Entry<K,V> {
         final int hash;
         final K key;
@@ -40,7 +96,7 @@ static class Node<K,V> implements Map.Entry<K,V> {
 
 ### ForwardingNode
 
-```
+```java
 	 /**
      * A node inserted at head of bins during transfer operations.
      */
@@ -90,7 +146,7 @@ static class Node<K,V> implements Map.Entry<K,V> {
 
 红黑树中的节点类，值得注意的是：TreeNode可用于构造双向链表，Node包含next成员，同时，TreeNode加入了prev成员。
 
-```
+```java
 static final class TreeNode<K,V> extends Node<K,V> {
         TreeNode<K,V> parent;  // red-black tree links
         TreeNode<K,V> left;
@@ -164,7 +220,7 @@ TreeBin封装了红黑树的逻辑，有关红黑树, 可以参考的资料有[�
 ![rotateLeft](https://img-blog.csdnimg.cn/20201207195154448.gif)
 
 对应代码
-```
+```java
 	static <K,V> TreeNode<K,V> rotateLeft(TreeNode<K,V> root,
                                               TreeNode<K,V> p) {
             TreeNode<K,V> r, pp, rl;
@@ -194,8 +250,7 @@ TreeBin封装了红黑树的逻辑，有关红黑树, 可以参考的资料有[�
 
 对应代码
 
-```
-
+```java
         static <K,V> TreeNode<K,V> rotateRight(TreeNode<K,V> root,
                                                TreeNode<K,V> p) {
             TreeNode<K,V> l, pp, lr;
@@ -219,7 +274,7 @@ TreeBin封装了红黑树的逻辑，有关红黑树, 可以参考的资料有[�
 
 仅列出Treebin数据成员以及部分方法：
 
-```
+```java
 // 维护了一个红黑树
 static final class TreeBin<K,V> extends Node<K,V> {
         TreeNode<K,V> root;
@@ -456,7 +511,7 @@ static <K,V> TreeNode<K,V> balanceInsertion(TreeNode<K,V> root,
 
 ## 核心成员
 
-```
+```java
 	// ForwardingNode的hash值都是-1
 	static final int MOVED     = -1; 
     // Treebin的hash值是-2
@@ -514,7 +569,7 @@ static <K,V> TreeNode<K,V> balanceInsertion(TreeNode<K,V> root,
 之所以列出这个函数，是因为这个函数初始化了sizeCtl，并且可以看出table在这里并没有被初始化，而是在插入元素的时候进行延迟初始化。
 我们要注意的是table的长度始终是2的幂，sizeCtl的值为正数时表示扩容的最小阀值。
 
-```
+```java
  // 需要注意的是，构造了一个能够容纳initialCapacity个元素的对象，
  // 但实际table的大小比1.5倍的initialCapacity还多
  public ConcurrentHashMap(int initialCapacity) {
@@ -530,7 +585,7 @@ static <K,V> TreeNode<K,V> balanceInsertion(TreeNode<K,V> root,
 
 ### initTable
 
-```
+```java
      // 初始化table，使用sizeCtl记录table的容量
      // 为了保证并发访问不会出现冲突，使用了Unsafe的CAS操作
     private final Node<K,V>[] initTable() {
@@ -573,9 +628,9 @@ static <K,V> TreeNode<K,V> balanceInsertion(TreeNode<K,V> root,
 
 put过程的描述：
 
-为表述方便，用符号i 来表示 (n - 1) & hash，用newNode表示使用key,value创建的节点
+为表述方便，用符号i 来表示 (n - 1) & hash，用newNode表示使用key,value创建的节点，伪代码：
 
-```
+```java
 loop:
 {
 	if table == null
@@ -611,7 +666,7 @@ loop:
 
 put源码如下：
 
-```
+```java
 	public V put(K key, V value) {
         return putVal(key, value, false);
     }
@@ -737,7 +792,7 @@ put源码如下：
 
 get方法比较简单，没有使用锁，而是用Unsafe来保证获取的头结点是volatile的
 
-```
+```java
  public V get(Object key) {
         Node<K,V>[] tab; Node<K,V> e, p; int n, eh; K ek;
         // 获取hash值h
@@ -771,7 +826,7 @@ static final <K,V> Node<K,V> tabAt(Node<K,V>[] tab, int i) {
 
 ### treeifyBin
 
-```
+```java
      // 如果tab的长度很小，小于64个，就尝试进行扩容为两倍，
      // 否则就将以tab[index]开头的链表转换为Treebin
     private final void treeifyBin(Node<K,V>[] tab, int index) {
@@ -807,7 +862,7 @@ static final <K,V> Node<K,V> tabAt(Node<K,V>[] tab, int i) {
 
 有关扩容，可以参考[深入分析 ConcurrentHashMap 1.8 的扩容实现](http://www.jianshu.com/p/f6730d5784ad) 这篇文章。
 
-```
+```java
 	// 尝试扩容使它能放size个元素
     private final void tryPresize(int size) {
 	    // 计算扩容后的数量
@@ -860,7 +915,7 @@ static final <K,V> Node<K,V> tabAt(Node<K,V>[] tab, int i) {
 
 ### transfer
 
-```
+```java
 伪代码：
 
 n = table.length
@@ -889,15 +944,9 @@ nextTable = null;
 ```
 
 
-
-数学公式：
-> 已知：n = 2 ^ k ， hash & (n-1) = i，显而易见：
-> （1）若 hash & n = 0， 则 hash &(2*n - 1) = i ；
-> （2）若 hash & n != 0,  则 hash&(2*n - 1) = i + n。
-
 源代码在此：
 
-```
+```java
      // 把table中所有的Node放入新的table中
     private final void transfer(Node<K,V>[] tab, Node<K,V>[] nextTab) {
         int n = tab.length, stride;
@@ -1036,7 +1085,7 @@ nextTable = null;
 
 ### addCount
 
-```
+```java
 	/**
      * Adds to count, and if table is too small and not already
      * resizing, initiates transfer. If already resizing, helps
@@ -1092,3 +1141,12 @@ nextTable = null;
         }
     }
 ```
+
+
+---
+
+欢迎关注我的公众号“**窗外月明**”，原创技术文章第一时间推送。
+
+<center>
+    <img src="https://open.weixin.qq.com/qr/code?username=gh_c36a67dfc3b3" style="width: 100px;">
+</center>
