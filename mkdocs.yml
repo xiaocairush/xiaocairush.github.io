@@ -157,6 +157,7 @@ nav:
   - 博客运维: index.md
   - JDK:
     - JDK源码剖析系列之Stream: jdk/JDK源码剖析系列之Stream.markdown
+    - JDK源码剖析系列之ConcurrentHashMap: jdk/JDK源码剖析系列之ConcurrentHashMap.markdown
     - 同步工具类: jdk/同步工具类.markdown
   - java:
     - ZooKeeper: java/ZooKeeper-overview.markdown
@@ -167,7 +168,6 @@ nav:
     - 理解REST: java/understanding-REST.markdown
     - spring: java/spring-callstack.markdown
     - BlockingQueue源码剖析: java/BlockingQueue源码剖析.markdown
-    - ConcurrentHashMap: java/ConcurrentHashMap(1.8版本)源码剖析.markdown
     - java.util.concurrent.locks源码剖析: java/java.util.concurrent.locks源码剖析.markdown
     - Redis: java/Redis-CheatSheet.markdown
   - 比赛相关:
@@ -530,10 +530,9 @@ nav:
       - 平衡树套线段树: ds/seg-in-balanced.md
       - 线段树套平衡树: ds/balanced-in-seg.md
       - 树状数组套权值线段树: ds/seg-in-bit.md
-      - 树状数组套主席树: ds/persistent-in-bit.md
       - 分块套树状数组: ds/bit-in-block-array.md
     - K-D Tree: ds/kdt.md
-    - 珂朵莉树: ds/odt.md
+    - 珂朵莉树: misc/odt.md
     - 动态树:
       - Link Cut Tree: ds/lct.md
       - Euler Tour Tree: ds/ett.md
@@ -583,7 +582,7 @@ nav:
     - 欧拉图: graph/euler.md
     - 哈密顿图: graph/hamilton.md
     - 二分图: graph/bi-graph.md
-    - 最小环: graph/min-cycle.md
+    - 最小环: graph/min-circle.md
     - 平面图: graph/planar.md
     - 图的着色: graph/color.md
     - 网络流:

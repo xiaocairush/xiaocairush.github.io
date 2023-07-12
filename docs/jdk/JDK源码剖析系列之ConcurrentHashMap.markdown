@@ -1,11 +1,5 @@
----
-layout: post
-title:  "ConcurrentHashMap(1.8版本)源码剖析"
-date:   2017-09-20 20:00:00 +0800
-categories: MultiThread
----
 
-# ConcurrentHashMap(1.8版本)源码剖析
+# JDK源码剖析系列之ConcurrentHashMap
 
 基于jdk1.8。
 
@@ -167,7 +161,7 @@ TreeBin封装了红黑树的逻辑，有关红黑树, 可以参考的资料有[�
 附文章中提到的红黑树旋转的动图与TreeBin中的rotateLeft、rotateRight代码片段帮助理解。
 
 左旋：
-![rotateLeft](http://img.blog.csdn.net/20170920113731723?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZ3V5Y2FuZHk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![rotateLeft](https://img-blog.csdnimg.cn/20201207195154448.gif)
 
 对应代码
 ```
@@ -196,7 +190,7 @@ TreeBin封装了红黑树的逻辑，有关红黑树, 可以参考的资料有[�
 
 
 右旋：
-![rotateRight](http://img.blog.csdn.net/20170920113827242?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZ3V5Y2FuZHk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![rotateRight](https://img-blog.csdnimg.cn/20201207195312438.gif)
 
 对应代码
 
@@ -465,7 +459,7 @@ static <K,V> TreeNode<K,V> balanceInsertion(TreeNode<K,V> root,
 ```
 	// ForwardingNode的hash值都是-1
 	static final int MOVED     = -1; 
-    // Treebin的hash值是-1
+    // Treebin的hash值是-2
     static final int TREEBIN   = -2; 
     
 	/**
