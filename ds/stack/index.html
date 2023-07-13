@@ -2,7 +2,7 @@
 pop(1)
 push(2)
 pop(2)
-</code></pre></div> <p>如果从整体考虑，1 最先入栈，最先出栈，2 最后入栈，最后出栈，这样就成了一个先进先出表，显然是错误的。</p> <p>所以，在考虑数据结构是 LIFO 还是 FIFO 的时候，应当考虑在当前容器内的情况。</p> </details> <h2 id=_2>使用数组模拟栈<a class=headerlink href=#_2 title="Permanent link">&para;</a></h2> <p>我们可以方便的使用数组来模拟一个栈，如下：</p> <details class=note open=open> <summary>实现</summary> <div class=tabbed-set data-tabs=1:2><input checked=checked id=__tabbed_1_1 name=__tabbed_1 type=radio><label for=__tabbed_1_1>C++</label><div class=tabbed-content> <div class=highlight><pre><span></span><code><span class=kt>int</span><span class=w> </span><span class=n>st</span><span class=p>[</span><span class=n>N</span><span class=p>];</span>
+</code></pre></div> <p>如果从整体考虑，1 最先入栈，最先出栈，2 最后入栈，最后出栈，这样就成了一个先进先出表，显然是错误的。</p> <p>所以，在考虑数据结构是 LIFO 还是 FIFO 的时候，应当考虑在当前容器内的情况。</p> </details> <h2 id=_2>使用数组模拟栈<a class=headerlink href=#_2 title="Permanent link">&para;</a></h2> <p>我们可以方便的使用数组来模拟一个栈，如下：</p> <details class=note open=open> <summary>实现</summary> <div class="tabbed-set tabbed-alternate" data-tabs=1:2><input checked=checked id=__tabbed_1_1 name=__tabbed_1 type=radio><input id=__tabbed_1_2 name=__tabbed_1 type=radio><div class=tabbed-labels><label for=__tabbed_1_1>C++</label><label for=__tabbed_1_2>Python</label></div> <div class=tabbed-content> <div class=tabbed-block> <div class=highlight><pre><span></span><code><span class=kt>int</span><span class=w> </span><span class=n>st</span><span class=p>[</span><span class=n>N</span><span class=p>];</span>
 <span class=c1>// 这里使用 st[0] (即 *st) 代表栈中元素数量，同时也是栈顶下标</span>
 
 <span class=c1>// 压栈 ：</span>
@@ -16,7 +16,7 @@ pop(2)
 
 <span class=c1>// 清空栈</span>
 <span class=o>*</span><span class=n>st</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=mi>0</span><span class=p>;</span>
-</code></pre></div> </div> <input id=__tabbed_1_2 name=__tabbed_1 type=radio><label for=__tabbed_1_2>Python</label><div class=tabbed-content> <div class=highlight><pre><span></span><code><span class=n>st</span> <span class=o>=</span> <span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>*</span> <span class=n>N</span>
+</code></pre></div> </div> <div class=tabbed-block> <div class=highlight><pre><span></span><code><span class=n>st</span> <span class=o>=</span> <span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>*</span> <span class=n>N</span>
 <span class=c1># 这里使用 st[0] 代表栈中元素数量，同时也是栈顶下标</span>
 
 <span class=c1># 压栈 ：</span>
@@ -32,7 +32,7 @@ pop(2)
 
 <span class=c1># 清空栈</span>
 <span class=n>st</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>=</span> <span class=mi>0</span>
-</code></pre></div> </div> </div> </details> <h2 id=c-stl>C++ STL 中的栈<a class=headerlink href=#c-stl title="Permanent link">&para;</a></h2> <p>C++ 中的 STL 也提供了一个容器 <code>std::stack</code>，使用前需要引入 <code>stack</code> 头文件。</p> <details class=info open=open> <summary>STL 中对 <code>stack</code> 的定义 </summary> <div class=highlight><pre><span></span><code><span class=c1>// clang-format off</span>
+</code></pre></div> </div> </div> </div> </details> <h2 id=c-stl>C++ STL 中的栈<a class=headerlink href=#c-stl title="Permanent link">&para;</a></h2> <p>C++ 中的 STL 也提供了一个容器 <code>std::stack</code>，使用前需要引入 <code>stack</code> 头文件。</p> <details class=info open=open> <summary>STL 中对 <code>stack</code> 的定义 </summary> <div class=highlight><pre><span></span><code><span class=c1>// clang-format off</span>
 <span class=k>template</span><span class=o>&lt;</span>
 <span class=w>    </span><span class=k>class</span><span class=w> </span><span class=nc>T</span><span class=p>,</span>
 <span class=w>    </span><span class=k>class</span><span class=w> </span><span class=nc>Container</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>std</span><span class=o>::</span><span class=n>deque</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span>
