@@ -21,3 +21,5 @@ git commit -m 'feat;publish article'
 git push
 ```
 
+# 鸣谢
+算法部分来自[OI-wiki](https://github.com/OI-wiki/OI-wik)项目，感谢[OI-wiki](https://github.com/OI-wiki/OI-wik)项目的无私贡献。
