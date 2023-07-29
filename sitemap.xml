@@ -991,6 +991,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://xiaocairush.github.io/java/jdk/aqs/</loc>
+         <lastmod>2023-07-29</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://xiaocairush.github.io/lang/</loc>
          <lastmod>2023-07-29</lastmod>
          <changefreq>daily</changefreq>
