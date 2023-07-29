@@ -163,6 +163,7 @@ nav:
     - JDK源码剖析系列:
       - Stream: java/jdk/Stream.markdown
       - ConcurrentHashMap: java/jdk/ConcurrentHashMap.markdown
+      - aqs: java/jdk/aqs.markdown
     - 同步工具类: java/同步工具类.markdown
     - ZooKeeper: java/ZooKeeper-overview.markdown
     - Spark: java/Spark-Overview.markdown
